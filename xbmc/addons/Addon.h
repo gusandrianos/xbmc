@@ -59,6 +59,7 @@ public:
   std::string Description() const override { return m_addonInfo.Description(); }
   std::string Path() const override { return m_addonInfo.Path(); }
   std::string Profile() const override { return m_profilePath; }
+  std::string LibName() const override { return m_addonInfo.LibName(); }
   std::string LibPath() const override;
   std::string Author() const override { return m_addonInfo.Author(); }
   std::string ChangeLog() const override { return m_addonInfo.ChangeLog(); }
