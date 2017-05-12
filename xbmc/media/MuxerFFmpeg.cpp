@@ -39,8 +39,23 @@ extern "C" {
 using namespace KODI;
 using namespace MEDIA;
 
+static int InterruptCallback(void *ctx)
+{
+  CMuxerFFmpeg *muxer = static_cast<CMuxerFFmpeg*>(ctx);
+  if (!muxer)
+    return 1;
+
+  if (muxer->Aborted())
+    return 1;
+
+  return 0;
+}
+
 static int WritePacket(void *handle, uint8_t *buf, int size)
 {
+  if (InterruptCallback(handle))
+    return AVERROR_EXIT;
+
   CMuxerFFmpeg *muxer = static_cast<CMuxerFFmpeg*>(handle);
   if (!muxer)
     return AVERROR_EXIT;
@@ -68,7 +83,8 @@ void CMuxerFFmpeg::delete_format_context::operator()(AVFormatContext *formatCont
 
 CMuxerFFmpeg::CMuxerFFmpeg(CMediaCache *callback, int inputBlockSize /* = 0 */) :
   m_callback(callback),
-  m_inputBlockSize(inputBlockSize)
+  m_inputBlockSize(inputBlockSize),
+  m_bAborted(false)
 {
 }
 
@@ -76,6 +92,9 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
 {
   if (m_callback == nullptr)
     return false;
+
+  // Reset aborted flag
+  m_bAborted = false;
 
   // Set format
   AVOutputFormat *format = av_guess_format(nullptr, m_callback->GetLocalPath().c_str(), nullptr);
@@ -108,6 +127,8 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
     return false;
   }
   m_formatContext->pb->direct = 1;
+  const AVIOInterruptCB int_cb = { InterruptCallback, this };
+  m_formatContext->interrupt_callback = int_cb;
 
   // Add streams
   for (const auto* stream : streams)
