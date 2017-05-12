@@ -27,8 +27,10 @@
 #include "filesystem/File.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MediaFile.h"
+#include "interfaces/AnnouncementManager.h"
 #include "utils/md5.h"
 #include "utils/StringUtils.h"
+#include "utils/Variant.h"
 #include "URL.h"
 
 #include <algorithm>
@@ -43,7 +45,8 @@ using namespace MEDIA;
 
 CMediaStore::CMediaStore() :
   m_database(new CMediaStoreDatabase),
-  m_fileStore(new CFileStore)
+  m_fileStore(new CFileStore),
+  m_bInitialized(false)
 {
 }
 
@@ -59,10 +62,19 @@ void CMediaStore::Initialize()
 
   m_database->Initialize();
   m_fileStore->Initialize();
+
+  ANNOUNCEMENT::CAnnouncementManager::GetInstance().AddAnnouncer(this);
+  m_bInitialized = true;
 }
 
 void CMediaStore::Deinitialize()
 {
+  if (m_bInitialized)
+  {
+    ANNOUNCEMENT::CAnnouncementManager::GetInstance().RemoveAnnouncer(this);
+    m_bInitialized = false;
+  }
+
   m_fileStore->Deinitialize();
   m_database->Deinitialize();
 }
@@ -113,6 +125,15 @@ bool CMediaStore::Stat(unsigned int mediaId, struct __stat64* buffer)
     return XFILE::CFile::Stat(CMediaStore::BuildLocalPath(mediaPath), buffer) == 0;
 
   return false;
+}
+
+void CMediaStore::Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data)
+{
+  if (strcmp(sender, "xbmc") == 0)
+  {
+    if (strcmp(message, "OnQuit") == 0)
+      Deinitialize();
+  }
 }
 
 std::string CMediaStore::BuildLocalPath(const std::string& mediaPath)

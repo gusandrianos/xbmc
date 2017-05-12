@@ -35,6 +35,7 @@ extern "C" {
 #include "libavutil/mem.h"
 }
 
+#include <algorithm>
 #include <math.h>
 
 using namespace KODI;
@@ -90,11 +91,13 @@ static int64_t SeekPosition(void *handle, int64_t offset, int whence)
 
 void CMuxerFFmpeg::delete_format_context::operator()(AVFormatContext *formatContext) const
 {
+  /*
   if (formatContext && formatContext->pb)
   {
     av_free(&formatContext->pb->buffer);
     av_free(&formatContext->pb);
   }
+  */
   avformat_free_context(formatContext);
 }
 
@@ -103,6 +106,11 @@ CMuxerFFmpeg::CMuxerFFmpeg(CMediaCache *callback, int inputBlockSize /* = 0 */) 
   m_inputBlockSize(inputBlockSize),
   m_bAborted(false)
 {
+}
+
+CMuxerFFmpeg::~CMuxerFFmpeg()
+{
+  Close();
 }
 
 bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
@@ -154,6 +162,12 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
       return false;
   }
 
+  if (m_formatContext->nb_streams == 0)
+  {
+    CLog::LogF(LOGERROR, "Input contains no valid streams");
+    return false;
+  }
+
   // Write header
   int ret = avformat_write_header(m_formatContext.get(), nullptr);
   if (ret < 0)
@@ -169,9 +183,17 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
 
 bool CMuxerFFmpeg::AddStream(const CDemuxStream *stream)
 {
+  std::vector<StreamType> validStreams = { STREAM_VIDEO, STREAM_AUDIO, STREAM_SUBTITLE };
+  if (std::find(validStreams.begin(), validStreams.end(), stream->type) == validStreams.end())
+  {
+    // Invalid stream, continue
+    CLog::LogF(LOGDEBUG, "Skipping stream %d with invalid type %d", stream->uniqueId, stream->type);
+    return true;
+  }
+
   AVCodec *codec = nullptr;// avcodec_find_encoder(stream->codec);
   AVStream *ffmpegStream = avformat_new_stream(m_formatContext.get(), codec);
-  if (!ffmpegStream)
+  if (ffmpegStream == nullptr)
   {
     if (codec && codec->name)
       CLog::LogF(LOGERROR, "Could not alloc stream with codec: %s", codec->name);
@@ -179,6 +201,8 @@ bool CMuxerFFmpeg::AddStream(const CDemuxStream *stream)
       CLog::LogF(LOGERROR, "Could not alloc stream with unknown codec");
     return false;
   }
+  // This is the MPEG-TS stream identifier + 1; 0 means unknown
+  ffmpegStream->stream_identifier = stream->uniqueId + 1;
 
   AVCodecParameters *codecParams = ffmpegStream->codecpar;
 
@@ -190,6 +214,8 @@ bool CMuxerFFmpeg::AddStream(const CDemuxStream *stream)
   {
   case STREAM_VIDEO:
   {
+    CLog::LogF(LOGDEBUG, "Adding video stream %d with MPEG-TS ID %d", stream->uniqueId, ffmpegStream->stream_identifier);
+
     const CDemuxStreamVideo *video = static_cast<const CDemuxStreamVideo*>(stream);
 
 #if defined(AVFORMAT_HAS_STREAM_GET_R_FRAME_RATE)
@@ -214,6 +240,8 @@ bool CMuxerFFmpeg::AddStream(const CDemuxStream *stream)
   }
   case STREAM_AUDIO:
   {
+    CLog::LogF(LOGDEBUG, "Adding audio stream %d with MPEG-TS ID %d", stream->uniqueId, ffmpegStream->stream_identifier);
+
     const CDemuxStreamAudio *audio = static_cast<const CDemuxStreamAudio*>(stream);
 
     codecParams->codec_type = AVMEDIA_TYPE_AUDIO;
@@ -228,20 +256,26 @@ bool CMuxerFFmpeg::AddStream(const CDemuxStream *stream)
 
     break;
   }
-  case STREAM_DATA:
-  {
-    codecParams->codec_type = AVMEDIA_TYPE_DATA;
-    break;
-  }
   case STREAM_SUBTITLE:
   {
+    CLog::LogF(LOGDEBUG, "Adding subtitle stream %d with MPEG-TS ID %d", stream->uniqueId, ffmpegStream->stream_identifier);
     codecParams->codec_type = AVMEDIA_TYPE_SUBTITLE;
+    break;
+  }
+  case STREAM_DATA:
+  {
+    CLog::LogF(LOGDEBUG, "Adding data stream %d with MPEG-TS ID %d", stream->uniqueId, ffmpegStream->stream_identifier);
+    codecParams->codec_type = AVMEDIA_TYPE_DATA;
     break;
   }
   case STREAM_TELETEXT:
   case STREAM_RADIO_RDS:
   default:
+  {
+    CLog::LogF(LOGERROR, "Invalid stream type %d for stream with ID %d", stream->type, stream->uniqueId);
+    codecParams->codec_type = AVMEDIA_TYPE_UNKNOWN;
     break;
+  }
   }
 
   return true;
@@ -257,10 +291,45 @@ void CMuxerFFmpeg::Close()
 
 bool CMuxerFFmpeg::Write(const DemuxPacket& packet, CDemuxStream *stream)
 {
+  if (m_formatContext->nb_streams == 0)
+    return false;
+
+  bool bIsValid = false;
+
+  for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
+  {
+    if (m_formatContext->streams[i]->stream_identifier == stream->uniqueId + 1)
+    {
+      bIsValid = true;
+      break;
+    }
+  }
+
+  // Skip packet
+  if (!bIsValid)
+    return true;
+
+  // Find stream index by MPEG TS identifier
+  int streamIndex = -1;
+  for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
+  {
+    if (m_formatContext->streams[i]->stream_identifier == stream->uniqueId + 1)
+    {
+      streamIndex = i;
+      break;
+    }
+  }
+
+  if (streamIndex < 0)
+  {
+    CLog::LogF(LOGERROR, "MPEG TS identifier (%d) not found", stream->uniqueId + 1);
+    return false;
+  }
+
   AVPacket pkt;
   av_init_packet(&pkt);
 
-  pkt.stream_index = packet.iStreamId;
+  pkt.stream_index = streamIndex;
   pkt.data = packet.pData;
   pkt.size = packet.iSize;
   pkt.dts = (packet.dts == DVD_NOPTS_VALUE) ? AV_NOPTS_VALUE : static_cast<int64_t>(packet.dts / DVD_TIME_BASE * AV_TIME_BASE);
@@ -268,8 +337,8 @@ bool CMuxerFFmpeg::Write(const DemuxPacket& packet, CDemuxStream *stream)
   pkt.duration = (packet.duration == DVD_NOPTS_VALUE) ? 0 : static_cast<int64_t>(packet.duration / DVD_TIME_BASE * AV_TIME_BASE);
   pkt.flags = packet.bKeyFrame ? AV_PKT_FLAG_KEY : 0;
 
-  int ret = av_interleaved_write_frame(m_formatContext.get(), &pkt);
-  //int ret = av_write_frame(m_formatContext.get(), &pkt); //! @todo
+  //int ret = av_interleaved_write_frame(m_formatContext.get(), &pkt);
+  int ret = av_write_frame(m_formatContext.get(), &pkt); //! @todo
 
   av_packet_unref(&pkt);
 

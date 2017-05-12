@@ -21,6 +21,7 @@
 #pragma once
 
 #include "PlatformDefs.h" // for __stat64
+#include "interfaces/IAnnouncer.h"
 
 #include <memory>
 #include <string>
@@ -34,11 +35,11 @@ class CFileStore;
 class CMediaStoreDatabase;
 class CMediaStream;
 
-class CMediaStore
+class CMediaStore : public ANNOUNCEMENT::IAnnouncer
 {
 public:
   CMediaStore();
-  ~CMediaStore();
+  virtual ~CMediaStore();
 
   void Initialize();
   void Deinitialize();
@@ -53,12 +54,16 @@ public:
   std::shared_ptr<CMediaStream> Open(unsigned int mediaId);
   bool Stat(unsigned int mediaId, struct __stat64* buffer);
 
+  // implementation of IAnnouncer
+  virtual void Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data) override;
+
   // Utility functions
   static std::string BuildLocalPath(const std::string& mediaPath);
 
 private:
   std::unique_ptr<CMediaStoreDatabase> m_database;
   std::unique_ptr<CFileStore> m_fileStore;
+  bool m_bInitialized;
 };
 
 }

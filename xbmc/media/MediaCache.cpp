@@ -175,20 +175,27 @@ bool CMediaCache::WriteOutputPacket(const uint8_t *buffer, size_t size)
   return false;
 }
 
-bool CMediaCache::SeekWrite(int64_t position, int whence)
+int64_t CMediaCache::SeekWrite(int64_t position, int whence)
 {
   CSingleLock lock(m_writeMutex);
 
-  if (m_cache && position >= 0)
+  if (m_cache)
   {
-    int64_t newPos = m_cache->SeekWrite(position, whence);
+    if (whence == SEEK_SET && position < 0)
+    {
+      CLog::LogF(LOGDEBUG, "Failed to seek to offset %d (%d)", position, whence);
+    }
+    else
+    {
+      int64_t newPos = m_cache->SeekWrite(position, whence);
 
-    if (newPos < 0)
-      return false;
+      if (newPos < 0)
+        return -1;
 
-    m_writePosition = newPos;
-    return true;
+      m_writePosition = newPos;
+      return newPos;
+    }
   }
 
-  return false;
+  return -1;
 }

@@ -39,6 +39,7 @@ class CMuxerFFmpeg : public IMuxer
 {
 public:
   CMuxerFFmpeg(CMediaCache *callback, int inputBlockSize = 0);
+  virtual ~CMuxerFFmpeg();
 
   // implementation of IMuxer
   virtual bool Open(const std::vector<CDemuxStream*>& streams) override;
