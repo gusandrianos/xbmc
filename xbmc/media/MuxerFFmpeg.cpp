@@ -50,6 +50,12 @@ static int WritePacket(void *handle, uint8_t *buf, int size)
   return 0;
 }
 
+int64_t Seek(void *handle, int64_t offset, int whence)
+{
+  CLog::Log(LOGDEBUG, "Can't seek file to offset %d (%d)", offset, whence);
+  return AVERROR_EXIT;
+}
+
 void CMuxerFFmpeg::delete_format_context::operator()(AVFormatContext *formatContext) const
 {
   if (formatContext && formatContext->pb)
@@ -94,7 +100,7 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
 
   // Set I/O context
   unsigned char *buffer = static_cast<unsigned char*>(av_malloc(FFMPEG_FILE_BUFFER_SIZE));
-  m_formatContext->pb = avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, AVIO_FLAG_WRITE, this, nullptr, WritePacket, nullptr);
+  m_formatContext->pb = avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, AVIO_FLAG_WRITE, this, nullptr, WritePacket, Seek);
   if (m_formatContext->pb == nullptr)
   {
     av_free(&buffer);
