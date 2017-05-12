@@ -61,6 +61,7 @@ public:
 
   // Write interface
   bool WriteOutputPacket(const uint8_t *buffer, size_t size);
+  bool SeekWrite(int64_t position, int whence);
 
 private:
   // Construction parameters

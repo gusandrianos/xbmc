@@ -174,3 +174,21 @@ bool CMediaCache::WriteOutputPacket(const uint8_t *buffer, size_t size)
 
   return false;
 }
+
+bool CMediaCache::SeekWrite(int64_t position, int whence)
+{
+  CSingleLock lock(m_writeMutex);
+
+  if (m_cache && position >= 0)
+  {
+    int64_t newPos = m_cache->SeekWrite(position, whence);
+
+    if (newPos < 0)
+      return false;
+
+    m_writePosition = newPos;
+    return true;
+  }
+
+  return false;
+}

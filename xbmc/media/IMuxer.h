@@ -20,6 +20,7 @@
  */
 #pragma once
 
+#include <stdint.h>
 #include <vector>
 
 class CDemuxStream;
@@ -39,6 +40,7 @@ public:
   virtual bool Open(const std::vector<CDemuxStream*>& streams) = 0;
   virtual void Close() = 0;
   virtual bool Write(const DemuxPacket& packet, CDemuxStream *stream) = 0;
+  virtual int64_t Seek(int64_t position, int whence) = 0;
   virtual bool Aborted() = 0;
 
   //! @todo tag info

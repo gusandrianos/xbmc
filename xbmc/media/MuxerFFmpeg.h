@@ -44,6 +44,7 @@ public:
   virtual bool Open(const std::vector<CDemuxStream*>& streams) override;
   virtual void Close() override;
   virtual bool Write(const DemuxPacket& packet, CDemuxStream *stream) override;
+  virtual int64_t Seek(int64_t position, int whence) override;
   virtual bool Aborted() override { return m_bAborted; }
 
   // Receive output packet

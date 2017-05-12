@@ -30,6 +30,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+#include "libavformat/avio.h"
 #include "libavutil/error.h"
 #include "libavutil/mem.h"
 }
@@ -65,10 +66,26 @@ static int WritePacket(void *handle, uint8_t *buf, int size)
   return 0;
 }
 
-int64_t Seek(void *handle, int64_t offset, int whence)
+static int64_t SeekPosition(void *handle, int64_t offset, int whence)
 {
-  CLog::Log(LOGDEBUG, "Can't seek file to offset %d (%d)", offset, whence);
-  return AVERROR_EXIT;
+  if ((whence & AVSEEK_SIZE) != 0)
+    return -1; // Unsupported until muxer can report file length
+
+  if (InterruptCallback(handle))
+    return AVERROR_EXIT;
+
+  CMuxerFFmpeg *muxer = static_cast<CMuxerFFmpeg*>(handle);
+  if (!muxer)
+    return AVERROR_EXIT;
+
+  int64_t newPos = muxer->Seek(offset, whence & ~AVSEEK_FORCE);
+  if (newPos < 0)
+  {
+    CLog::Log(LOGDEBUG, "Can't seek muxed file to offset %d (%d)", offset, whence);
+    return AVERROR_EXIT;
+  }
+
+  return newPos;
 }
 
 void CMuxerFFmpeg::delete_format_context::operator()(AVFormatContext *formatContext) const
@@ -119,7 +136,7 @@ bool CMuxerFFmpeg::Open(const std::vector<CDemuxStream*>& streams)
 
   // Set I/O context
   unsigned char *buffer = static_cast<unsigned char*>(av_malloc(FFMPEG_FILE_BUFFER_SIZE));
-  m_formatContext->pb = avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, AVIO_FLAG_WRITE, this, nullptr, WritePacket, Seek);
+  m_formatContext->pb = avio_alloc_context(buffer, FFMPEG_FILE_BUFFER_SIZE, AVIO_FLAG_WRITE, this, nullptr, WritePacket, SeekPosition);
   if (m_formatContext->pb == nullptr)
   {
     av_free(&buffer);
@@ -265,6 +282,14 @@ bool CMuxerFFmpeg::Write(const DemuxPacket& packet, CDemuxStream *stream)
   }
 
   return true;
+}
+
+int64_t CMuxerFFmpeg::Seek(int64_t position, int whence)
+{
+  if (m_callback)
+    return m_callback->SeekWrite(position, whence);
+
+  return false;
 }
 
 void CMuxerFFmpeg::WriteOutputPacket(const uint8_t *buffer, int size)
