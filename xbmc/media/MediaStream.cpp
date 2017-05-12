@@ -147,12 +147,14 @@ void CMediaStream::Process()
       if (!OnPacket(*pPacket))
       {
         CLog::LogF(LOGERROR, "Failed to write packet of %d bytes", pPacket->iSize);
+        m_bStop = true;
         break;
       }
       CDVDDemuxUtils::FreeDemuxPacket(pPacket);
     }
 
-    Sleep(SLEEP_DURATION_MS);
+    if (!m_bStop)
+      Sleep(SLEEP_DURATION_MS);
   }
 }
 
