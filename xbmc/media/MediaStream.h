@@ -93,7 +93,6 @@ private:
   std::unique_ptr<CMediaCache> m_cache;
 
   // Stream properties
-  int64_t m_fileSize;
   std::unique_ptr<CDVDInputStream> m_inputStream;
   std::unique_ptr<CDVDDemux> m_demuxer;
 

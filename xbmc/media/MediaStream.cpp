@@ -95,8 +95,6 @@ bool CMediaStream::Open()
     return false;
   }
 
-  m_fileSize = m_inputStream->GetLength();
-
   // Open demuxer
   m_demuxer.reset(CDVDFactoryDemuxer::CreateDemuxer(m_inputStream.get()));
   if (!m_demuxer)
