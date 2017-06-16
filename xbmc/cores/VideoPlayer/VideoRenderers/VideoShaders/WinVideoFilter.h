@@ -49,6 +49,7 @@ private:
   bool         m_limitedRange;
   EBufferFormat m_format;
   XMFLOAT4X4   m_mat;
+  ESCALINGMETHOD m_scalingMethod;
 };
 
 class CWinShader
@@ -108,7 +109,7 @@ private:
   unsigned m_sourceWidth{ 0 };
   unsigned m_sourceHeight{ 0 };
   CRect m_sourceRect{ 0.f, 0.f, 0.f, 0.f };
-  CPoint m_destPoints[4] = 
+  CPoint m_destPoints[4] =
   {
     { 0.f, 0.f },
     { 0.f, 0.f },
@@ -132,13 +133,14 @@ class CYUV2RGBShader : public CWinShader
 public:
   CYUV2RGBShader();
   virtual ~CYUV2RGBShader();
-  virtual bool Create(EBufferFormat fmt, COutputShader *pOutShader = nullptr);
-  virtual void Render(CRect sourceRect, CPoint dest[], float contrast, float brightness, CRenderBuffer* videoBuffer, CD3DTexture *target);
+  virtual bool Create(EBufferFormat fmt, COutputShader *pOutShader = nullptr, ESCALINGMETHOD scalingMethod = VS_SCALINGMETHOD_LINEAR);
+  virtual void Render(CRect sourceRect, CPoint dest[], float contrast, float brightness, CRenderBuffer* videoBuffer, CD3DTexture *target, ESCALINGMETHOD scalingMethod = VS_SCALINGMETHOD_LINEAR);
 
 protected:
   void PrepareParameters(CRenderBuffer* videoBuffer, CRect sourceRect, CPoint dest[],
                          float contrast, float brightness);
   void SetShaderParameters(CRenderBuffer* videoBuffer);
+  void HandleScalerChange(ESCALINGMETHOD escalingMethod);
 
 private:
   CYUV2RGBMatrix      m_matrix;
@@ -148,6 +150,7 @@ private:
   EBufferFormat       m_format;
   float               m_texSteps[2];
   COutputShader *m_pOutShader;
+  ESCALINGMETHOD m_scalingMethod;
 
   struct CUSTOMVERTEX {
       FLOAT x, y, z;
@@ -192,14 +195,14 @@ public:
   void Render(CD3DTexture &sourceTexture,
               unsigned int sourceWidth, unsigned int sourceHeight,
               unsigned int destWidth, unsigned int destHeight,
-              CRect sourceRect, CRect destRect, bool useLimitRange, 
+              CRect sourceRect, CRect destRect, bool useLimitRange,
               CD3DTexture *target) override;
   CConvolutionShader1Pass() : CConvolutionShader(), m_sourceWidth(0), m_sourceHeight(0) {}
 
 protected:
   void PrepareParameters(unsigned int sourceWidth, unsigned int sourceHeight,
                          CRect sourceRect, CRect destRect);
-  void SetShaderParameters(CD3DTexture &sourceTexture, float* texSteps, 
+  void SetShaderParameters(CD3DTexture &sourceTexture, float* texSteps,
                            int texStepsCount, bool useLimitRange) override;
 
 
@@ -227,7 +230,7 @@ protected:
   void PrepareParameters(unsigned int sourceWidth, unsigned int sourceHeight,
                          unsigned int destWidth, unsigned int destHeight,
                          CRect sourceRect, CRect destRect);
-  void SetShaderParameters(CD3DTexture &sourceTexture, float* texSteps, 
+  void SetShaderParameters(CD3DTexture &sourceTexture, float* texSteps,
                            int texStepsCount, bool useLimitRange) override;
   void SetStepParams(UINT stepIndex) override;
 
