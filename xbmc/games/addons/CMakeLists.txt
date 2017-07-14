@@ -6,7 +6,6 @@ set(SOURCES GameClient.cpp
             GameClientMouse.cpp
             GameClientPort.cpp
             GameClientProperties.cpp
-            GameClientTiming.cpp
             GameClientTranslator.cpp)
 
 set(HEADERS GameClient.h
@@ -18,7 +17,6 @@ set(HEADERS GameClient.h
             GameClientMouse.h
             GameClientPort.h
             GameClientProperties.h
-            GameClientTiming.h
             GameClientTranslator.h)
 
 core_add_library(gameaddons)
