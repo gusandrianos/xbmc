@@ -51,7 +51,6 @@ class CGameClientJoystick;
 class CGameClientKeyboard;
 class CGameClientMouse;
 class IGameAudioCallback;
-class IGameClientPlayback;
 class IGameInputCallback;
 class IGameVideoCallback;
 
@@ -94,8 +93,8 @@ public:
   double GetSampleRate() const { return m_sampleRate; }
 
   // Playback control
+  bool RequiresGameLoop() const { return m_bRequiresGameLoop; }
   bool IsPlaying() const { return m_bIsPlaying; }
-  IGameClientPlayback* GetPlayback() { return m_playback.get(); }
   void RunFrame();
 
   // Audio/video callbacks
@@ -133,8 +132,6 @@ private:
   bool LoadGameInfo();
   void NotifyError(GAME_ERROR error);
   std::string GetMissingResource();
-  void CreatePlayback();
-  void ResetPlayback();
 
   // Private input functions
   void LoadTopology();
@@ -187,13 +184,13 @@ private:
   //GamePlatforms         m_platforms;
 
   // Properties of the current playing file
+  bool m_bRequiresGameLoop = false;
   std::atomic_bool      m_bIsPlaying;          // True between OpenFile() and CloseFile()
   std::string           m_gamePath;
   size_t                m_serializeSize;
   IGameAudioCallback*   m_audio;               // The audio callback passed to OpenFile()
   IGameVideoCallback*   m_video;               // The video callback passed to OpenFile()
   IGameInputCallback*   m_input = nullptr;     // The input callback passed to OpenFile()
-  std::unique_ptr<IGameClientPlayback> m_playback; // Interface to control playback
   double                m_fps = 0.0;           // FPS of video content
   double                m_sampleRate = 0.0;    // Sampling rate of audio
   GAME_REGION           m_region;              // Region of the loaded game
