@@ -18,18 +18,9 @@
  *
  */
 
-#include "GameSettings.h"
+#include "Player.h"
 
-void CGameSettings::Reset()
-{
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = ViewModeNormal;
-  m_bExclusivePorts = true;
-}
+using namespace KODI;
+using namespace GAME;
 
-bool CGameSettings::operator==(const CGameSettings &rhs) const
-{
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
-}
+CPlayer::CPlayer() = default;

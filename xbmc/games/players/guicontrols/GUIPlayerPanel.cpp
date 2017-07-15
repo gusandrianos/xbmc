@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2017 Team Kodi
+ *      Copyright (C) 2016-2017 Team Kodi
  *      http://kodi.tv
  *
  *  This Program is free software; you can redistribute it and/or modify
@@ -18,18 +18,12 @@
  *
  */
 
-#include "GameSettings.h"
+#include "GUIPlayerPanel.h"
 
-void CGameSettings::Reset()
-{
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = ViewModeNormal;
-  m_bExclusivePorts = true;
-}
+using namespace KODI;
+using namespace GAME;
 
-bool CGameSettings::operator==(const CGameSettings &rhs) const
+CGUIPlayerPanel::CGUIPlayerPanel(int parentID, int controlID, float posX, float posY, float width, float height, ORIENTATION orientation, const CScroller& scroller, int preloadItems) :
+  CGUIPanelContainer(parentID, controlID, posX, posY, width, height, orientation, scroller, preloadItems)
 {
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
 }

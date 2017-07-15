@@ -56,6 +56,15 @@ public:
   const std::vector<CControllerFeature>& Features(void) const { return m_features; }
 
   /*!
+   * \brief Get a feature by its name
+   *
+   * \param name The feature name
+   *
+   * \return The feature, or a feature of type FEATURE_TYPE::UNKNOWN if the name is invalid
+   */
+  const CControllerFeature& GetFeature(const std::string &name) const;
+
+  /*!
    * \brief Get the count of controller features matching the specified types
    *
    * \param type The feature type, or FEATURE_TYPE::UNKNOWN to match all feature types

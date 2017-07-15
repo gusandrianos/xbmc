@@ -79,6 +79,21 @@ CController::CController(ADDON::CAddonInfo addonInfo) :
 
 CController::~CController() = default;
 
+const CControllerFeature& CController::GetFeature(const std::string &name) const
+{
+  auto it = std::find_if(m_features.begin(), m_features.end(),
+    [&name](const CControllerFeature &feature)
+    {
+      return name == feature.Name();
+    });
+
+  if (it != m_features.end())
+    return *it;
+
+  static const CControllerFeature invalid;
+  return invalid;
+}
+
 unsigned int CController::FeatureCount(FEATURE_TYPE type /* = FEATURE_TYPE::UNKNOWN */,
                                        JOYSTICK::INPUT_TYPE inputType /* = JOYSTICK::INPUT_TYPE::UNKNOWN */) const
 {
