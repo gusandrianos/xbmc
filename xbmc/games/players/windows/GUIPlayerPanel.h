@@ -17,19 +17,19 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "GameSettings.h"
+#include "IPlayerWindow.h"
 
-void CGameSettings::Reset()
+namespace KODI
 {
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = ViewModeNormal;
-  m_bExclusivePorts = true;
+namespace GAME
+{
+  class CGUIPlayerPanel : public IPlayerPanel
+  {
+  public:
+    CGUIPlayerPanel();
+    ~CGUIPlayerPanel() override;
+  };
 }
-
-bool CGameSettings::operator==(const CGameSettings &rhs) const
-{
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
 }

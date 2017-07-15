@@ -18,18 +18,14 @@
  *
  */
 
-#include "GameSettings.h"
+#include "GUIVirtualPortPanel.h"
 
-void CGameSettings::Reset()
+using namespace KODI;
+using namespace GAME;
+
+CGUIVirtualPortPanel::CGUIVirtualPortPanel(const GameClientTopology &controllerTopology) :
+  m_topology(controllerTopology)
 {
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = ViewModeNormal;
-  m_bExclusivePorts = true;
 }
 
-bool CGameSettings::operator==(const CGameSettings &rhs) const
-{
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
-}
+CGUIVirtualPortPanel::~CGUIVirtualPortPanel() = default;

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol>3</defaultcontrol>
+	<include>Animation_DialogPopupOpenClose</include>
+	<controls>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<width>1820</width>
+			<height>860</height>
+			<include content="DialogBackgroundCommons">
+				<param name="width" value="1820" />
+				<param name="height" value="860" />
+				<param name="header_label" value="$LOCALIZE[35151] - $INFO[Window(GamePlayers).Property(AddonName)]" />
+				<param name="header_id" value="2" />
+			</include>
+			<control type="group">
+				<description>Dialog content</description>
+				<top>140</top>
+				<control type="group">
+					<description>Left column</description>
+					<left>40</left>
+					<width>400</width>
+					<control type="group">
+						<description>Action group</description>
+						<control type="label">
+							<description>Action grouplist heading</description>
+							<top>-55</top>
+							<height>50</height>
+							<font>font14</font>
+							<label>$LOCALIZE[14230]</label>
+							<align>center</align>
+							<aligny>center</aligny>
+							<textcolor>button_focus</textcolor>
+						</control>
+						<control type="grouplist" id="3">
+							<top>-20</top>
+							<left>-20</left>
+							<width>440</width>
+							<onleft></onleft>
+							<onright>5</onright>
+							<itemgap>-22</itemgap>
+							<include content="DefaultDialogButton">
+								<param name="id" value="30" />
+								<param name="width" value="440" />
+								<param name="height" value="100" />
+								<param name="label" value="$LOCALIZE[35235]" />
+								<param name="align" value="left" />
+								<param name="font" value="font25_title" />
+								<param name="textoffsetx" value="36" />
+							</include>
+							<include content="DefaultDialogButton">
+								<param name="id" value="31" />
+								<param name="width" value="440" />
+								<param name="height" value="100" />
+								<param name="label" value="$LOCALIZE[35236]" />
+								<param name="align" value="left" />
+								<param name="font" value="font25_title" />
+								<param name="textoffsetx" value="36" />
+							</include>
+							<include content="DefaultDialogRadioButton">
+								<param name="id" value="32" />
+								<param name="width" value="440" />
+								<param name="height" value="100" />
+								<param name="label" value="$LOCALIZE[35227]" />
+								<param name="align" value="left" />
+								<param name="font" value="font25_title" />
+								<param name="textoffsetx" value="36" />
+								<param name="selected" value="!String.IsEmpty(Window(GamePlayers).Property(ExclusiveMode))"/>
+							</include>
+							<include content="DefaultDialogButton">
+								<param name="id" value="33" />
+								<param name="width" value="440" />
+								<param name="height" value="100" />
+								<param name="label" value="$LOCALIZE[20177]" />
+								<param name="align" value="left" />
+								<param name="font" value="font25_title" />
+								<param name="textoffsetx" value="36" />
+								<param name="onclick" value="Dialog.Close(GamePlayers)" />
+							</include>
+						</control>
+					</control>
+					<control type="group">
+						<description>Hotkey group</description>
+						<top>460</top>
+						<control type="label">
+							<description>Hotkeys listing heading</description>
+							<top>-55</top>
+							<height>50</height>
+							<font>font14</font>
+							<label>$LOCALIZE[35228]</label>
+							<align>center</align>
+							<aligny>center</aligny>
+							<textcolor>button_focus</textcolor>
+						</control>
+						<control type="list" id="4">
+							<orientation>vertical</orientation>
+							<itemlayout height="45">
+								<control type="label">
+									<description>Hotkey label</description>
+									<width>230</width>
+									<info>ListItem.Label</info>
+									<font>font10</font>
+									<align>left</align>
+									<aligny>center</aligny>
+								</control>
+								<control type="label">
+									<description>Hotkey button combo</description>
+									<left>230</left>
+									<right>0</right>
+									<info>ListItem.Label2</info>
+									<font>font10</font>
+									<align>left</align>
+									<aligny>center</aligny>
+									<textcolor>grey</textcolor>
+								</control>
+							</itemlayout>
+							<focusedlayout height="45">
+								<control type="label">
+									<description>Hotkey label</description>
+									<width>230</width>
+									<info>ListItem.Label</info>
+									<font>font10</font>
+									<align>left</align>
+									<aligny>center</aligny>
+								</control>
+								<control type="label">
+									<description>Hotkey button combo</description>
+									<left>230</left>
+									<right>0</right>
+									<info>ListItem.Label2</info>
+									<font>font10</font>
+									<align>left</align>
+									<aligny>center</aligny>
+									<textcolor>grey</textcolor>
+								</control>
+							</focusedlayout>
+						</control>
+					</control>
+				</control>
+				<control type="group">
+					<description>Middle column</description>
+					<left>480</left>
+					<width>1120</width>
+					<height>700</height>
+					<control type="label">
+						<description>Virtual ports panel heading</description>
+						<top>-55</top>
+						<height>50</height>
+						<font>font14</font>
+						<label>$LOCALIZE[35229]</label>
+						<align>center</align>
+						<aligny>center</aligny>
+						<textcolor>button_focus</textcolor>
+					</control>
+					<control type="group">
+						<top>420</top>
+						<control type="label">
+							<description>Player panel heading</description>
+							<top>-120</top>
+							<height>50</height>
+							<font>font14</font>
+							<label>$LOCALIZE[35230]</label>
+							<align>center</align>
+							<aligny>center</aligny>
+							<textcolor>button_focus</textcolor>
+						</control>
+					</control>
+					<control type="group">
+						<height>280</height>
+						<control type="image">
+							<description>Virtual ports panel background</description>
+							<top>-20</top>
+							<bottom>-20</bottom>
+							<left>-20</left>
+							<right>-20</right>
+							<texture border="40">buttons/dialogbutton-nofo.png</texture>
+						</control>
+					</control>
+					<control type="group">
+						<top>420</top>
+						<height>140</height>
+						<visible>!String.IsEmpty(Window(GamePlayers).Property(ExclusiveMode))</visible>
+						<control type="image">
+							<description>Player panel background</description>
+							<top>-20</top>
+							<bottom>-20</bottom>
+							<left>-20</left>
+							<right>-20</right>
+							<texture border="40">buttons/dialogbutton-nofo.png</texture>
+						</control>
+					</control>
+					<control type="group">
+						<top>420</top>
+						<height>280</height>
+						<visible>String.IsEmpty(Window(GamePlayers).Property(ExclusiveMode))</visible>
+						<control type="image">
+							<description>Player panel background</description>
+							<top>-20</top>
+							<bottom>-20</bottom>
+							<left>-20</left>
+							<right>-20</right>
+							<texture border="40">buttons/dialogbutton-nofo.png</texture>
+						</control>
+					</control>
+					<control type="playerpanel" id="5">
+						<description>Virtual ports panel</description>
+						<orientation>horizontal</orientation>
+						<width>100%</width>
+						<height>700</height>
+						<onup></onup>
+						<ondown></ondown>
+						<onleft>3</onleft>
+						<onright>6</onright>
+						<itemlayout width="140" height="140">
+							<control type="label">
+								<info>ListItem.Label</info>
+								<font>font27_title</font>
+								<align>center</align>
+								<aligny>center</aligny>
+							</control>
+						</itemlayout>
+						<focusedlayout width="140" height="140">
+							<control type="image">
+								<texture colordiffuse="button_focus">lists/focus.png</texture>
+							</control>
+							<control type="label">
+								<info>ListItem.Label</info>
+								<font>font27_title</font>
+								<align>center</align>
+								<aligny>center</aligny>
+							</control>
+						</focusedlayout>
+						<content>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12316]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12316]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12316]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12316]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12316]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12317]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12317]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12317]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12317]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12317]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12318]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12318]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12318]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12318]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12318]</label>
+							</item>
+						</content>
+					</control>
+				</control>
+				<control type="group">
+					<description>Right column</description>
+					<right>40</right>
+					<width>140</width>
+					<control type="label">
+						<description>Spectator panel heading</description>
+						<top>-55</top>
+						<left>-40</left>
+						<right>-40</right>
+						<height>50</height>
+						<font>font14</font>
+						<label>$LOCALIZE[35231]</label>
+						<align>center</align>
+						<aligny>center</aligny>
+						<textcolor>button_focus</textcolor>
+					</control>
+					<control type="image">
+						<description>Spectator panel background</description>
+						<top>-20</top>
+						<right>-20</right>
+						<width>180</width>
+						<height>740</height>
+						<texture border="40">buttons/dialogbutton-nofo.png</texture>
+					</control>
+					<control type="list" id="6">
+						<description>Spectator panel</description>
+						<orientation>vertical</orientation>
+						<width>140</width>
+						<height>700</height>
+						<onup></onup>
+						<ondown></ondown>
+						<onleft>5</onleft>
+						<onright></onright>
+						<itemlayout width="140" height="140">
+							<control type="label">
+								<info>ListItem.Label</info>
+								<font>font27_title</font>
+								<align>center</align>
+								<aligny>center</aligny>
+							</control>
+						</itemlayout>
+						<focusedlayout width="140" height="140">
+							<control type="image">
+								<texture colordiffuse="button_focus">lists/focus.png</texture>
+							</control>
+							<control type="label">
+								<info>ListItem.Label</info>
+								<font>font27_title</font>
+								<align>center</align>
+								<aligny>center</aligny>
+							</control>
+						</focusedlayout>
+						<content>
+							<item>
+								<label>$LOCALIZE[12311]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12312]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12313]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12314]</label>
+							</item>
+							<item>
+								<label>$LOCALIZE[12315]</label>
+							</item>
+						</content>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>
