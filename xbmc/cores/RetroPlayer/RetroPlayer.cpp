@@ -51,7 +51,6 @@
 #include "URL.h"
 
 using namespace KODI;
-using namespace GAME;
 using namespace RETRO;
 
 #define REWIND_FACTOR  0.25  // Rewind at 25% of gameplay speed
@@ -92,12 +91,8 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
 
   bool bSuccess = false;
 
-  std::string gameClientId;
-  if (file.HasGameInfoTag())
-    gameClientId = file.GetGameInfoTag()->GetGameClient();
-
-  ADDON::AddonPtr addon;
-  if (gameClientId.empty())
+  m_gameClient = GAME::CGameUtils::OpenGameClient(file);
+  if (m_gameClient)
   {
     CLog::Log(LOGERROR, "Can't play game, no game client was passed to RetroPlayer!");
   }
@@ -189,6 +184,7 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
 {
   CLog::Log(LOGDEBUG, "RetroPlayer: Closing file");
 
+  // Stop the game
   m_autoSave.reset();
   if (m_clock)
     m_clock->Stop();
@@ -610,7 +606,7 @@ void CRetroPlayer::UnregisterWindowCallbacks()
 
 void CRetroPlayer::PrintGameInfo(const CFileItem &file) const
 {
-  const CGameInfoTag *tag = file.GetGameInfoTag();
+  const GAME::CGameInfoTag *tag = file.GetGameInfoTag();
   if (tag)
   {
     CLog::Log(LOGDEBUG, "RetroPlayer: ---------------------------------------");
