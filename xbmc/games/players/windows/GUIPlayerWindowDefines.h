@@ -17,19 +17,19 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "GameSettings.h"
+#define CONTROL_ACTION_LIST             3
+#define CONTROL_HOTKEY_LIST             4
+#define CONTROL_PLAYER_PANEL            5
+#define CONTROL_SPECTATORS_PANEL        6
 
-void CGameSettings::Reset()
-{
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = 0;
-  m_bExclusivePorts = true;
-}
+#define CONTROL_ACTION_ADD_PORT         30
+#define CONTROL_ACTION_REMOVE_PORT      31
+#define CONTROL_ACTION_EXCLUSIVE_PORTS  32
 
-bool CGameSettings::operator==(const CGameSettings &rhs) const
-{
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
-}
+// Set on window load
+#define WINDOW_PROPERTY_ADDON_NAME      "AddonName"
+
+// Set by radio button with ID CONTROL_ACTION_EXCLUSIVE_PORTS
+#define WINDOW_PROPERTY_EXCLUSIVE_MODE  "ExclusiveMode"

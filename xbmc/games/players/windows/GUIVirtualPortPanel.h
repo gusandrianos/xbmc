@@ -17,19 +17,29 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "GameSettings.h"
+#include "IPlayerWindow.h"
+#include "games/GameTypes.h"
 
-void CGameSettings::Reset()
+namespace KODI
 {
-  m_scalingMethod = VS_SCALINGMETHOD_NEAREST;
-  m_viewMode = 0;
-  m_bExclusivePorts = true;
+namespace GAME
+{
+  class CGUIVirtualPortPanel : public IVirtualPortPanel
+  {
+  public:
+    CGUIVirtualPortPanel(const GameClientTopology &controllerTopology);
+    ~CGUIVirtualPortPanel() override;
+
+    // implementation of IVirtualPortPanel
+    void OnAddPort() override { }
+    void OnRemovePort() override { }
+    void OnSelect(unsigned int column, unsigned int row) override { }
+    bool HasDevice(unsigned int column, unsigned int row) override { return false; }
+
+  private:
+    GameClientTopology m_topology;
+  };
 }
-
-bool CGameSettings::operator==(const CGameSettings &rhs) const
-{
-  return m_scalingMethod == rhs.m_scalingMethod &&
-         m_viewMode == rhs.m_viewMode &&
-         m_bExclusivePorts == rhs.m_bExclusivePorts;
 }

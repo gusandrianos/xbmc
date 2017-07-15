@@ -12064,6 +12064,7 @@ msgctxt "#20176"
 msgid "Show video information"
 msgstr ""
 
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
 #: addons/skin.estuary/xml/DialogNumeric.xml
 #: addons/skin.estuary/xml/DialogKeyboard.xml
 msgctxt "#20177"
@@ -16816,7 +16817,7 @@ msgctxt "#35150"
 msgid "Keyboard"
 msgstr ""
 
-#. Name of group in "Games -> Keyboard" for configuring keyboard players
+#. Name of window for configuring players during gameplay
 #: system/settings/settings.xml
 msgctxt "#35151"
 msgid "Player configuration"
@@ -16944,7 +16945,11 @@ msgctxt "#35201"
 msgid "Gameplay"
 msgstr ""
 
-#empty string with id 35202
+#. Short error message when a game is not being played
+#: xbmc/games/players/windows/GUIPlayerWindow.cpp
+msgctxt "#35202"
+msgid "Error: Not playing a game"
+msgstr ""
 
 #: system/settings/settings.xml
 msgctxt "#35203"
@@ -17076,7 +17081,69 @@ msgctxt "#35225"
 msgid "Video filter"
 msgstr ""
 
-#empty strings from id 35226 to 35249
+#empty string with id 35226
+
+#. Setting in the game player window to make virtual game ports exclusive to one controller
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35227"
+msgid "Exclusive ports"
+msgstr ""
+
+#. Title of the group of hotkeys listed in the game player window
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35228"
+msgid "Hotkeys"
+msgstr ""
+
+#. Title of the panel for handling the virtual ports of an emulated game system
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35229"
+msgid "Virtual ports"
+msgstr ""
+
+#. Title of the panel for allowing players to choose which player number they are
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35230"
+msgid "Players"
+msgstr ""
+
+#. Title of the panel for players that are spectating instead of playing the game
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35231"
+msgid "Spectators"
+msgstr ""
+
+#. In the game player window, this action moves the controller to the next player number
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35232"
+msgid "Move left"
+msgstr ""
+
+#. In the game player window, this action moves the controller to the previous player number
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35233"
+msgid "Move right"
+msgstr ""
+
+#. In the game player window, this action opens the player's context menu
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35234"
+msgid "Player menu"
+msgstr ""
+
+#. Button in the game player window for adding a virtual port to the emulator's game system
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35235"
+msgid "Add port"
+msgstr ""
+
+#. Button in the game player window for removing a virtual port from the emulator's game system
+#: addons/skin.estuary/xml/DialogGamePlayers.xml
+msgctxt "#35236"
+msgid "Remove port"
+msgstr ""
+
+#empty strings from id 35237 to 35249
 
 #: xbmc/windows/GUIMediaWindow.cpp
 msgctxt "#35250"

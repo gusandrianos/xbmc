@@ -63,6 +63,7 @@
 #include "utils/StringUtils.h"
 #include "GUIAction.h"
 #include "games/controllers/guicontrols/GUIGameController.h"
+#include "games/players/guicontrols/GUIPlayerPanel.h"
 #include "Util.h"
 
 using namespace KODI;
@@ -103,6 +104,7 @@ static const ControlMapping controls[] =
     {"grouplist",         CGUIControl::GUICONTROL_GROUPLIST},
     {"scrollbar",         CGUIControl::GUICONTROL_SCROLLBAR},
     {"gamecontroller",    CGUIControl::GUICONTROL_GAMECONTROLLER},
+    {"playerpanel",       CGUIControl::GUICONTAINER_PLAYERPANEL},
     {"list",              CGUIControl::GUICONTAINER_LIST},
     {"wraplist",          CGUIControl::GUICONTAINER_WRAPLIST},
     {"fixedlist",         CGUIControl::GUICONTAINER_FIXEDLIST},
@@ -1305,6 +1307,25 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
         parentID, id, posX, posY, width, height, texture, timePerImage, fadeTime, randomized, loop, timeToPauseAtEnd);
       static_cast<CGUIMultiImage*>(control)->SetInfo(texturePath);
       static_cast<CGUIMultiImage*>(control)->SetAspectRatio(aspect);
+    }
+    break;
+  case CGUIControl::GUICONTAINER_PLAYERPANEL:
+    {
+      using namespace GAME;
+
+      CScroller scroller;
+      GetScroller(pControlNode, "scrolltime", scroller);
+
+      control = new CGUIPlayerPanel(parentID, id, posX, posY, width, height, orientation, scroller, preloadItems);
+      ((CGUIPlayerPanel *)control)->LoadLayout(pControlNode);
+      ((CGUIPlayerPanel *)control)->LoadListProvider(pControlNode, defaultControl, defaultAlways);
+      ((CGUIPlayerPanel *)control)->SetType(viewType, viewLabel);
+      ((CGUIPlayerPanel *)control)->SetPageControl(pageControl);
+      ((CGUIPlayerPanel *)control)->SetRenderOffset(offset);
+      ((CGUIPlayerPanel *)control)->SetAutoScrolling(pControlNode);
+      ((CGUIPlayerPanel *)control)->SetClickActions(clickActions);
+      ((CGUIPlayerPanel *)control)->SetFocusActions(focusActions);
+      ((CGUIPlayerPanel *)control)->SetUnFocusActions(unfocusActions);
     }
     break;
   case CGUIControl::GUICONTAINER_LIST:

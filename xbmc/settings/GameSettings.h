@@ -38,8 +38,14 @@ public:
   int ViewMode() const { return m_viewMode; }
   void SetViewMode(int viewMode) { m_viewMode = viewMode; }
 
+  bool ExclusivePorts() const { return m_bExclusivePorts; }
+  void SetExclusivePorts(bool bExclusivePorts) { m_bExclusivePorts = bExclusivePorts; }
+
 private:
   // Video settings
   ESCALINGMETHOD m_scalingMethod;
   int m_viewMode;
+
+  // Player settings
+  bool m_bExclusivePorts;
 };
