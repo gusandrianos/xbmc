@@ -32,6 +32,12 @@ using namespace KODI;
 using namespace GAME;
 using namespace JOYSTICK;
 
+CControllerFeature::CControllerFeature(int labelId)
+{
+  Reset();
+  m_labelId = labelId;
+}
+
 void CControllerFeature::Reset(void)
 {
   m_controller = nullptr;
@@ -77,6 +83,9 @@ std::string CControllerFeature::Label() const
 
   if (m_labelId >= 0 && m_controller != nullptr)
     label = g_localizeStrings.GetAddonString(m_controller->ID(), m_labelId);
+
+  if (label.empty())
+    label = g_localizeStrings.Get(m_labelId);
 
   return label;
 }

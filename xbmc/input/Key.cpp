@@ -48,7 +48,7 @@ CKey::CKey(uint32_t buttonCode, unsigned int held)
   m_held = held;
 }
 
-CKey::CKey(uint8_t vkey, wchar_t unicode, char ascii, uint32_t modifiers, unsigned int held)
+CKey::CKey(uint8_t vkey, wchar_t unicode, char ascii, uint32_t modifiers, unsigned int held, const std::string &keyName /* = "" */)
 {
   Reset();
   if (vkey) // FIXME: This needs cleaning up - should we always use the unicode key where available?
@@ -61,6 +61,7 @@ CKey::CKey(uint8_t vkey, wchar_t unicode, char ascii, uint32_t modifiers, unsign
   m_ascii = ascii;
   m_modifiers = modifiers;
   m_held = held;
+  m_keyName = keyName;
 }
 
 CKey::CKey(const CKey& key)
@@ -84,6 +85,7 @@ void CKey::Reset()
   m_ascii = 0;
   m_modifiers = 0;
   m_held = 0;
+  m_keyName.clear();
 }
 
 CKey& CKey::operator=(const CKey& key)
@@ -103,6 +105,7 @@ CKey& CKey::operator=(const CKey& key)
   m_ascii       = key.m_ascii;
   m_modifiers    = key.m_modifiers;
   m_held         = key.m_held;
+  m_keyName      = key.m_keyName;
   return *this;
 }
 

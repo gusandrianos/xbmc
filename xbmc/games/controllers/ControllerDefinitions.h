@@ -27,6 +27,7 @@
 #define LAYOUT_XML_ELM_MOTOR               "motor"
 #define LAYOUT_XML_ELM_RELPOINTER          "relpointer"
 #define LAYOUT_XML_ELM_ABSPOINTER          "abspointer"
+#define LAYOUT_XML_ELM_KEY                 "key"
 #define LAYOUT_XML_ELM_TOPOLOGY            "physicaltopology"
 #define LAYOUT_XML_ELM_PORT                "port"
 #define LAYOUT_XML_ELM_ACCEPTS             "accepts"

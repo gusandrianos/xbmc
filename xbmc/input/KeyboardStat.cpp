@@ -80,6 +80,7 @@ CKey CKeyboardStat::TranslateKey(XBMC_keysym& keysym) const
   uint32_t modifiers;
   unsigned int held;
   XBMCKEYTABLE keytable;
+  std::string keyName;
 
   modifiers = 0;
   if (keysym.mod & XBMCKMOD_CTRL)
@@ -115,6 +116,7 @@ CKey CKeyboardStat::TranslateKey(XBMC_keysym& keysym) const
   {
     vkey = keytable.vkey;
     ascii = keytable.ascii;
+    keyName = keytable.keyname;
   }
 
   // If we failed to match the sym and unicode try just the unicode. This
@@ -123,12 +125,14 @@ CKey CKeyboardStat::TranslateKey(XBMC_keysym& keysym) const
   {
     vkey = keytable.vkey;
     ascii = keytable.ascii;
+    keyName = keytable.keyname;
   }
 
   // If there is still no match try the sym
   else if (KeyTableLookupSym(keysym.sym, &keytable))
   {
     vkey = keytable.vkey;
+    keyName = keytable.keyname;
 
     // Occasionally we get non-printing keys that have a non-zero value in
     // the keysym.unicode. Check for this here and replace any rogue unicode
@@ -175,7 +179,7 @@ CKey CKeyboardStat::TranslateKey(XBMC_keysym& keysym) const
 
   // Create and return a CKey
 
-  CKey key(vkey, unicode, ascii, modifiers, held);
+  CKey key(vkey, unicode, ascii, modifiers, held, keyName);
 
   return key;
 }

@@ -29,6 +29,7 @@
 static const XBMCKEYTABLE XBMCKeyTable[] =
 { { XBMCK_BACKSPACE, 0,    0, XBMCVK_BACK,   "backspace" }
 , { XBMCK_TAB,       0,    0, XBMCVK_TAB,    "tab" }
+, { XBMCK_CLEAR,     0,    0, 0,             "clear" }
 , { XBMCK_RETURN,    0,    0, XBMCVK_RETURN, "return" }
 , { XBMCK_ESCAPE,    0,    0, XBMCVK_ESCAPE, "escape" }
 , { 0,               0,    0, XBMCVK_ESCAPE, "esc" } // Allowed abbreviation for "escape"
@@ -45,34 +46,33 @@ static const XBMCKEYTABLE XBMCKeyTable[] =
 , { XBMCK_8,    '8',  '8', XBMCVK_8, "eight" }
 , { XBMCK_9,    '9',  '9', XBMCVK_9, "nine" }
 
-// A to Z - note that upper case A-Z don't have a matching name or
-// vkey. Only the lower case a-z are used in key mappings.
-, { XBMCK_a,    'A',  'A', XBMCVK_A, NULL }
-, { XBMCK_b,    'B',  'B', XBMCVK_B, NULL }
-, { XBMCK_c,    'C',  'C', XBMCVK_C, NULL }
-, { XBMCK_d,    'D',  'D', XBMCVK_D, NULL }
-, { XBMCK_e,    'E',  'E', XBMCVK_E, NULL }
-, { XBMCK_f,    'F',  'F', XBMCVK_F, NULL }
-, { XBMCK_g,    'G',  'G', XBMCVK_G, NULL }
-, { XBMCK_h,    'H',  'H', XBMCVK_H, NULL }
-, { XBMCK_i,    'I',  'I', XBMCVK_I, NULL }
-, { XBMCK_j,    'J',  'J', XBMCVK_J, NULL }
-, { XBMCK_k,    'K',  'K', XBMCVK_K, NULL }
-, { XBMCK_l,    'L',  'L', XBMCVK_L, NULL }
-, { XBMCK_m,    'M',  'M', XBMCVK_M, NULL }
-, { XBMCK_n,    'N',  'N', XBMCVK_N, NULL }
-, { XBMCK_o,    'O',  'O', XBMCVK_O, NULL }
-, { XBMCK_p,    'P',  'P', XBMCVK_P, NULL }
-, { XBMCK_q,    'Q',  'Q', XBMCVK_Q, NULL }
-, { XBMCK_r,    'R',  'R', XBMCVK_R, NULL }
-, { XBMCK_s,    'S',  'S', XBMCVK_S, NULL }
-, { XBMCK_t,    'T',  'T', XBMCVK_T, NULL }
-, { XBMCK_u,    'U',  'U', XBMCVK_U, NULL }
-, { XBMCK_v,    'V',  'V', XBMCVK_V, NULL }
-, { XBMCK_w,    'W',  'W', XBMCVK_W, NULL }
-, { XBMCK_x,    'X',  'X', XBMCVK_X, NULL }
-, { XBMCK_y,    'Y',  'Y', XBMCVK_Y, NULL }
-, { XBMCK_z,    'Z',  'Z', XBMCVK_Z, NULL }
+// A to Z
+, { XBMCK_a,    'A',  'A', XBMCVK_A, "a" }
+, { XBMCK_b,    'B',  'B', XBMCVK_B, "b" }
+, { XBMCK_c,    'C',  'C', XBMCVK_C, "c" }
+, { XBMCK_d,    'D',  'D', XBMCVK_D, "d" }
+, { XBMCK_e,    'E',  'E', XBMCVK_E, "e" }
+, { XBMCK_f,    'F',  'F', XBMCVK_F, "f" }
+, { XBMCK_g,    'G',  'G', XBMCVK_G, "g" }
+, { XBMCK_h,    'H',  'H', XBMCVK_H, "h" }
+, { XBMCK_i,    'I',  'I', XBMCVK_I, "i" }
+, { XBMCK_j,    'J',  'J', XBMCVK_J, "j" }
+, { XBMCK_k,    'K',  'K', XBMCVK_K, "k" }
+, { XBMCK_l,    'L',  'L', XBMCVK_L, "l" }
+, { XBMCK_m,    'M',  'M', XBMCVK_M, "m" }
+, { XBMCK_n,    'N',  'N', XBMCVK_N, "n" }
+, { XBMCK_o,    'O',  'O', XBMCVK_O, "o" }
+, { XBMCK_p,    'P',  'P', XBMCVK_P, "p" }
+, { XBMCK_q,    'Q',  'Q', XBMCVK_Q, "q" }
+, { XBMCK_r,    'R',  'R', XBMCVK_R, "r" }
+, { XBMCK_s,    'S',  'S', XBMCVK_S, "s" }
+, { XBMCK_t,    'T',  'T', XBMCVK_T, "t" }
+, { XBMCK_u,    'U',  'U', XBMCVK_U, "u" }
+, { XBMCK_v,    'V',  'V', XBMCVK_V, "v" }
+, { XBMCK_w,    'W',  'W', XBMCVK_W, "w" }
+, { XBMCK_x,    'X',  'X', XBMCVK_X, "x" }
+, { XBMCK_y,    'Y',  'Y', XBMCVK_Y, "y" }
+, { XBMCK_z,    'Z',  'Z', XBMCVK_Z, "z" }
 
 , { XBMCK_a,    'a',  'a', XBMCVK_A, "a" }
 , { XBMCK_b,    'b',  'b', XBMCVK_B, "b" }
@@ -222,14 +222,24 @@ static const XBMCKEYTABLE XBMCKeyTable[] =
 , { XBMCK_LSHIFT,                 0,    0, XBMCVK_LSHIFT,        "leftshift" }
 , { XBMCK_RCTRL,                  0,    0, XBMCVK_RCONTROL,      "rightctrl" }
 , { XBMCK_LCTRL,                  0,    0, XBMCVK_LCONTROL,      "leftctrl" }
+, { XBMCK_RALT,                   0,    0, XBMCVK_RMENU,         "rightalt" }
 , { XBMCK_LALT,                   0,    0, XBMCVK_LMENU,         "leftalt" }
+, { XBMCK_RMETA,                  0,    0, 0,                    "leftmeta" }
+, { XBMCK_LMETA,                  0,    0, 0,                    "rightmeta" }
 , { XBMCK_LSUPER,                 0,    0, XBMCVK_LWIN,          "leftwindows" }
 , { XBMCK_RSUPER,                 0,    0, XBMCVK_RWIN,          "rightwindows" }
+, { XBMCK_MODE,                   0,    0, 0,                    "mode" }
+, { XBMCK_COMPOSE,                0,    0, 0,                    "compose" }
+, { XBMCK_HELP,                   0,    0, 0,                    "help" }
 , { XBMCK_MENU,                   0,    0, XBMCVK_MENU,          "menu" }
 , { XBMCK_PAUSE,                  0,    0, XBMCVK_PAUSE,         "pause" }
 , { XBMCK_SCROLLOCK,              0,    0, XBMCVK_SCROLLLOCK,    "scrolllock" }
 , { XBMCK_PRINT,                  0,    0, XBMCVK_PRINTSCREEN,   "printscreen" }
+, { XBMCK_SYSREQ,                 0,    0, 0,                    "sysreq" }
+, { XBMCK_BREAK,                  0,    0, 0,                    "break" }
 , { XBMCK_POWER,                  0,    0, XBMCVK_POWER,         "power" }
+, { XBMCK_EURO,                   0,    0, 0,                    "euro" }
+, { XBMCK_UNDO,                   0,    0, 0,                    "undo" }
 , { XBMCK_SLEEP,                  0,    0, XBMCVK_SLEEP,         "sleep" }
 , { XBMCK_GUIDE,                  0,    0, XBMCVK_GUIDE,         "guide" }
 , { XBMCK_SETTINGS,               0,    0, XBMCVK_SETTINGS,      "settings" }

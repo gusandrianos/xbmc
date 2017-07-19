@@ -117,6 +117,12 @@ void CGUIFeatureList::Load(const ControllerPtr& controller)
   for (auto itGroup = featureGroups.begin(); itGroup != featureGroups.end(); ++itGroup)
   {
     const std::string& groupName = itGroup->groupName;
+    JOYSTICK::FEATURE_CATEGORY featureCategory = itGroup->category;
+
+    if (featureCategory == JOYSTICK::FEATURE_CATEGORY::KEY)
+    {
+      //! @todo Add a "select key" button
+    }
 
     // Create buttons
     std::vector<CGUIButtonControl*> buttons = GetButtons(itGroup->features, featureIndex);

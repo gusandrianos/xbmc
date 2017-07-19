@@ -35,6 +35,7 @@ class CControllerFeature
 {
 public:
   CControllerFeature(void) { Reset(); }
+  CControllerFeature(int labelId);
   CControllerFeature(const CControllerFeature& other) { *this = other; }
 
   void Reset(void);

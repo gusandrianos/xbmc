@@ -34,6 +34,8 @@ const char* CControllerTranslator::TranslateFeatureType(FEATURE_TYPE type)
     case FEATURE_TYPE::ACCELEROMETER:    return LAYOUT_XML_ELM_ACCELEROMETER;
     case FEATURE_TYPE::MOTOR:            return LAYOUT_XML_ELM_MOTOR;
     case FEATURE_TYPE::RELPOINTER:       return LAYOUT_XML_ELM_RELPOINTER;
+    case FEATURE_TYPE::ABSPOINTER:       return LAYOUT_XML_ELM_ABSPOINTER;
+    case FEATURE_TYPE::KEY:              return LAYOUT_XML_ELM_KEY;
     default:
       break;
   }
@@ -48,6 +50,7 @@ FEATURE_TYPE CControllerTranslator::TranslateFeatureType(const std::string& strT
   if (strType == LAYOUT_XML_ELM_MOTOR)            return FEATURE_TYPE::MOTOR;
   if (strType == LAYOUT_XML_ELM_RELPOINTER)       return FEATURE_TYPE::RELPOINTER;
   if (strType == LAYOUT_XML_ELM_ABSPOINTER)       return FEATURE_TYPE::ABSPOINTER;
+  if (strType == LAYOUT_XML_ELM_KEY)              return FEATURE_TYPE::KEY;
 
   return FEATURE_TYPE::UNKNOWN;
 }
