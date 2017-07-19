@@ -824,7 +824,7 @@ JOYSTICK::IInputHandler *CGameClient::OpenPort(const std::string &address, const
     controllerStruct.analog_button_count  = controller->FeatureCount(FEATURE_TYPE::SCALAR, INPUT_TYPE::ANALOG);
     controllerStruct.analog_stick_count   = controller->FeatureCount(FEATURE_TYPE::ANALOG_STICK);
     controllerStruct.accelerometer_count  = controller->FeatureCount(FEATURE_TYPE::ACCELEROMETER);
-    controllerStruct.key_count            = 0; //! @todo
+    controllerStruct.key_count            = controller->FeatureCount(FEATURE_TYPE::KEY);
     controllerStruct.rel_pointer_count    = controller->FeatureCount(FEATURE_TYPE::RELPOINTER);
     controllerStruct.abs_pointer_count    = controller->FeatureCount(FEATURE_TYPE::ABSPOINTER);
     controllerStruct.motor_count          = controller->FeatureCount(FEATURE_TYPE::MOTOR);
@@ -1010,7 +1010,7 @@ void CGameClient::OpenMouse(void)
       controllerStruct.analog_button_count  = mouse->FeatureCount(FEATURE_TYPE::SCALAR, INPUT_TYPE::ANALOG);
       controllerStruct.analog_stick_count   = mouse->FeatureCount(FEATURE_TYPE::ANALOG_STICK);
       controllerStruct.accelerometer_count  = mouse->FeatureCount(FEATURE_TYPE::ACCELEROMETER);
-      controllerStruct.key_count            = 0; //! @todo
+      controllerStruct.key_count            = mouse->FeatureCount(FEATURE_TYPE::KEY);
       controllerStruct.rel_pointer_count    = mouse->FeatureCount(FEATURE_TYPE::RELPOINTER);
       controllerStruct.abs_pointer_count    = mouse->FeatureCount(FEATURE_TYPE::ABSPOINTER);
       controllerStruct.motor_count          = mouse->FeatureCount(FEATURE_TYPE::MOTOR);

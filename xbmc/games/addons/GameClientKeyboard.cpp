@@ -22,6 +22,7 @@
 #include "GameClient.h"
 #include "GameClientTranslator.h"
 #include "addons/kodi-addon-dev-kit/include/kodi/kodi_game_types.h"
+#include "input/joysticks/JoystickIDs.h"
 #include "input/keyboard/IKeyboardInputProvider.h"
 #include "input/Key.h"
 #include "utils/log.h"
@@ -59,7 +60,7 @@ bool CGameClientKeyboard::OnKeyPress(const CKey& key)
 
   event.type            = GAME_INPUT_EVENT_KEY;
   event.controller_id   = ""; //! @todo
-  event.feature_name    = ""; //! @todo
+  event.feature_name    = key.GetKeyName().c_str();
   event.key.pressed     = true;
   event.key.character   = static_cast<XBMCVKey>(key.GetButtonCode() & BUTTON_INDEX_MASK);
   event.key.modifiers   = CGameClientTranslator::GetModifiers(static_cast<CKey::Modifier>(key.GetModifiers()));
@@ -88,7 +89,7 @@ void CGameClientKeyboard::OnKeyRelease(const CKey& key)
 
   event.type            = GAME_INPUT_EVENT_KEY;
   event.controller_id   = ""; //! @todo
-  event.feature_name    = ""; //! @todo
+  event.feature_name    = key.GetKeyName().c_str();
   event.key.pressed     = false;
   event.key.character   = static_cast<XBMCVKey>(key.GetButtonCode() & BUTTON_INDEX_MASK);
   event.key.modifiers   = CGameClientTranslator::GetModifiers(static_cast<CKey::Modifier>(key.GetModifiers()));
