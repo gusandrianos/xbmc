@@ -373,7 +373,7 @@ typedef struct game_accelerometer_event
 typedef struct game_key_event
 {
   bool         pressed;
-  XBMCVKey     character;
+  XBMCVKey     character; //! @deprecated
   GAME_KEY_MOD modifiers;
 } ATTRIBUTE_PACKED game_key_event;
 

@@ -17,33 +17,39 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "GUIFeatureTranslator.h"
+#include "GUIFeatureButton.h"
+#include "games/controllers/ControllerFeature.h"
 
-using namespace KODI;
-using namespace GAME;
-
-BUTTON_TYPE CGUIFeatureTranslator::GetButtonType(JOYSTICK::FEATURE_TYPE featureType)
+namespace KODI
 {
-  switch (featureType)
+namespace GAME
+{
+  class CGUISelectKeyButton : public CGUIFeatureButton
   {
-  case JOYSTICK::FEATURE_TYPE::SCALAR:
-    return BUTTON_TYPE::BUTTON;
+  public:
+    CGUISelectKeyButton(const CGUIButtonControl& buttonTemplate,
+                        IConfigurationWizard* wizard);
 
-  case JOYSTICK::FEATURE_TYPE::ANALOG_STICK:
-    return BUTTON_TYPE::ANALOG_STICK;
+    virtual ~CGUISelectKeyButton() = default;
 
-  //! @todo Create button control for relative pointers. Use analog sticks for
-  //  now, as four directions are sufficient for relative pointers.
-  case JOYSTICK::FEATURE_TYPE::RELPOINTER:
-    return BUTTON_TYPE::ANALOG_STICK;
+    // implementation of IFeatureButton
+    virtual bool PromptForInput(CEvent& waitEvent) override;
+    virtual bool IsFinished(void) const override;
+    virtual void Reset(void) override;
 
-  case JOYSTICK::FEATURE_TYPE::KEY:
-    return BUTTON_TYPE::BUTTON;
+  private:
+    static CControllerFeature GetFeature();
 
-  default:
-    break;
-  }
+    enum class STATE
+    {
+      NEED_KEY,
+      NEED_INPUT,
+      FINISHED,
+    };
 
-  return BUTTON_TYPE::UNKNOWN;
+    STATE m_state;
+  };
+}
 }
