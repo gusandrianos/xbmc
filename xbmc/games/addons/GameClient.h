@@ -37,6 +37,11 @@ class CFileItem;
 
 namespace KODI
 {
+namespace JOYSTICK
+{
+  class IInputHandler;
+}
+
 namespace GAME
 {
 
@@ -106,12 +111,13 @@ public:
   bool Deserialize(const uint8_t* data, size_t size);
 
   // Input callbacks
-  bool OpenPort(unsigned int port);
-  void ClosePort(unsigned int port);
-  bool ReceiveInputEvent(const game_input_event& eventStruct);
+  bool ReceiveInputEvent(const std::string &address, const game_input_event& eventStruct);
 
   // Input functions
   bool AcceptsInput(void) const;
+  const GameClientTopology &ControllerTopology() const { return m_topology; }
+  JOYSTICK::IInputHandler *OpenPort(const std::string &address, const ControllerPtr &controller, const std::string &model = "");
+  void ClosePort(const std::string &address);
 
   /*!
     * @brief To get the interface table used between addon and kodi
@@ -131,13 +137,15 @@ private:
   void ResetPlayback();
 
   // Private input functions
-  void UpdatePort(unsigned int port, const ControllerPtr& controller);
+  void LoadTopology();
   void ClearPorts(void);
-  bool SetRumble(unsigned int port, const std::string& feature, float magnitude);
+  bool SetRumble(const std::string &address, const std::string& feature, float magnitude);
+  void OpenControllerPorts();
   void OpenKeyboard(void);
   void CloseKeyboard(void);
   void OpenMouse(void);
   void CloseMouse(void);
+  bool IsControllerAccepted(const std::string &address);
   ControllerVector GetControllers(void) const;
 
   // Private memory stream functions
@@ -163,9 +171,7 @@ private:
   static uintptr_t cb_hw_get_current_framebuffer(void* kodiInstance);
   static game_proc_address_t cb_hw_get_proc_address(void* kodiInstance, const char* sym);
   static void cb_render_frame(void* kodiInstance);
-  static bool cb_open_port(void* kodiInstance, unsigned int port);
-  static void cb_close_port(void* kodiInstance, unsigned int port);
-  static bool cb_input_event(void* kodiInstance, const game_input_event* event);
+  static bool cb_input_event(void* kodiInstance, game_controller_address address, const game_input_event* event);
   //@}
 
   // Add-on properties
@@ -195,7 +201,9 @@ private:
   std::unique_ptr<CGameClientInGameSaves> m_inGameSaves;
 
   // Input
-  std::map<int, std::unique_ptr<CGameClientJoystick>> m_ports;
+  GameClientTopology m_topology;
+  using ControllerAddress = std::string;
+  std::map<ControllerAddress, std::unique_ptr<CGameClientJoystick>> m_ports;
   std::unique_ptr<CGameClientKeyboard> m_keyboard;
   std::unique_ptr<CGameClientMouse> m_mouse;
   std::unique_ptr<CGameClientHardware> m_hardware;

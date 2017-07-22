@@ -30,9 +30,9 @@
 using namespace KODI;
 using namespace GAME;
 
-CGameClientJoystick::CGameClientJoystick(CGameClient* gameClient, int port, const ControllerPtr& controller, const KodiToAddonFuncTable_Game *dllStruct) :
+CGameClientJoystick::CGameClientJoystick(CGameClient* gameClient, const std::string &address, const ControllerPtr& controller, const KodiToAddonFuncTable_Game *dllStruct) :
   m_gameClient(gameClient),
-  m_port(port),
+  m_address(address),
   m_controller(controller),
   m_dllStruct(dllStruct)
 {
@@ -73,14 +73,13 @@ bool CGameClientJoystick::OnButtonPress(const std::string& feature, bool bPresse
   std::string controllerId = m_controller->ID();
 
   event.type                   = GAME_INPUT_EVENT_DIGITAL_BUTTON;
-  event.port                   = m_port;
   event.controller_id          = controllerId.c_str();
   event.feature_name           = feature.c_str();
   event.digital_button.pressed = bPressed;
 
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(m_address.c_str(), &event);
   }
   catch (...)
   {
@@ -99,14 +98,13 @@ bool CGameClientJoystick::OnButtonMotion(const std::string& feature, float magni
   std::string controllerId = m_controller->ID();
 
   event.type                    = GAME_INPUT_EVENT_ANALOG_BUTTON;
-  event.port                    = m_port;
   event.controller_id           = controllerId.c_str();
   event.feature_name            = feature.c_str();
   event.analog_button.magnitude = magnitude;
 
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(m_address.c_str(), &event);
   }
   catch (...)
   {
@@ -125,7 +123,6 @@ bool CGameClientJoystick::OnAnalogStickMotion(const std::string& feature, float 
   std::string controllerId = m_controller->ID();
 
   event.type           = GAME_INPUT_EVENT_ANALOG_STICK;
-  event.port           = m_port;
   event.controller_id  = controllerId.c_str();
   event.feature_name   = feature.c_str();
   event.analog_stick.x = x;
@@ -133,7 +130,7 @@ bool CGameClientJoystick::OnAnalogStickMotion(const std::string& feature, float 
 
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(m_address.c_str(), &event);
   }
   catch (...)
   {
@@ -152,7 +149,6 @@ bool CGameClientJoystick::OnAccelerometerMotion(const std::string& feature, floa
   std::string controllerId = m_controller->ID();
 
   event.type            = GAME_INPUT_EVENT_ACCELEROMETER;
-  event.port            = m_port;
   event.controller_id   = controllerId.c_str();
   event.feature_name    = feature.c_str();
   event.accelerometer.x = x;
@@ -161,7 +157,7 @@ bool CGameClientJoystick::OnAccelerometerMotion(const std::string& feature, floa
 
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(m_address.c_str(), &event);
   }
   catch (...)
   {
