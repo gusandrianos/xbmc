@@ -39,6 +39,7 @@ void CControllerLayout::Reset(void)
   m_icon.clear();
   m_strImage.clear();
   m_models.clear();
+  m_topology.Reset();
 }
 
 bool CControllerLayout::IsValid(bool bLog) const
@@ -112,7 +113,6 @@ void CControllerLayout::Deserialize(const TiXmlElement* pElement, const CControl
   if (!models.empty())
     m_models = models;
 
-  // Features
   for (const TiXmlElement* pChild = pElement->FirstChildElement(); pChild != nullptr; pChild = pChild->NextSiblingElement())
   {
     if (pChild->ValueStr() == LAYOUT_XML_ELM_CATEGORY)
@@ -128,6 +128,7 @@ void CControllerLayout::Deserialize(const TiXmlElement* pElement, const CControl
       if (!strCategoryLabelId.empty())
         std::istringstream(strCategoryLabelId) >> categoryLabelId;
 
+      // Features
       for (const TiXmlElement* pFeature = pChild->FirstChildElement(); pFeature != nullptr; pFeature = pFeature->NextSiblingElement())
       {
         CControllerFeature feature;
@@ -135,6 +136,13 @@ void CControllerLayout::Deserialize(const TiXmlElement* pElement, const CControl
         if (feature.Deserialize(pFeature, controller, category, categoryLabelId))
           features.push_back(feature);
       }
+    }
+    else if (pChild->ValueStr() == LAYOUT_XML_ELM_TOPOLOGY)
+    {
+      // Topology
+      CControllerTopology topology;
+      if (topology.Deserialize(pChild))
+        m_topology = std::move(topology);
     }
     else
     {

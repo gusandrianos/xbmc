@@ -60,15 +60,18 @@ bool CGameClientMouse::OnMotion(const std::string& relpointer, int dx, int dy)
   game_input_event event;
 
   event.type            = GAME_INPUT_EVENT_RELATIVE_POINTER;
-  event.port            = GAME_INPUT_PORT_MOUSE;
   event.controller_id   = m_controllerId.c_str();
   event.feature_name    = relpointer.c_str();
   event.rel_pointer.x   = dx;
   event.rel_pointer.y   = dy;
 
+  //! @todo
+  std::string port = "-2";
+  std::string address = port + "/" + m_controllerId;
+
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(address.c_str(), &event);
   }
   catch (...)
   {
@@ -91,14 +94,17 @@ bool CGameClientMouse::OnButtonPress(const std::string& button)
   game_input_event event;
 
   event.type                   = GAME_INPUT_EVENT_DIGITAL_BUTTON;
-  event.port                   = GAME_INPUT_PORT_MOUSE;
   event.controller_id          = m_controllerId.c_str();
   event.feature_name           = button.c_str();
   event.digital_button.pressed = true;
 
+  //! @todo
+  std::string port = "-2";
+  std::string address = port + "/" + m_controllerId;
+
   try
   {
-    bHandled = m_dllStruct->InputEvent(&event);
+    bHandled = m_dllStruct->InputEvent(address.c_str(), &event);
   }
   catch (...)
   {
@@ -113,14 +119,17 @@ void CGameClientMouse::OnButtonRelease(const std::string& button)
   game_input_event event;
 
   event.type                   = GAME_INPUT_EVENT_DIGITAL_BUTTON;
-  event.port                   = GAME_INPUT_PORT_MOUSE;
   event.controller_id          = m_controllerId.c_str();
   event.feature_name           = button.c_str();
   event.digital_button.pressed = false;
 
+  //! @todo
+  std::string port = "-2";
+  std::string address = port + "/" + m_controllerId;
+
   try
   {
-    m_dllStruct->InputEvent(&event);
+    m_dllStruct->InputEvent(address.c_str(), &event);
   }
   catch (...)
   {

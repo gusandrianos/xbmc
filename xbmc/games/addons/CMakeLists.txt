@@ -4,6 +4,7 @@ set(SOURCES GameClient.cpp
             GameClientJoystick.cpp
             GameClientKeyboard.cpp
             GameClientMouse.cpp
+            GameClientPort.cpp
             GameClientProperties.cpp
             GameClientTiming.cpp
             GameClientTranslator.cpp)
@@ -15,6 +16,7 @@ set(HEADERS GameClient.h
             GameClientJoystick.h
             GameClientKeyboard.h
             GameClientMouse.h
+            GameClientPort.h
             GameClientProperties.h
             GameClientTiming.h
             GameClientTranslator.h)

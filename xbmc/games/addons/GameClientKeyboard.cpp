@@ -58,18 +58,20 @@ bool CGameClientKeyboard::OnKeyPress(const CKey& key)
   game_input_event event;
 
   event.type            = GAME_INPUT_EVENT_KEY;
-  event.port            = GAME_INPUT_PORT_KEYBOARD;
   event.controller_id   = ""; //! @todo
   event.feature_name    = ""; //! @todo
   event.key.pressed     = true;
   event.key.character   = static_cast<XBMCVKey>(key.GetButtonCode() & BUTTON_INDEX_MASK);
   event.key.modifiers   = CGameClientTranslator::GetModifiers(static_cast<CKey::Modifier>(key.GetModifiers()));
 
+  //! @todo
+  std::string address = "";
+
   if (event.key.character != 0)
   {
     try
     {
-      bHandled = m_dllStruct->InputEvent(&event);
+      bHandled = m_dllStruct->InputEvent(address.c_str(), &event);
     }
     catch (...)
     {
@@ -85,18 +87,20 @@ void CGameClientKeyboard::OnKeyRelease(const CKey& key)
   game_input_event event;
 
   event.type            = GAME_INPUT_EVENT_KEY;
-  event.port            = GAME_INPUT_PORT_KEYBOARD;
   event.controller_id   = ""; //! @todo
   event.feature_name    = ""; //! @todo
   event.key.pressed     = false;
   event.key.character   = static_cast<XBMCVKey>(key.GetButtonCode() & BUTTON_INDEX_MASK);
   event.key.modifiers   = CGameClientTranslator::GetModifiers(static_cast<CKey::Modifier>(key.GetModifiers()));
 
+  //! @todo
+  std::string address = "";
+
   if (event.key.character != 0)
   {
     try
     {
-      m_dllStruct->InputEvent(&event);
+      m_dllStruct->InputEvent(address.c_str(), &event);
     }
     catch (...)
     {

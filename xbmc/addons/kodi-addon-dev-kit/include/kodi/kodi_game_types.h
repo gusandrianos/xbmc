@@ -159,13 +159,6 @@ typedef enum GAME_HW_CONTEXT_TYPE
   GAME_HW_CONTEXT_OPENGLES3,   // GLES 3.0
 } GAME_HW_CONTEXT_TYPE;
 
-typedef enum GAME_INPUT_PORT
-{
-  GAME_INPUT_PORT_JOYSTICK_START = 0, // Non-negative values are for joystick ports
-  GAME_INPUT_PORT_KEYBOARD = -1,
-  GAME_INPUT_PORT_MOUSE = -2,
-} GAME_INPUT_PORT;
-
 typedef enum GAME_INPUT_EVENT_SOURCE
 {
   GAME_INPUT_EVENT_DIGITAL_BUTTON,
@@ -279,6 +272,8 @@ typedef enum GAME_ROTATION
 typedef struct game_controller
 {
   const char*  controller_id;
+  const char*  model;
+  bool         has_player;
   unsigned int digital_button_count;
   unsigned int analog_button_count;
   unsigned int analog_stick_count;
@@ -288,6 +283,69 @@ typedef struct game_controller
   unsigned int abs_pointer_count;
   unsigned int motor_count;
 } ATTRIBUTE_PACKED game_controller;
+
+struct game_input_port;
+
+typedef struct game_input_device
+{
+  const char*      controller_id;
+  const char*      model;
+  bool             exclusive;
+  bool             force;
+  game_input_port* available_ports;
+  unsigned int     port_count;
+} game_input_device_topology;
+
+typedef struct game_input_port
+{
+  const char*        port_id;
+  game_input_device* accepted_devices;
+  unsigned int       device_count;
+} game_input_port;
+
+/*!
+ * \brief A string representing the controller's topological address
+ *
+ * Controllers are addressed by a sequence of ports and controller IDs,
+ * separated by "/".
+ *
+ * For example, lets assume that the topology XML for Snes9x passed to
+ * game.libretro looks like:
+ *
+ *     <logicaltopology>
+ *       <port id="1">
+ *         <accepts controller="game.controller.snes"/>
+ *       </port>
+ *       <port id="2">
+ *         <accepts controller="game.controller.snes"/>
+ *         <accepts controller="game.controller.snes.multitap">
+ *           <port id="1">
+ *             <accepts controller="game.controller.snes"/>
+ *           </port>
+ *           <port id="2">
+ *             <accepts controller="game.controller.snes"/>
+ *           </port>
+ *           ...
+ *         </accepts>
+ *       </port>
+ *     </logicaltopology>
+ *
+ * To connect a SNES controller to the console's first port, the controller
+ * info would be set using the address:
+ *
+ *     1/game.controller.snes
+ *
+ * To connect a multitap to the console's second port, the multitap's info
+ * would be set using the address:
+ *
+ *     2/game.controller.snes.multitap
+ *
+ * To then connect a SNES controller to the multitap's first port, the
+ * controller info would be set using the address:
+ *
+ *     2/game.controller.snes.multitap/1/game.controller.snes
+ */
+typedef const char* game_controller_address;
 
 typedef struct game_digital_button_event
 {
@@ -340,7 +398,6 @@ typedef struct game_motor_event
 typedef struct game_input_event
 {
   GAME_INPUT_EVENT_SOURCE type;
-  int                     port;
   const char*             controller_id;
   const char*             feature_name;
   union
@@ -467,9 +524,7 @@ typedef struct AddonToKodiFuncTable_Game
   uintptr_t (*HwGetCurrentFramebuffer)(void* kodiInstance);
   game_proc_address_t (*HwGetProcAddress)(void* kodiInstance, const char* symbol);
   void (*RenderFrame)(void* kodiInstance);
-  bool (*OpenPort)(void* kodiInstance, unsigned int port);
-  void (*ClosePort)(void* kodiInstance, unsigned int port);
-  bool (*InputEvent)(void* kodiInstance, const game_input_event* event);
+  bool (*InputEvent)(void* kodiInstance, game_controller_address address, const game_input_event* event);
 
 } AddonToKodiFuncTable_Game;
 
@@ -486,9 +541,11 @@ typedef struct KodiToAddonFuncTable_Game
   GAME_ERROR  (__cdecl* Reset)(void);
   GAME_ERROR  (__cdecl* HwContextReset)(void);
   GAME_ERROR  (__cdecl* HwContextDestroy)(void);
-  void        (__cdecl* UpdatePort)(int, bool, const game_controller*);
   bool        (__cdecl* HasFeature)(const char* controller_id, const char* feature_name);
-  bool        (__cdecl* InputEvent)(const game_input_event*);
+  bool        (__cdecl* GetPorts)(game_input_port**, unsigned int*);
+  void        (__cdecl* FreePorts)(game_input_port*, unsigned int);
+  bool        (__cdecl* SetController)(game_controller_address, const game_controller*);
+  bool        (__cdecl* InputEvent)(game_controller_address, const game_input_event*);
   size_t      (__cdecl* SerializeSize)(void);
   GAME_ERROR  (__cdecl* Serialize)(uint8_t*, size_t);
   GAME_ERROR  (__cdecl* Deserialize)(const uint8_t*, size_t);
