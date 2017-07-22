@@ -188,40 +188,23 @@ public:
   // --- Input callbacks -------------------------------------------------------
 
   /*!
-   * \brief Begin reporting events for the specified joystick port
-   *
-   * \param port The zero-indexed port number
-   *
-   * \return true if the port was opened, false otherwise
-   */
-  bool OpenPort(unsigned int port)
-  {
-    return m_callbacks->toKodi.OpenPort(m_callbacks->toKodi.kodiInstance, port);
-  }
-
-  /*!
-   * \brief End reporting events for the specified port
-   *
-   * \param port The port number passed to OpenPort()
-   */
-  void ClosePort(unsigned int port)
-  {
-    return m_callbacks->toKodi.ClosePort(m_callbacks->toKodi.kodiInstance, port);
-  }
-
-  /*!
   * \brief Notify the port of an input event
   *
+  * \param address The address of the controller receiving the event
   * \param event The input event
+  *
+  * The controller address is a string that allows traversal of the controller
+  * topology. For its specification, see the documentation for the
+  * `game_controller_address` type.
   *
   * Input events can arrive for the following sources:
   *   - GAME_INPUT_EVENT_MOTOR
   *
   * \return true if the event was handled, false otherwise
   */
-  bool InputEvent(const game_input_event& event)
+  bool InputEvent(game_controller_address address, const game_input_event& event)
   {
-    return m_callbacks->toKodi.InputEvent(m_callbacks->toKodi.kodiInstance, &event);
+    return m_callbacks->toKodi.InputEvent(m_callbacks->toKodi.kodiInstance, address, &event);
   }
 
 private:

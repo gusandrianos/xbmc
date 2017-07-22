@@ -131,17 +131,6 @@ GAME_ERROR HwContextDestroy(void);
 // --- Input operations --------------------------------------------------------
 
 /*!
- * \brief Notify the add-on of a status change on an open port
- *
- * Ports can be opened using the OpenPort() callback
- *
- * \param port Non-negative for a joystick port, or GAME_INPUT_PORT value otherwise
- * \param collected True if a controller was connected, false if disconnected
- * \param controller The connected controller
- */
-void UpdatePort(int port, bool connected, const game_controller* controller);
-
-/*!
  * \brief Check if input is accepted for a feature on the controller
  *
  * If only a subset of the controller profile is used, this can return false
@@ -156,13 +145,49 @@ void UpdatePort(int port, bool connected, const game_controller* controller);
 bool HasFeature(const char* controller_id, const char* feature_name);
 
 /*!
+ * \brief Get the logical topology of supported controllers
+ *
+ * \param ports The ports that the emulated game console provides
+ * \param port_cout The number of ports
+ *
+ * If this returns true, ports must be freed using FreePorts().
+ *
+ * If this returns false, it is assumed that the emulated game console has only
+ * a single port that can accept all controllers imported by addon.xml.
+ *
+ * \return True if the topology was returned successfully, false otherwise
+ */
+bool GetPorts(game_input_port** ports, unsigned int* port_count);
+
+/*!
+ * \brief Free the controller topology
+ *
+ * \param ports The list of ports returned by GetPorts()
+ * \param port_count The port count returned by GetPorts()
+ */
+void FreePorts(game_input_port* ports, unsigned int port_count);
+
+/*!
+ * \brief Connect or disconnect a controller
+ *
+ * \param address The address of the controller
+ * \param controller The controller info, or null to disconnect the controller
+ *
+ * The controller address is a string that allows traversal of the controller
+ * topology. For its specification, see the documentation for the
+ * `game_controller_address` type.
+ */
+bool SetController(game_controller_address address, const game_controller* controller);
+
+/*!
  * \brief Notify the add-on of an input event
  *
+ * \param address The address of the controller generating the event
  * \param event The input event
  *
  * \return true if the event was handled, false otherwise
  */
-bool InputEvent(const game_input_event* event);
+bool InputEvent(game_controller_address address, const game_input_event* event);
 
 // --- Serialization operations ------------------------------------------------
 
@@ -247,8 +272,10 @@ void __declspec(dllexport) get_addon(void* ptr)
   pClient->toAddon.Reset                    = Reset;
   pClient->toAddon.HwContextReset           = HwContextReset;
   pClient->toAddon.HwContextDestroy         = HwContextDestroy;
-  pClient->toAddon.UpdatePort               = UpdatePort;
   pClient->toAddon.HasFeature               = HasFeature;
+  pClient->toAddon.GetPorts                 = GetPorts;
+  pClient->toAddon.FreePorts                = FreePorts;
+  pClient->toAddon.SetController            = SetController;
   pClient->toAddon.InputEvent               = InputEvent;
   pClient->toAddon.SerializeSize            = SerializeSize;
   pClient->toAddon.Serialize                = Serialize;
