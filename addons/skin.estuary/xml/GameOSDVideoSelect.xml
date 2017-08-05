@@ -45,6 +45,12 @@
 							<bordertexture colordiffuse="border_alpha">colors/black.png</bordertexture>
 							<bordersize>4</bordersize>
 						</control>
+						<control type="gamewindow">
+							<left>0</left>
+							<top>5</top>
+							<width>330</width>
+							<height>250</height>
+						</control>
 						<control type="label">
 							<left>20</left>
 							<top>255</top>
@@ -69,6 +75,12 @@
 							<texture border="4">DefaultVideo.png</texture>
 							<bordertexture colordiffuse="border_alpha">colors/black.png</bordertexture>
 							<bordersize>4</bordersize>
+						</control>
+						<control type="gamewindow">
+							<left>0</left>
+							<top>5</top>
+							<width>330</width>
+							<height>250</height>
 						</control>
 						<control type="label">
 							<left>20</left>

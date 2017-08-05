@@ -93,6 +93,7 @@ static const ControlMapping controls[] =
     {"textbox",           CGUIControl::GUICONTROL_TEXTBOX},
     {"togglebutton",      CGUIControl::GUICONTROL_TOGGLEBUTTON},
     {"videowindow",       CGUIControl::GUICONTROL_VIDEO},
+    {"gamewindow",        CGUIControl::GUICONTROL_GAME},
     {"mover",             CGUIControl::GUICONTROL_MOVER},
     {"resize",            CGUIControl::GUICONTROL_RESIZE},
     {"edit",              CGUIControl::GUICONTROL_EDIT},
