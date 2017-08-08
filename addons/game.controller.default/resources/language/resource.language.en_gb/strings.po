@@ -61,11 +61,11 @@ msgid "Up"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Down"
+msgid "Right"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Right"
+msgid "Down"
 msgstr ""
 
 msgctxt "#30013"

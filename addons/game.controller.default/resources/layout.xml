@@ -9,8 +9,8 @@
     <button name="back" type="digital" label="30006"/>
     <button name="guide" type="digital" label="30007"/>
     <button name="up" type="digital" label="30010"/>
-    <button name="right" type="digital" label="30012"/>
-    <button name="down" type="digital" label="30011"/>
+    <button name="right" type="digital" label="30011"/>
+    <button name="down" type="digital" label="30012"/>
     <button name="left" type="digital" label="30013"/>
     <button name="leftthumb" type="digital" label="30008"/>
     <button name="rightthumb" type="digital" label="30009"/>
