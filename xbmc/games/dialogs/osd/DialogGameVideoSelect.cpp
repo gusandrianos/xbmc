@@ -30,8 +30,6 @@
 #include "settings/Settings.h"
 #include "view/GUIViewControl.h"
 #include "view/ViewState.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
 #include "FileItem.h"
 #include "ServiceBroker.h"
 
@@ -68,7 +66,7 @@ bool CDialogGameVideoSelect::OnMessage(CGUIMessage &message)
     case GUI_MSG_WINDOW_INIT:
     {
       // Don't init this dialog if we aren't playing a game
-      if (!g_application.m_pPlayer->HasGame())
+      if (m_callback == nullptr)
         return false;
       break;
     }
