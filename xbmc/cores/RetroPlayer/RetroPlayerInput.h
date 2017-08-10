@@ -21,6 +21,7 @@
 
 #include "games/addons/GameClientCallbacks.h"
 #include "peripherals/PeripheralTypes.h"
+#include "utils/Observer.h"
 
 namespace PERIPHERALS
 {
@@ -31,7 +32,8 @@ namespace KODI
 {
 namespace RETRO
 {
-  class CRetroPlayerInput : public GAME::IGameInputCallback
+  class CRetroPlayerInput : public GAME::IGameInputCallback,
+                            public Observer
   {
   public:
     CRetroPlayerInput(PERIPHERALS::CPeripherals &peripheralManager);
@@ -42,7 +44,12 @@ namespace RETRO
     // implementation of IGameAudioCallback
     void PollInput() override;
 
+    // implementation of Observer
+    void Notify(const Observable &obs, const ObservableMessage msg) override;
+
   private:
+    void UpdatePeripherals();
+
     // Construction parameters
     PERIPHERALS::CPeripherals &m_peripheralManager;
 
