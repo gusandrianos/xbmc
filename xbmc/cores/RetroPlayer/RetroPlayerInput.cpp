@@ -29,10 +29,14 @@ CRetroPlayerInput::CRetroPlayerInput(PERIPHERALS::CPeripherals &peripheralManage
   m_peripheralManager(peripheralManager)
 {
   m_inputPollHandle = m_peripheralManager.RegisterEventPoller();
+
+  m_peripheralManager.RegisterObserver(this);
 }
 
 CRetroPlayerInput::~CRetroPlayerInput()
 {
+  m_peripheralManager.UnregisterObserver(this);
+
   m_inputPollHandle.reset();
 }
 
@@ -47,4 +51,26 @@ void CRetroPlayerInput::SetSpeed(double speed)
 void CRetroPlayerInput::PollInput()
 {
   m_inputPollHandle->HandleEvents(true);
+}
+
+void CRetroPlayerInput::Notify(const Observable &obs, const ObservableMessage msg)
+{
+  if (msg == ObservableMessagePeripheralsChanged)
+    UpdatePeripherals();
+}
+
+void CRetroPlayerInput::UpdatePeripherals()
+{
+  using namespace PERIPHERALS;
+
+  PeripheralVector joysticks;
+  m_peripheralManager.GetPeripheralsWithFeature(joysticks, FEATURE_JOYSTICK);
+
+  PeripheralVector keyboard;
+  m_peripheralManager.GetPeripheralsWithFeature(keyboard, FEATURE_KEYBOARD);
+
+  PeripheralVector mouse;
+  m_peripheralManager.GetPeripheralsWithFeature(mouse, FEATURE_MOUSE);
+
+  //! @todo
 }
