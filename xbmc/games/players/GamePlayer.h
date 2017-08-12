@@ -19,18 +19,44 @@
  */
 #pragma once
 
-class CSetting;
+#include "peripherals/PeripheralTypes.h"
+
+namespace PERIPHERALS
+{
+  class CPeripheral;
+  class CPeripherals;
+}
 
 namespace KODI
 {
+
+namespace HARDWARE
+{
+  class IHardwareInput;
+}
+
+namespace JOYSTICK
+{
+  class IInputHandler;
+}
+
 namespace GAME
 {
+  class CGameClient;
+  class CPortMapper;
 
-class CPlayer
-{
-public:
-  CPlayer();
-};
+  class CGamePlayer
+  {
+  public:
+    CGamePlayer();
 
+  private:
+    JOYSTICK::IInputHandler*    handler; // Input handler for this port
+    HARDWARE::IHardwareInput    *hardwareInput; // Callbacks for hardware input
+    unsigned int                port;    // Port number belonging to the game client
+    PERIPHERALS::PeripheralType requiredType;
+    void*                       device;
+    CGameClient*                gameClient;
+  };
 } // namespace GAME
 }

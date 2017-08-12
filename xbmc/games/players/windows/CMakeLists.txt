@@ -1,12 +1,10 @@
 set(SOURCES GUIPlayerPanel.cpp
             GUIPlayerWindow.cpp
-            GUIVirtualPortPanel.cpp
 )
 
 set(HEADERS GUIPlayerPanel.h
             GUIPlayerWindow.h
             GUIPlayerWindowDefines.h
-            GUIVirtualPortPanel.h
             IPlayerWindow.h
 )
 

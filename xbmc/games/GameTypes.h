@@ -34,5 +34,9 @@ namespace GAME
   class CGameClientPort;
   using GameClientPortPtr = std::shared_ptr<CGameClientPort>;
   using GameClientTopology = std::vector<GameClientPortPtr>;
+
+  class CGamePlayer;
+  using GamePlayerPtr = std::shared_ptr<CGamePlayer>;
+  using GamePlayerVector = std::vector<GamePlayerPtr>;
 }
 }

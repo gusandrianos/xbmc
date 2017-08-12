@@ -18,9 +18,9 @@
  *
  */
 
-#include "Player.h"
+#include "GamePlayer.h"
 
 using namespace KODI;
 using namespace GAME;
 
-CPlayer::CPlayer() = default;
+CGamePlayer::CGamePlayer() = default;
