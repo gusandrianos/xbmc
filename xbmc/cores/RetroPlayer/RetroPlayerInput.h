@@ -20,8 +20,11 @@
 #pragma once
 
 #include "games/addons/GameClientCallbacks.h"
+#include "games/players/IPlayerHandler.h"
 #include "peripherals/PeripheralTypes.h"
 #include "utils/Observer.h"
+
+#include <map>
 
 namespace PERIPHERALS
 {
@@ -30,19 +33,34 @@ namespace PERIPHERALS
 
 namespace KODI
 {
+namespace GAME
+{
+  class CGameClient;
+}
+
 namespace RETRO
 {
+  class CRetroPlayerAgent;
+
   class CRetroPlayerInput : public GAME::IGameInputCallback,
+                            public GAME::IPlayerHandler,
                             public Observer
   {
   public:
-    CRetroPlayerInput(PERIPHERALS::CPeripherals &peripheralManager);
+    CRetroPlayerInput(const GAME::CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager);
     ~CRetroPlayerInput() override;
 
     void SetSpeed(double speed);
 
-    // implementation of IGameAudioCallback
+    void HardwareReset();
+
+    // implementation of IGameInputCallback
     void PollInput() override;
+
+    // implementation of IPlayerHandler
+    void AddPlayer(unsigned int index, const std::string &controllerAddress) override;
+    void UpdateAddress(unsigned int index, const std::string &controllerAddress) override;
+    void RemovePlayer(unsigned int index) override;
 
     // implementation of Observer
     void Notify(const Observable &obs, const ObservableMessage msg) override;
@@ -51,10 +69,12 @@ namespace RETRO
     void UpdatePeripherals();
 
     // Construction parameters
+    GAME::CGameClient &m_gameClient;
     PERIPHERALS::CPeripherals &m_peripheralManager;
 
     // Input variables
     PERIPHERALS::EventPollHandlePtr m_inputPollHandle;
+    std::map<unsigned int, CRetroPlayerAgent> m_agents;
   };
 }
 }

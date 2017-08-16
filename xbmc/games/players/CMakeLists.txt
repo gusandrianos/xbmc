@@ -1,5 +1,10 @@
-set(SOURCES Player.cpp)
+set(SOURCES Player.cpp
+            PlayerManager.cpp
+)
 
-set(HEADERS Player.h)
+set(HEADERS IPlayerHandler.h
+            Player.h
+            PlayerManager.h
+)
 
 core_add_library(games_players)

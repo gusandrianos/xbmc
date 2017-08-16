@@ -22,7 +22,7 @@
 #include "cores/RetroPlayer/guicontrols/GUIGameControlManager.h"
 #include "controllers/Controller.h"
 #include "controllers/ControllerManager.h"
-#include "games/ports/PortManager.h"
+#include "games/players/PlayerManager.h"
 #include "ServiceBroker.h"
 
 using namespace KODI;
@@ -30,7 +30,7 @@ using namespace GAME;
 
 CGameServices::CGameServices(CControllerManager &controllerManager, PERIPHERALS::CPeripherals& peripheralManager) :
   m_controllerManager(controllerManager),
-  m_portManager(new CPortManager(peripheralManager)),
+  m_playerManager(new CPlayerManager(peripheralManager)),
   m_gameControlManager(new RETRO::CGUIGameControlManager)
 {
 }
@@ -50,9 +50,4 @@ ControllerPtr CGameServices::GetDefaultController()
 ControllerVector CGameServices::GetControllers()
 {
   return m_controllerManager.GetControllers();
-}
-
-CPortManager& CGameServices::PortManager()
-{
-  return *m_portManager;
 }

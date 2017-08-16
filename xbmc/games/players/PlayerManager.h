@@ -19,10 +19,12 @@
  */
 #pragma once
 
-#include "controllers/ControllerTypes.h"
+#include "games/GameTypes.h"
+#include "utils/Observer.h"
 
-#include <memory>
-#include <string>
+#include <map>
+
+class CSetting;
 
 namespace PERIPHERALS
 {
@@ -31,37 +33,33 @@ namespace PERIPHERALS
 
 namespace KODI
 {
-namespace RETRO
-{
-  class CGUIGameControlManager;
-}
-
 namespace GAME
 {
-  class CControllerManager;
-  class CPlayerManager;
+  class IPlayerFrontend;
+  class IPlayerHandler;
 
-  class CGameServices
+  class CPlayerManager : public Observer
   {
   public:
-    CGameServices(CControllerManager &controllerManager, PERIPHERALS::CPeripherals& peripheralManager);
-    ~CGameServices();
+    CPlayerManager(PERIPHERALS::CPeripherals &peripheralManager);
+    ~CPlayerManager();
 
-    ControllerPtr GetController(const std::string& controllerId);
-    ControllerPtr GetDefaultController();
-    ControllerVector GetControllers();
+    void RegisterPlayerHandler(IPlayerHandler *handler, GameClientTopology topology);
+    void UnregisterPlayerHandler(IPlayerHandler *handler);
 
-    CPlayerManager& PlayerManager() { return *m_playerManager; }
+    void RegisterFrontend(IPlayerFrontend *frontend);
+    void UnregisterFrontend(IPlayerFrontend *frontend);
 
-    RETRO::CGUIGameControlManager &GameControls() { return *m_gameControlManager; }
+    // implementation of Observer
+    void Notify(const Observable& obs, const ObservableMessage msg) override;
 
   private:
-    // Construction parameters
-    CControllerManager &m_controllerManager;
+    void ProcessPeripherals();
 
-    // Game services
-    std::unique_ptr<CPlayerManager> m_playerManager;
-    std::unique_ptr<RETRO::CGUIGameControlManager> m_gameControlManager;
+    // Construction parameters
+    PERIPHERALS::CPeripherals &m_peripheralManager;
+
+    std::map<IPlayerHandler*, GameClientTopology> m_topologies;
   };
-}
+} // namespace GAME
 }

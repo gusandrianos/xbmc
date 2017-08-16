@@ -861,7 +861,7 @@ void CGameClient::ClosePort(const std::string &address)
   {
     CLog::Log(LOGDEBUG, "Closing port at controller address \"%s\"", address.c_str());
 
-    CServiceBroker::GetGameServices().PortManager().ClosePort(m_ports[address].get());
+    //CServiceBroker::GetGameServices().PortManager().ClosePort(m_ports[address].get()); //! @todo
 
     try { m_struct.toAddon.SetController(address.c_str(), nullptr); }
     catch (...) { LogException("SetController()"); }
@@ -958,7 +958,7 @@ void CGameClient::OpenControllerPorts()
         if (m_bSupportsKeyboard)
           deviceType = PERIPHERALS::PERIPHERAL_JOYSTICK;
 
-        CServiceBroker::GetGameServices().PortManager().OpenPort(inputHandler, m_hardware.get(), this, portIndex, deviceType);
+        //CServiceBroker::GetGameServices().PortManager().OpenPort(inputHandler, m_hardware.get(), this, portIndex, deviceType); //! @todo
 
         portIndex++;
       }

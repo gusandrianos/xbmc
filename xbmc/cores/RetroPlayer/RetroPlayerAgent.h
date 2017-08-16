@@ -19,36 +19,19 @@
  */
 #pragma once
 
-#include "peripherals/PeripheralTypes.h"
-
-class CSetting;
+#include <string>
 
 namespace KODI
 {
-namespace JOYSTICK
+namespace RETRO
 {
-  class IInputHandler;
-}
-namespace HARDWARE
-{
-  class IHardwareInput;
-}
-
-namespace GAME
-{
-  class CGameClient;
-
-  class CPlayer
+  class CRetroPlayerAgent
   {
   public:
-    CPlayer();
+    CRetroPlayerAgent() = default;
 
   private:
-    JOYSTICK::IInputHandler *handler;
-    HARDWARE::IHardwareInput *hardwareInput;
-    PERIPHERALS::PeripheralType requiredType;
-    void* device;
-    CGameClient* gameClient;
+    std::string m_controllerAddress;
   };
-} // namespace GAME
+}
 }

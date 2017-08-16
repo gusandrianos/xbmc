@@ -19,36 +19,18 @@
  */
 #pragma once
 
-#include "peripherals/PeripheralTypes.h"
-
-class CSetting;
-
 namespace KODI
 {
-namespace JOYSTICK
-{
-  class IInputHandler;
-}
-namespace HARDWARE
-{
-  class IHardwareInput;
-}
-
 namespace GAME
 {
-  class CGameClient;
-
-  class CPlayer
+  class IPlayerHandler
   {
   public:
-    CPlayer();
+    virtual ~IPlayerHandler() = default;
 
-  private:
-    JOYSTICK::IInputHandler *handler;
-    HARDWARE::IHardwareInput *hardwareInput;
-    PERIPHERALS::PeripheralType requiredType;
-    void* device;
-    CGameClient* gameClient;
+    virtual void AddPlayer(unsigned int index, const std::string &controllerAddress) = 0;
+    virtual void UpdateAddress(unsigned int index, const std::string &controllerAddress) = 0;
+    virtual void RemovePlayer(unsigned int index) = 0;
   };
-} // namespace GAME
+}
 }

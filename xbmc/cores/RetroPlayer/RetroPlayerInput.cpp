@@ -19,23 +19,29 @@
  */
 
 #include "RetroPlayerInput.h"
+#include "games/addons/GameClient.h"
+#include "games/players/PlayerManager.h"
+#include "games/GameServices.h"
 #include "peripherals/Peripherals.h"
 #include "peripherals/EventPollHandle.h"
+#include "ServiceBroker.h"
 
 using namespace KODI;
+using namespace GAME;
 using namespace RETRO;
 
-CRetroPlayerInput::CRetroPlayerInput(PERIPHERALS::CPeripherals &peripheralManager) :
+CRetroPlayerInput::CRetroPlayerInput(const CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager) :
+  m_gameClient(gameClient),
   m_peripheralManager(peripheralManager)
 {
   m_inputPollHandle = m_peripheralManager.RegisterEventPoller();
 
-  m_peripheralManager.RegisterObserver(this);
+  CServiceBroker::GetGameServices().PlayerManager().RegisterPlayerHandler(this, m_gameClient.ControllerTopology());
 }
 
 CRetroPlayerInput::~CRetroPlayerInput()
 {
-  m_peripheralManager.UnregisterObserver(this);
+  CServiceBroker::GetGameServices().PlayerManager().UnregisterPlayerHandler(this);
 
   m_inputPollHandle.reset();
 }
@@ -48,9 +54,29 @@ void CRetroPlayerInput::SetSpeed(double speed)
     m_inputPollHandle->Deactivate();
 }
 
+void CRetroPlayerInput::HardwareReset()
+{
+  //! @todo
+}
+
 void CRetroPlayerInput::PollInput()
 {
   m_inputPollHandle->HandleEvents(true);
+}
+
+void CRetroPlayerInput::AddPlayer(unsigned int index, const std::string &controllerAddress)
+{
+
+}
+
+void CRetroPlayerInput::UpdateAddress(unsigned int index, const std::string &controllerAddress)
+{
+
+}
+
+void CRetroPlayerInput::RemovePlayer(unsigned int index)
+{
+
 }
 
 void CRetroPlayerInput::Notify(const Observable &obs, const ObservableMessage msg)

@@ -17,38 +17,12 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
-#pragma once
 
-#include "peripherals/PeripheralTypes.h"
+#include "RetroPlayerAgent.h"
 
-class CSetting;
+using namespace KODI;
+using namespace RETRO;
 
-namespace KODI
+CRetroPlayerAgent::CRetroPlayerAgent()
 {
-namespace JOYSTICK
-{
-  class IInputHandler;
-}
-namespace HARDWARE
-{
-  class IHardwareInput;
-}
-
-namespace GAME
-{
-  class CGameClient;
-
-  class CPlayer
-  {
-  public:
-    CPlayer();
-
-  private:
-    JOYSTICK::IInputHandler *handler;
-    HARDWARE::IHardwareInput *hardwareInput;
-    PERIPHERALS::PeripheralType requiredType;
-    void* device;
-    CGameClient* gameClient;
-  };
-} // namespace GAME
 }

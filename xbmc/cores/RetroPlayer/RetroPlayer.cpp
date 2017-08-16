@@ -120,7 +120,7 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
     {
       m_audio.reset(new CRetroPlayerAudio(*m_processInfo));
       m_video.reset(new CRetroPlayerVideo(*m_renderManager, *m_processInfo));
-      m_input.reset(new CRetroPlayerInput(CServiceBroker::GetPeripherals()));
+      m_input.reset(new CRetroPlayerInput(*m_gameClient, CServiceBroker::GetPeripherals()));
 
       if (!fileCopy.GetPath().empty())
         bSuccess = m_gameClient->OpenFile(fileCopy, m_audio.get(), m_video.get(), m_input.get());
@@ -371,7 +371,9 @@ bool CRetroPlayer::OnAction(const CAction &action)
 
       m_gameClient->GetPlayback()->SetSpeed(0.0);
 
-      CServiceBroker::GetGameServices().PortManager().HardwareReset();
+      m_input->HardwareReset();
+
+      //CServiceBroker::GetGameServices().PortManager().HardwareReset(); //! @todo
 
       // If rewinding or paused, begin playback
       if (speed <= 0.0)
