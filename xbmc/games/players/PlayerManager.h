@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include "PlayerTypes.h"
 #include "games/GameTypes.h"
 #include "utils/Observer.h"
 
@@ -55,11 +56,18 @@ namespace GAME
 
   private:
     void ProcessPeripherals();
+    void OnDisconnect(const CPort &port);
 
     // Construction parameters
     PERIPHERALS::CPeripherals &m_peripheralManager;
 
-    std::map<IPlayerHandler*, GameClientTopology> m_topologies;
+    // Peripherals
+    PERIPHERALS::PeripheralVector m_joysticks;
+    PERIPHERALS::PeripheralVector m_keyboard;
+    PERIPHERALS::PeripheralVector m_mouse;
+
+    PortVector m_ports;
+    std::map<IPlayerHandler*, GameClientTopology> m_playerHandlers;
   };
 } // namespace GAME
 }

@@ -36,16 +36,17 @@ namespace GAME
 {
   class CGameClient;
 
-  class CPort : public JOYSTICK::IInputHandler,
-                public IKeymapEnvironment
+  class CPlayer : public JOYSTICK::IInputHandler,
+                  public IKeymapEnvironment
   {
   public:
-    CPort(JOYSTICK::IInputHandler* gameInput, CGameClient& gameClient);
-    ~CPort();
+    CPlayer(const std::string &peripheral, JOYSTICK::IInputHandler* gameInput, CGameClient& gameClient);
+    ~CPlayer();
 
     void RegisterInput(JOYSTICK::IInputProvider *provider);
     void UnregisterInput(JOYSTICK::IInputProvider *provider);
 
+    const std::string &Peripheral() const { return m_peripheral; }
     JOYSTICK::IInputHandler *InputHandler() { return m_gameInput; }
 
     // Implementation of IInputHandler
@@ -67,6 +68,8 @@ namespace GAME
 
   private:
     // Construction parameters
+    const std::string m_peripheral;
+
     JOYSTICK::IInputHandler* const m_gameInput;
     CGameClient& m_gameClient;
 
@@ -75,6 +78,12 @@ namespace GAME
 
     // Prevents input falling through to Kodi when not handled by the game
     std::unique_ptr<JOYSTICK::IInputHandler> m_inputSink;
+
+
+    HARDWARE::IHardwareInput *hardwareInput;
+    PERIPHERALS::PeripheralType requiredType;
+    void* device;
+    CGameClient* gameClient;
   };
 }
 }

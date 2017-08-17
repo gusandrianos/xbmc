@@ -17,10 +17,19 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "Player.h"
+#include <memory>
+#include <vector>
 
-using namespace KODI;
-using namespace GAME;
+namespace KODI
+{
+namespace GAME
+{
 
-CPlayer::CPlayer() = default;
+class CPort;
+using PortPtr = std::shared_ptr<CPort>;
+using PortVector = std::vector<PortPtr>;
+
+}
+}

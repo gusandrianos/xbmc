@@ -18,7 +18,8 @@
  *
  */
 
-#include "Port.h"
+#include "Player.h"
+
 #include "InputSink.h"
 #include "games/addons/GameClient.h"
 #include "guilib/WindowIDs.h"
@@ -28,16 +29,16 @@
 using namespace KODI;
 using namespace GAME;
 
-CPort::CPort(JOYSTICK::IInputHandler *gameInput, CGameClient &gameClient) :
-  m_gameInput(gameInput),
+CPlayer::CPlayer(JOYSTICK::IInputHandler *playerInput, CGameClient &gameClient) :
+  m_playerInput(playerInput),
   m_gameClient(gameClient),
   m_inputSink(new CInputSink(gameClient))
 {
 }
 
-CPort::~CPort() = default;
+CPlayer::~CPlayer() = default;
 
-void CPort::RegisterInput(JOYSTICK::IInputProvider *provider)
+void CPlayer::RegisterInput(JOYSTICK::IInputProvider *provider)
 {
   // Give input sink the lowest priority by registering it before the other
   // input handlers
@@ -50,7 +51,7 @@ void CPort::RegisterInput(JOYSTICK::IInputProvider *provider)
   m_appInput.reset(new JOYSTICK::CKeymapHandling(provider, false, this));
 }
 
-void CPort::UnregisterInput(JOYSTICK::IInputProvider *provider)
+void CPlayer::UnregisterInput(JOYSTICK::IInputProvider *provider)
 {
   // Unregister in reverse order
   m_appInput.reset();
@@ -58,17 +59,17 @@ void CPort::UnregisterInput(JOYSTICK::IInputProvider *provider)
   provider->UnregisterInputHandler(m_inputSink.get());
 }
 
-std::string CPort::ControllerID() const
+std::string CPlayer::ControllerID() const
 {
   return m_gameInput->ControllerID();
 }
 
-bool CPort::AcceptsInput(const std::string& feature) const
+bool CPlayer::AcceptsInput(const std::string& feature) const
 {
   return m_gameClient.AcceptsInput();
 }
 
-bool CPort::OnButtonPress(const std::string& feature, bool bPressed)
+bool CPlayer::OnButtonPress(const std::string& feature, bool bPressed)
 {
   if (bPressed && !m_gameClient.AcceptsInput())
     return false;
@@ -76,12 +77,12 @@ bool CPort::OnButtonPress(const std::string& feature, bool bPressed)
   return m_gameInput->OnButtonPress(feature, bPressed);
 }
 
-void CPort::OnButtonHold(const std::string& feature, unsigned int holdTimeMs)
+void CPlayer::OnButtonHold(const std::string& feature, unsigned int holdTimeMs)
 {
   m_gameInput->OnButtonHold(feature, holdTimeMs);
 }
 
-bool CPort::OnButtonMotion(const std::string& feature, float magnitude, unsigned int motionTimeMs)
+bool CPlayer::OnButtonMotion(const std::string& feature, float magnitude, unsigned int motionTimeMs)
 {
   if (magnitude > 0.0f && !m_gameClient.AcceptsInput())
     return false;
@@ -89,7 +90,7 @@ bool CPort::OnButtonMotion(const std::string& feature, float magnitude, unsigned
   return m_gameInput->OnButtonMotion(feature, magnitude, motionTimeMs);
 }
 
-bool CPort::OnAnalogStickMotion(const std::string& feature, float x, float y, unsigned int motionTimeMs)
+bool CPlayer::OnAnalogStickMotion(const std::string& feature, float x, float y, unsigned int motionTimeMs)
 {
   if ((x != 0.0f || y != 0.0f) && !m_gameClient.AcceptsInput())
     return false;
@@ -97,7 +98,7 @@ bool CPort::OnAnalogStickMotion(const std::string& feature, float x, float y, un
   return m_gameInput->OnAnalogStickMotion(feature, x, y, motionTimeMs);
 }
 
-bool CPort::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
+bool CPlayer::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
 {
   if (!m_gameClient.AcceptsInput())
     return false;
@@ -105,7 +106,7 @@ bool CPort::OnAccelerometerMotion(const std::string& feature, float x, float y, 
   return m_gameInput->OnAccelerometerMotion(feature, x, y, z);
 }
 
-int CPort::GetWindowID() const
+int CPlayer::GetWindowID() const
 {
   return WINDOW_FULLSCREEN_GAME;
 }
