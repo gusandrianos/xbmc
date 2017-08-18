@@ -144,6 +144,9 @@ void CRPRenderManager::AddFrame(const uint8_t* data, unsigned int size)
 void CRPRenderManager::SetSpeed(double speed)
 {
   m_speed = speed;
+
+  for (const auto &renderer : m_renderers)
+    renderer->SetSpeed(speed); //! @todo Retroactive set speed for newly created renderers
 }
 
 void CRPRenderManager::FrameMove()
@@ -359,7 +362,12 @@ std::shared_ptr<CRPBaseRenderer> CRPRenderManager::GetRenderer(IRenderBufferPool
   // If buffer pool has no compatible renderers, create one now
   if (!renderer)
   {
-    renderer.reset(m_processInfo.CreateRenderer(bufferPool, renderSettings));
+    const std::string &shaderPreset = renderSettings.VideoSettings().GetShaderPreset();
+
+    // Try to create a renderer now, unless the shader preset has failed already
+    if (shaderPreset.empty() || m_failedShaderPresets.find(shaderPreset) == m_failedShaderPresets.end())
+      renderer.reset(m_processInfo.CreateRenderer(bufferPool, renderSettings));
+
     if (renderer && renderer->Configure(m_format, m_width, m_height, m_orientation))
     {
       // Ensure we have a render buffer for this renderer
@@ -369,6 +377,10 @@ std::shared_ptr<CRPBaseRenderer> CRPRenderManager::GetRenderer(IRenderBufferPool
     }
     else
       renderer.reset();
+
+    // If we failed to create a renderer, blacklist the shader preset
+    if (!renderer && !shaderPreset.empty())
+      m_failedShaderPresets.insert(shaderPreset);
   }
 
   return renderer;
@@ -491,6 +503,8 @@ CRenderVideoSettings CRPRenderManager::GetEffectiveSettings(const IGUIRenderSett
 
   if (settings != nullptr)
   {
+    if (settings->HasShaderPreset())
+      effectiveSettings.SetShaderPreset(settings->GetSettings().VideoSettings().GetShaderPreset());
     if (settings->HasScalingMethod())
       effectiveSettings.SetScalingMethod(settings->GetSettings().VideoSettings().GetScalingMethod());
     if (settings->HasViewMode())
@@ -498,7 +512,9 @@ CRenderVideoSettings CRPRenderManager::GetEffectiveSettings(const IGUIRenderSett
   }
 
   // Sanitize settings
-  if (effectiveSettings.GetScalingMethod() == VS_SCALINGMETHOD_AUTO)
+  if (!effectiveSettings.GetShaderPreset().empty())
+    effectiveSettings.SetScalingMethod(VS_SCALINGMETHOD_AUTO);
+  else if (effectiveSettings.GetScalingMethod() == VS_SCALINGMETHOD_AUTO)
     effectiveSettings.SetScalingMethod(m_processInfo.GetDefaultScalingMethod());
 
   return effectiveSettings;
