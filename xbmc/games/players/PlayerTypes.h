@@ -27,9 +27,9 @@ namespace KODI
 namespace GAME
 {
 
-class CPort;
-using PortPtr = std::shared_ptr<CPort>;
-using PortVector = std::vector<PortPtr>;
+class CPlayer;
+using PlayerPtr = std::shared_ptr<CPlayer>;
+using PlayerVector = std::vector<PlayerPtr>;
 
 }
 }

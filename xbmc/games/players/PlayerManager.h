@@ -56,17 +56,20 @@ namespace GAME
 
   private:
     void ProcessPeripherals();
-    void OnDisconnect(const CPort &port);
+    void OnDisconnect(const CPlayer &player);
 
     // Construction parameters
     PERIPHERALS::CPeripherals &m_peripheralManager;
 
     // Peripherals
-    PERIPHERALS::PeripheralVector m_joysticks;
-    PERIPHERALS::PeripheralVector m_keyboard;
-    PERIPHERALS::PeripheralVector m_mouse;
+    //PERIPHERALS::PeripheralVector m_joysticks;
+    //PERIPHERALS::PeripheralVector m_keyboard;
+    //PERIPHERALS::PeripheralVector m_mouse;
 
-    PortVector m_ports;
+    PlayerVector m_localPlayers;
+    PlayerVector m_spectators;
+
+
     std::map<IPlayerHandler*, GameClientTopology> m_playerHandlers;
   };
 } // namespace GAME

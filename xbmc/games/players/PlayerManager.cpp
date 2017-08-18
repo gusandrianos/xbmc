@@ -68,101 +68,56 @@ void CPlayerManager::ProcessPeripherals()
   if (m_playerHandlers.empty())
   {
     // Nothing to do
-    m_ports.clear();
+    m_localPlayers.clear();
     return;
   }
 
   PeripheralVector joysticks;
   m_peripheralManager.GetPeripheralsWithFeature(joysticks, FEATURE_JOYSTICK);
 
-  PeripheralVector keyboard;
-  m_peripheralManager.GetPeripheralsWithFeature(joysticks, FEATURE_KEYBOARD);
+  PeripheralVector keyboards;
+  m_peripheralManager.GetPeripheralsWithFeature(keyboards, FEATURE_KEYBOARD);
 
-  PeripheralVector mouse;
-  m_peripheralManager.GetPeripheralsWithFeature(joysticks, FEATURE_MOUSE);
-
-
-  //! @todo
-  m_joysticks = std::move(joysticks);
-  m_keyboard = std::move(keyboard);
-  m_mouse = std::move(mouse);
-
+  PeripheralVector mice;
+  m_peripheralManager.GetPeripheralsWithFeature(mice, FEATURE_MOUSE);
 
   // Look for disconnected joysticks
-  for (auto &port : m_ports)
+  for (auto &player : m_localPlayers)
   {
     if (std::find_if(joysticks.begin(), joysticks.end(),
-      [&port](const PeripheralPtr &peripheral)
+      [&player](const PeripheralPtr &peripheral)
       {
-        return port->Peripheral() == peripheral;
+        return player->Peripheral() == peripheral;
       }) == joysticks.end())
     {
-      OnDisconnect(*port);
-      port.reset();
+      OnDisconnect(*player);
+      player.reset();
     }
   }
 
-  m_ports.erase(std::remove_if(m_ports.begin(), m_ports.end(),
-    [](const PortPtr &port)
+  m_localPlayers.erase(std::remove_if(m_localPlayers.begin(), m_localPlayers.end(),
+    [](const PlayerPtr &port)
     {
       return !port;
-    }), m_ports.end());
+    }), m_localPlayers.end());
 
   // Look for newly connected joysticks
   for (auto &joystick : joysticks)
   {
-    if (std::find_if(m_ports.begin(), m_ports.end(),
-      [joystick](const PortPtr &port)
+    if (std::find_if(m_localPlayers.begin(), m_localPlayers.end(),
+      [joystick](const PlayerPtr &player)
       {
-        return joystick == port->Peripheral();
-      }) == m_ports.end())
+        return joystick == player->Peripheral();
+      }) == m_localPlayers.end())
     {
-      PortPtr newPort = std::make_shared<CPort>(joystick->Location(), this);
-
-      newPort->RegisterInput(joystick.get());
-
-      m_portMap.insert(std::make_pair(joystick.get(), std::move(newPort)));
-      m_ports.emplace_back(std::make_shared<CPort>(joystick.get()));
-    }
-  }
-
-
-    auto itConnectedPort = newPortMap.find(joystick.get());
-    auto itDisconnectedPort = m_portMap.find(joystick.get());
-
-    IInputHandler* newHandler = itConnectedPort != newPortMap.end() ? itConnectedPort->second : nullptr;
-    IInputHandler* oldHandler = itDisconnectedPort != m_portMap.end() ? itDisconnectedPort->second->InputHandler() : nullptr;
-
-    if (oldHandler != newHandler)
-    {
-      // Unregister old handler
-      if (oldHandler != nullptr)
-      {
-        PortPtr& oldPort = itDisconnectedPort->second;
-
-        oldPort->UnregisterInput(joystick.get());
-
-        m_portMap.erase(itDisconnectedPort);
-      }
-
-      // Register new handler
-      if (newHandler != nullptr)
-      {
-        CGameClient *gameClient = m_portManager.GameClient(newHandler);
-        if (gameClient)
-        {
-          PortPtr newPort(new CPort(newHandler, *gameClient));
-
-          newPort->RegisterInput(joystick.get());
-
-          m_portMap.insert(std::make_pair(joystick.get(), std::move(newPort)));
-        }
-      }
+      PlayerPtr newPlayer = std::make_shared<CPlayer>(joystick, this);
+      m_localPlayers.emplace_back(newPlayer);
+      m_spectators.emplace_back(std::move(newPlayer));
     }
   }
 }
 
-void OnDisconnect(const CPort &port)
+void OnDisconnect(const CPlayer &player)
 {
   //! @todo
 }
