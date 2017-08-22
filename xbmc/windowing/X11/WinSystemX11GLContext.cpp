@@ -34,10 +34,13 @@
 #include "Application.h"
 #include "VideoSyncDRM.h"
 #include "VideoSyncGLX.h"
+#include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererOpenGL.h"
 #include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
 #include "cores/VideoPlayer/Process/X11/ProcessInfoX11.h"
 #include "cores/VideoPlayer/VideoRenderers/LinuxRendererGL.h"
 #include "cores/VideoPlayer/VideoRenderers/RenderFactory.h"
+
+using namespace KODI;
 
 CWinSystemX11GLContext::CWinSystemX11GLContext() = default;
 
@@ -214,6 +217,7 @@ bool CWinSystemX11GLContext::RefreshGLContext(bool force)
   CDVDFactoryCodec::ClearHWAccels();
   VIDEOPLAYER::CRendererFactory::ClearRenderer();
   CLinuxRendererGL::Register();
+  RETRO::CRPRendererOpenGL::Register();
 
   m_pGLContext = new CGLContextEGL(m_dpy);
   success = m_pGLContext->Refresh(force, m_nScreen, m_glWindow, m_newGlContext);
