@@ -17420,7 +17420,13 @@ msgctxt "#35234"
 msgid "Controls"
 msgstr ""
 
-#empty strings from id 35235 to 35249
+#empty strings from id 35235 to 35248
+
+#. Button to open the saved game manager from the game OSD
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35249"
+msgid "Saved games"
+msgstr ""
 
 #: xbmc/windows/GUIMediaWindow.cpp
 msgctxt "#35250"
