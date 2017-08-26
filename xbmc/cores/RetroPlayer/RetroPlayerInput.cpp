@@ -30,7 +30,7 @@ using namespace KODI;
 using namespace GAME;
 using namespace RETRO;
 
-CRetroPlayerInput::CRetroPlayerInput(const CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager) :
+CRetroPlayerInput::CRetroPlayerInput(CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager) :
   m_gameClient(gameClient),
   m_peripheralManager(peripheralManager)
 {

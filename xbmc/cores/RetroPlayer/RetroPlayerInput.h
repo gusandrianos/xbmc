@@ -25,6 +25,7 @@
 #include "utils/Observer.h"
 
 #include <map>
+#include <memory> //! @todo
 
 namespace PERIPHERALS
 {
@@ -47,7 +48,7 @@ namespace RETRO
                             public Observer
   {
   public:
-    CRetroPlayerInput(const GAME::CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager);
+    CRetroPlayerInput(GAME::CGameClient &gameClient, PERIPHERALS::CPeripherals &peripheralManager);
     ~CRetroPlayerInput() override;
 
     void SetSpeed(double speed);
@@ -74,7 +75,7 @@ namespace RETRO
 
     // Input variables
     PERIPHERALS::EventPollHandlePtr m_inputPollHandle;
-    std::map<unsigned int, CRetroPlayerAgent> m_agents;
+    std::map<unsigned int, std::shared_ptr<CRetroPlayerAgent>> m_agents; //! @todo
   };
 }
 }

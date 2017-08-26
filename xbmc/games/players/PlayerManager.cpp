@@ -19,6 +19,7 @@
  */
 
 #include "PlayerManager.h"
+#include "Player.h"
 #include "peripherals/Peripherals.h"
 
 using namespace KODI;
@@ -87,7 +88,7 @@ void CPlayerManager::ProcessPeripherals()
     if (std::find_if(joysticks.begin(), joysticks.end(),
       [&player](const PeripheralPtr &peripheral)
       {
-        return player->Peripheral() == peripheral;
+        return player->Peripheral() == peripheral->Location();
       }) == joysticks.end())
     {
       OnDisconnect(*player);
@@ -107,17 +108,19 @@ void CPlayerManager::ProcessPeripherals()
     if (std::find_if(m_localPlayers.begin(), m_localPlayers.end(),
       [joystick](const PlayerPtr &player)
       {
-        return joystick == player->Peripheral();
+        return joystick->Location() == player->Peripheral();
       }) == m_localPlayers.end())
     {
-      PlayerPtr newPlayer = std::make_shared<CPlayer>(joystick, this);
+      /*
+      PlayerPtr newPlayer = std::make_shared<CPlayer>(joystick->Location(), this); //! @todo
       m_localPlayers.emplace_back(newPlayer);
       m_spectators.emplace_back(std::move(newPlayer));
+      */
     }
   }
 }
 
-void OnDisconnect(const CPlayer &player)
+void CPlayerManager::OnDisconnect(const CPlayer &player)
 {
   //! @todo
 }

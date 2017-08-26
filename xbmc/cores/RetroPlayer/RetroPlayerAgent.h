@@ -28,7 +28,7 @@ namespace RETRO
   class CRetroPlayerAgent
   {
   public:
-    CRetroPlayerAgent() = default;
+    CRetroPlayerAgent();
 
   private:
     std::string m_controllerAddress;

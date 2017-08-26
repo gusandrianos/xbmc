@@ -21,11 +21,17 @@
 
 #include "input/joysticks/IInputHandler.h"
 #include "input/KeymapEnvironment.h"
+#include "peripherals/PeripheralTypes.h"
 
 #include <memory>
 
 namespace KODI
 {
+namespace HARDWARE
+{
+  class IHardwareInput;
+}
+
 namespace JOYSTICK
 {
   class CKeymapHandling;
@@ -47,7 +53,7 @@ namespace GAME
     void UnregisterInput(JOYSTICK::IInputProvider *provider);
 
     const std::string &Peripheral() const { return m_peripheral; }
-    JOYSTICK::IInputHandler *InputHandler() { return m_gameInput; }
+    JOYSTICK::IInputHandler *InputHandler() { return m_playerInput; }
 
     // Implementation of IInputHandler
     virtual std::string ControllerID() const override;
@@ -70,7 +76,7 @@ namespace GAME
     // Construction parameters
     const std::string m_peripheral;
 
-    JOYSTICK::IInputHandler* const m_gameInput;
+    JOYSTICK::IInputHandler* const m_playerInput;
     CGameClient& m_gameClient;
 
     // Handles input to Kodi
@@ -78,7 +84,6 @@ namespace GAME
 
     // Prevents input falling through to Kodi when not handled by the game
     std::unique_ptr<JOYSTICK::IInputHandler> m_inputSink;
-
 
     HARDWARE::IHardwareInput *hardwareInput;
     PERIPHERALS::PeripheralType requiredType;

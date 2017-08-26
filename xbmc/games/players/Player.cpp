@@ -29,7 +29,7 @@
 using namespace KODI;
 using namespace GAME;
 
-CPlayer::CPlayer(JOYSTICK::IInputHandler *playerInput, CGameClient &gameClient) :
+CPlayer::CPlayer(const std::string &peripheral, JOYSTICK::IInputHandler *playerInput, CGameClient &gameClient) :
   m_playerInput(playerInput),
   m_gameClient(gameClient),
   m_inputSink(new CInputSink(gameClient))
@@ -61,7 +61,7 @@ void CPlayer::UnregisterInput(JOYSTICK::IInputProvider *provider)
 
 std::string CPlayer::ControllerID() const
 {
-  return m_gameInput->ControllerID();
+  return m_playerInput->ControllerID();
 }
 
 bool CPlayer::AcceptsInput(const std::string& feature) const
@@ -74,12 +74,12 @@ bool CPlayer::OnButtonPress(const std::string& feature, bool bPressed)
   if (bPressed && !m_gameClient.AcceptsInput())
     return false;
 
-  return m_gameInput->OnButtonPress(feature, bPressed);
+  return m_playerInput->OnButtonPress(feature, bPressed);
 }
 
 void CPlayer::OnButtonHold(const std::string& feature, unsigned int holdTimeMs)
 {
-  m_gameInput->OnButtonHold(feature, holdTimeMs);
+  m_playerInput->OnButtonHold(feature, holdTimeMs);
 }
 
 bool CPlayer::OnButtonMotion(const std::string& feature, float magnitude, unsigned int motionTimeMs)
@@ -87,7 +87,7 @@ bool CPlayer::OnButtonMotion(const std::string& feature, float magnitude, unsign
   if (magnitude > 0.0f && !m_gameClient.AcceptsInput())
     return false;
 
-  return m_gameInput->OnButtonMotion(feature, magnitude, motionTimeMs);
+  return m_playerInput->OnButtonMotion(feature, magnitude, motionTimeMs);
 }
 
 bool CPlayer::OnAnalogStickMotion(const std::string& feature, float x, float y, unsigned int motionTimeMs)
@@ -95,7 +95,7 @@ bool CPlayer::OnAnalogStickMotion(const std::string& feature, float x, float y, 
   if ((x != 0.0f || y != 0.0f) && !m_gameClient.AcceptsInput())
     return false;
 
-  return m_gameInput->OnAnalogStickMotion(feature, x, y, motionTimeMs);
+  return m_playerInput->OnAnalogStickMotion(feature, x, y, motionTimeMs);
 }
 
 bool CPlayer::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
@@ -103,7 +103,7 @@ bool CPlayer::OnAccelerometerMotion(const std::string& feature, float x, float y
   if (!m_gameClient.AcceptsInput())
     return false;
 
-  return m_gameInput->OnAccelerometerMotion(feature, x, y, z);
+  return m_playerInput->OnAccelerometerMotion(feature, x, y, z);
 }
 
 int CPlayer::GetWindowID() const
