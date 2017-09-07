@@ -325,8 +325,11 @@ public:
 /*private:*/ /* Needed public as long the old call functions becomes used! */
   static inline void ADDONBASE_Destroy()
   {
-    delete CAddonBase::m_interface->addonBase;
-    CAddonBase::m_interface->addonBase = nullptr;
+    if (CAddonBase::m_interface)
+    {
+      delete CAddonBase::m_interface->addonBase;
+      CAddonBase::m_interface->addonBase = nullptr;
+    }
   }
 
   static inline ADDON_STATUS ADDONBASE_GetStatus() { return CAddonBase::m_interface->addonBase->GetStatus(); }
