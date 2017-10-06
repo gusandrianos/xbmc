@@ -85,7 +85,7 @@ bool CAddonInputHandling::OnHatMotion(unsigned int hatIndex, HAT_STATE state)
   return false;
 }
 
-bool CAddonInputHandling::OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range)
+bool CAddonInputHandling::OnAxisMotion(unsigned int axisIndex, float position, float center, float range)
 {
   if (m_driverHandler)
     return m_driverHandler->OnAxisMotion(axisIndex, position, center, range);

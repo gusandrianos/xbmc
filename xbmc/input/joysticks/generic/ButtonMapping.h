@@ -80,8 +80,8 @@ namespace JOYSTICK
   struct AxisConfiguration
   {
     bool bKnown = false;
-    int center = 0;
-    unsigned int range = 1;
+    float center = 0.0f;
+    float range = 1.0f;
     bool bLateDiscovery = false;
   };
 
@@ -220,7 +220,7 @@ namespace JOYSTICK
     // implementation of IDriverHandler
     virtual bool OnButtonMotion(unsigned int buttonIndex, bool bPressed) override;
     virtual bool OnHatMotion(unsigned int hatIndex, HAT_STATE state) override;
-    virtual bool OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range) override;
+    virtual bool OnAxisMotion(unsigned int axisIndex, float position, float center, float range) override;
     virtual void ProcessAxisMotions(void) override;
 
     // implementation of IButtonMapCallback

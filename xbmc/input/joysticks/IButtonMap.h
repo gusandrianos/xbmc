@@ -266,7 +266,7 @@ namespace JOYSTICK
      *
      * \return True if the properties are known, false otherwise
      */
-    virtual bool GetAxisProperties(unsigned int axisIndex, int& center, unsigned int& range) = 0;
+    virtual bool GetAxisProperties(unsigned int axisIndex, float& center, float& range) = 0;
 
     /*!
      * \brief Save the button map

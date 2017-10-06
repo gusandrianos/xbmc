@@ -323,7 +323,7 @@ bool CAddonButtonMap::IsIgnored(const JOYSTICK::CDriverPrimitive& primitive)
   return std::find(m_ignoredPrimitives.begin(), m_ignoredPrimitives.end(), primitive) != m_ignoredPrimitives.end();
 }
 
-bool CAddonButtonMap::GetAxisProperties(unsigned int axisIndex, int& center, unsigned int& range)
+bool CAddonButtonMap::GetAxisProperties(unsigned int axisIndex, float& center, float& range)
 {
   CSingleLock lock(m_mutex);
 

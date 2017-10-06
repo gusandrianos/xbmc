@@ -37,10 +37,15 @@
 #include "ServiceBroker.h"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace KODI;
 using namespace JOYSTICK;
 using namespace PERIPHERALS;
+
+// Allowed noise, both from the controller and from float deserialization
+// Discrete D-pads have been observed to report 0.007 when centered
+#define CENTER_EPSILON  0.01f
 
 CPeripheralJoystick::CPeripheralJoystick(CPeripherals& manager, const PeripheralScanResult& scanResult, CPeripheralBus* bus) :
   CPeripheral(manager, scanResult, bus),
@@ -280,17 +285,25 @@ bool CPeripheralJoystick::OnHatMotion(unsigned int hatIndex, HAT_STATE state)
 bool CPeripheralJoystick::OnAxisMotion(unsigned int axisIndex, float position)
 {
   // Get axis properties
-  int center = 0;
-  unsigned int range = 1;
+  float center = 0.0f;
+  float range = 1.0f;
   if (m_buttonMap)
     m_buttonMap->GetAxisProperties(axisIndex, center, range);
 
+  // Sanity check
+  if (range <= 0.0f)
+    return false;
+
   // Apply deadzone filtering
-  if (center == 0 && m_deadzoneFilter)
+  if (center == 0.0f && m_deadzoneFilter)
     position = m_deadzoneFilter->FilterAxis(axisIndex, position);
 
+  // Snap to center
+  if (std::fabs(position - center) < CENTER_EPSILON)
+    position = center;
+
   // Avoid sending activated input if the app is in the background
-  if (position != static_cast<float>(center) && !g_application.IsAppFocused())
+  if (position != center && !g_application.IsAppFocused())
     return false;
 
   CSingleLock lock(m_handlerMutex);
@@ -313,7 +326,7 @@ bool CPeripheralJoystick::OnAxisMotion(unsigned int axisIndex, float position)
 
       // If axis is centered, force bHandled to false to notify all handlers.
       // This avoids "sticking".
-      if (position == static_cast<float>(center))
+      if (position == center)
         bHandled = false;
 
       // Once an axis is handled, we're done

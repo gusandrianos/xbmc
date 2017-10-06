@@ -50,7 +50,7 @@ namespace PERIPHERALS
     // implementation of IDriverHandler
     bool OnButtonMotion(unsigned int buttonIndex, bool bPressed) override;
     bool OnHatMotion(unsigned int hatIndex, KODI::JOYSTICK::HAT_STATE state) override;
-    bool OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range) override;
+    bool OnAxisMotion(unsigned int axisIndex, float position, float center, float range) override;
     void ProcessAxisMotions(void) override;
 
     // implementation of IButtonMapCallback

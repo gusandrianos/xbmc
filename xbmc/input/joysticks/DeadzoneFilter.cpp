@@ -30,8 +30,6 @@
 using namespace KODI;
 using namespace JOYSTICK;
 
-#define AXIS_EPSILON  0.01f // Allowed noise for detecting discrete D-pads (value of 0.007 when centered has been observed)
-
 // Settings for analog sticks
 #define SETTING_LEFT_STICK_DEADZONE   "left_stick_deadzone"
 #define SETTING_RIGHT_STICK_DEADZONE  "right_stick_deadzone"
@@ -53,10 +51,6 @@ float CDeadzoneFilter::FilterAxis(unsigned int axisIndex, float axisValue)
 
   if (bSuccess)
     return ApplyDeadzone(axisValue, deadzone);
-
-  // Always filter noise about the center
-  if (std::abs(axisValue) < AXIS_EPSILON)
-    axisValue = 0.0f;
 
   return axisValue;
 }

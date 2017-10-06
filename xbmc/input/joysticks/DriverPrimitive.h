@@ -56,9 +56,9 @@ namespace JOYSTICK
    *
    *    Semiaxis:
    *       - driver index
-   *       - center (-1, 0 or 1)
+   *       - center
    *       - semiaxis direction (positive/negative)
-   *       - range (1 or 2)
+   *       - range
    *
    *    Motor:
    *       - driver index
@@ -89,7 +89,7 @@ namespace JOYSTICK
      * \brief Construct a driver primitive representing the positive or negative
      *        half of an axis
      */
-    CDriverPrimitive(unsigned int axisIndex, int center, SEMIAXIS_DIRECTION direction, unsigned int range);
+    CDriverPrimitive(unsigned int axisIndex, float center, SEMIAXIS_DIRECTION direction, float range);
 
     bool operator==(const CDriverPrimitive& rhs) const;
     bool operator<(const CDriverPrimitive& rhs) const;
@@ -117,7 +117,7 @@ namespace JOYSTICK
     /*!
      * \brief The location of the zero point of the semiaxis
      */
-    int Center() const { return m_center; }
+    float Center() const { return m_center; }
 
     /*!
      * \brief The semiaxis direction (valid for semiaxes)
@@ -127,7 +127,7 @@ namespace JOYSTICK
     /*!
      * \brief The distance between the center and the farthest valid value (valid for semiaxes)
      */
-    unsigned int Range() const { return m_range; }
+    float Range() const { return m_range; }
 
     /*!
      * \brief Test if an driver primitive is valid
@@ -143,9 +143,9 @@ namespace JOYSTICK
     PRIMITIVE_TYPE     m_type;
     unsigned int       m_driverIndex;
     HAT_DIRECTION      m_hatDirection;
-    int                m_center;
+    float              m_center;
     SEMIAXIS_DIRECTION m_semiAxisDirection;
-    unsigned int       m_range;
+    float              m_range;
   };
 }
 }

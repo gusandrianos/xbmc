@@ -110,7 +110,7 @@ namespace PERIPHERALS
 
     bool IsIgnored(const KODI::JOYSTICK::CDriverPrimitive& primitive) override;
 
-    bool GetAxisProperties(unsigned int axisIndex, int& center, unsigned int& range) override;
+    bool GetAxisProperties(unsigned int axisIndex, float& center, float& range) override;
 
     void SaveButtonMap() override;
 

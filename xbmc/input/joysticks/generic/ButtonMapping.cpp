@@ -44,6 +44,8 @@ using namespace XbmcThreads;
 #define MAPPING_COOLDOWN_MS  50    // Guard against repeated input
 #define AXIS_THRESHOLD       0.75f // Axis must exceed this value to be mapped
 #define TRIGGER_DELAY_MS     200   // Delay trigger detection to handle anomalous triggers with non-zero center
+#define OFFSET_DPAD_CENTER          0.5f // Center point for detecting offset discrete D-pads centered about 0.5
+#define OFFSET_DPAD_CENTER_EPSILON  0.05f // Allowed error in detected offset D-pads
 
 // --- CButtonDetector ---------------------------------------------------------
 
@@ -195,7 +197,7 @@ void CAxisDetector::DetectType(float position)
 
   // Update range if a range of > 1 is observed
   if (std::abs(position - m_config.center) > 1.0f)
-    m_config.range = 2;
+    m_config.range = 2.0f;
 
   if (m_type != AXIS_TYPE::UNKNOWN)
     return;
@@ -225,13 +227,20 @@ void CAxisDetector::DetectType(float position)
     // Calculate center based on initial position.
     if (m_initialPosition < -0.5f)
     {
-      m_config.center = -1;
+      m_config.center = -1.0f;
       m_type = AXIS_TYPE::OFFSET;
       CLog::Log(LOGDEBUG, "Anomalous trigger detected on axis %u with center %d", m_axisIndex, m_config.center);
     }
+    else if (std::fabs(m_initialPosition - OFFSET_DPAD_CENTER) < OFFSET_DPAD_CENTER_EPSILON)
+    {
+      m_config.center = m_initialPosition;
+      m_config.range = 1.0f - m_initialPosition;
+      m_type = AXIS_TYPE::OFFSET;
+      CLog::Log(LOGDEBUG, "Offset discrete D-pad detected on axis %u with center %d", m_axisIndex, m_config.center);
+    }
     else if (m_initialPosition > 0.5f)
     {
-      m_config.center = 1;
+      m_config.center = 1.0f;
       m_type = AXIS_TYPE::OFFSET;
       CLog::Log(LOGDEBUG, "Anomalous trigger detected on axis %u with center %d", m_axisIndex, m_config.center);
     }
@@ -289,7 +298,7 @@ CButtonMapping::CButtonMapping(IButtonMapper* buttonMapper, IButtonMap* buttonMa
       axisConfig.center = primitive.Center();
       axisConfig.range = primitive.Range();
 
-      GetAxis(primitive.Index(), static_cast<float>(primitive.Center()), axisConfig).SetEmitted(primitive);
+      GetAxis(primitive.Index(), primitive.Center(), axisConfig).SetEmitted(primitive);
     }
   }
 }
@@ -304,7 +313,7 @@ bool CButtonMapping::OnHatMotion(unsigned int hatIndex, HAT_STATE state)
   return GetHat(hatIndex).OnMotion(state);
 }
 
-bool CButtonMapping::OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range)
+bool CButtonMapping::OnAxisMotion(unsigned int axisIndex, float position, float center, float range)
 {
   return GetAxis(axisIndex, position).OnMotion(position);
 }

@@ -181,9 +181,9 @@ extern "C"
   typedef struct JOYSTICK_DRIVER_SEMIAXIS
   {
     int                                index;
-    int                                center;
+    float                              center;
     JOYSTICK_DRIVER_SEMIAXIS_DIRECTION direction;
-    unsigned int                       range;
+    float                              range;
   } ATTRIBUTE_PACKED JOYSTICK_DRIVER_SEMIAXIS;
 
   typedef struct JOYSTICK_DRIVER_MOTOR

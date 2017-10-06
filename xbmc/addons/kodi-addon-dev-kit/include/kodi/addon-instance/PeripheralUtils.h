@@ -381,9 +381,9 @@ namespace addon
       m_type(type),
       m_driverIndex(driverIndex),
       m_hatDirection(JOYSTICK_DRIVER_HAT_UNKNOWN),
-      m_center(0),
+      m_center(0.0f),
       m_semiAxisDirection(JOYSTICK_DRIVER_SEMIAXIS_UNKNOWN),
-      m_range(1)
+      m_range(1.0f)
     {
     }
 
@@ -395,9 +395,9 @@ namespace addon
       m_type(JOYSTICK_DRIVER_PRIMITIVE_TYPE_UNKNOWN),
       m_driverIndex(0),
       m_hatDirection(JOYSTICK_DRIVER_HAT_UNKNOWN),
-      m_center(0),
+      m_center(0.0f),
       m_semiAxisDirection(JOYSTICK_DRIVER_SEMIAXIS_UNKNOWN),
-      m_range(1)
+      m_range(1.0f)
     {
     }
 
@@ -417,9 +417,9 @@ namespace addon
       m_type(JOYSTICK_DRIVER_PRIMITIVE_TYPE_HAT_DIRECTION),
       m_driverIndex(hatIndex),
       m_hatDirection(direction),
-      m_center(0),
+      m_center(0.0f),
       m_semiAxisDirection(JOYSTICK_DRIVER_SEMIAXIS_UNKNOWN),
-      m_range(1)
+      m_range(1.0f)
     {
     }
 
@@ -427,7 +427,7 @@ namespace addon
      * \brief Construct a driver primitive representing the positive or negative
      *        half of an axis
      */
-    DriverPrimitive(unsigned int axisIndex, int center, JOYSTICK_DRIVER_SEMIAXIS_DIRECTION direction, unsigned int range) :
+    DriverPrimitive(unsigned int axisIndex, float center, JOYSTICK_DRIVER_SEMIAXIS_DIRECTION direction, float range) :
       m_type(JOYSTICK_DRIVER_PRIMITIVE_TYPE_SEMIAXIS),
       m_driverIndex(axisIndex),
       m_hatDirection(JOYSTICK_DRIVER_HAT_UNKNOWN),
@@ -449,9 +449,9 @@ namespace addon
       m_type(primitive.type),
       m_driverIndex(0),
       m_hatDirection(JOYSTICK_DRIVER_HAT_UNKNOWN),
-      m_center(0),
+      m_center(0.0f),
       m_semiAxisDirection(JOYSTICK_DRIVER_SEMIAXIS_UNKNOWN),
-      m_range(1)
+      m_range(1.0f)
     {
       switch (m_type)
       {
@@ -487,9 +487,9 @@ namespace addon
     JOYSTICK_DRIVER_PRIMITIVE_TYPE     Type(void) const { return m_type; }
     unsigned int                       DriverIndex(void) const { return m_driverIndex; }
     JOYSTICK_DRIVER_HAT_DIRECTION      HatDirection(void) const { return m_hatDirection; }
-    int                                Center(void) const { return m_center; }
+    float                              Center(void) const { return m_center; }
     JOYSTICK_DRIVER_SEMIAXIS_DIRECTION SemiAxisDirection(void) const { return m_semiAxisDirection; }
-    unsigned int                       Range(void) const { return m_range; }
+    float                              Range(void) const { return m_range; }
 
     bool operator==(const DriverPrimitive& other) const
     {
@@ -564,9 +564,9 @@ namespace addon
     JOYSTICK_DRIVER_PRIMITIVE_TYPE     m_type;
     unsigned int                       m_driverIndex;
     JOYSTICK_DRIVER_HAT_DIRECTION      m_hatDirection;
-    int                                m_center;
+    float                              m_center;
     JOYSTICK_DRIVER_SEMIAXIS_DIRECTION m_semiAxisDirection;
-    unsigned int                       m_range;
+    float                              m_range;
   };
 
   typedef PeripheralVector<DriverPrimitive, JOYSTICK_DRIVER_PRIMITIVE> DriverPrimitives;

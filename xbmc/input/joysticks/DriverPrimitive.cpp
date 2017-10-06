@@ -27,9 +27,9 @@ CDriverPrimitive::CDriverPrimitive(void)
   : m_type(),
     m_driverIndex(0),
     m_hatDirection(),
-    m_center(0),
+    m_center(0.0f),
     m_semiAxisDirection(),
-    m_range(1)
+    m_range(1.0f)
 {
 }
 
@@ -37,9 +37,9 @@ CDriverPrimitive::CDriverPrimitive(PRIMITIVE_TYPE type, unsigned int index)
   : m_type(type),
     m_driverIndex(index),
     m_hatDirection(),
-    m_center(0),
+    m_center(0.0f),
     m_semiAxisDirection(),
-    m_range(1)
+    m_range(1.0f)
 {
 }
 
@@ -47,13 +47,13 @@ CDriverPrimitive::CDriverPrimitive(unsigned int hatIndex, HAT_DIRECTION directio
   : m_type(HAT),
     m_driverIndex(hatIndex),
     m_hatDirection(direction),
-    m_center(0),
+    m_center(0.0f),
     m_semiAxisDirection(),
-    m_range(1)
+    m_range(1.0f)
 {
 }
 
-CDriverPrimitive::CDriverPrimitive(unsigned int axisIndex, int center, SEMIAXIS_DIRECTION direction, unsigned int range)
+CDriverPrimitive::CDriverPrimitive(unsigned int axisIndex, float center, SEMIAXIS_DIRECTION direction, float range)
   : m_type(SEMIAXIS),
     m_driverIndex(axisIndex),
     m_hatDirection(),
@@ -134,36 +134,20 @@ bool CDriverPrimitive::IsValid(void) const
 
   if (m_type == SEMIAXIS)
   {
-    unsigned int maxRange = 1;
+    // Check center
+    if (m_center < -1.0f || m_center > 1.0f)
+      return false;
 
-    switch (m_center)
-    {
-    case -1:
-    {
-      if (m_semiAxisDirection != SEMIAXIS_DIRECTION::POSITIVE)
-        return false;
-      maxRange = 2;
-      break;
-    }
-    case 0:
-    {
-      if (m_semiAxisDirection != SEMIAXIS_DIRECTION::POSITIVE &&
-          m_semiAxisDirection != SEMIAXIS_DIRECTION::NEGATIVE)
-        return false;
-      break;
-    }
-    case 1:
-    {
-      if (m_semiAxisDirection != SEMIAXIS_DIRECTION::POSITIVE)
-        return false;
-      maxRange = 2;
-      break;
-    }
-    default:
-      break;
-    }
+    // Check range
+    if (m_range <= 0.0f)
+      return false;
 
-    return 1 <= m_range && m_range <= maxRange;
+    // Check endpoint
+    float destination = m_center + static_cast<int>(m_semiAxisDirection) * m_range;
+    if (destination < -1.0f || destination > 1.0f)
+      return false;
+
+    return true;
   }
 
   return false;
