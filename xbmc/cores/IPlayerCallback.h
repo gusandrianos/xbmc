@@ -26,6 +26,14 @@
 class CFileItem;
 class CBookmark;
 
+namespace KODI
+{
+namespace RETRO
+{
+  class CGameSettings;
+}
+}
+
 class IPlayerCallback
 {
 public:
@@ -45,4 +53,6 @@ public:
   virtual void OnAVStarted(const CFileItem &file) {};
   virtual void RequestVideoSettings(const CFileItem &fileItem) {};
   virtual void StoreVideoSettings(const CFileItem &fileItem, CVideoSettings vs) {};
+  virtual void RequestGameSettings(const CFileItem &fileItem) {}
+  virtual void StoreGameSettings(const CFileItem &fileItem, const KODI::RETRO::CGameSettings &gs) {}
 };

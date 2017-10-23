@@ -209,6 +209,33 @@ bool CGUIGameRenderManager::SupportsScalingMethod(SCALINGMETHOD method)
   return false;
 }
 
+
+CGameSettings CGUIGameRenderManager::GetGameSettings()
+{
+  CSingleLock lock(m_callbackMutex);
+
+  if (m_callback != nullptr)
+    return m_callback->GetGameSettings();
+
+  return CGameSettings();
+}
+
+bool CGUIGameRenderManager::SetScalingMethod(SCALINGMETHOD method)
+{
+  CSingleLock lock(m_callbackMutex);
+
+  if (m_callback != nullptr)
+    m_callback->SetScalingMethod(method);
+}
+
+bool CGUIGameRenderManager::SetViewMode(VIEWMODE viewMode)
+{
+  CSingleLock lock(m_callbackMutex);
+
+  if (m_callback != nullptr)
+    m_callback->SetViewMode(viewMode);
+}
+
 std::string CGUIGameRenderManager::GameClientID()
 {
   CSingleLock lock(m_callbackMutex);

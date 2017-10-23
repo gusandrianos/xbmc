@@ -1,5 +1,6 @@
 set(SOURCES DataCacheCore.cpp
             FFmpeg.cpp
+            GameSettings.cpp
             VideoSettings.cpp)
 
 set(HEADERS DataCacheCore.h

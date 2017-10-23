@@ -21,9 +21,9 @@
 #include "DialogGameVideoFilter.h"
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
 #include "games/dialogs/DialogGameDefines.h"
+#include "cores/GameSettings.h"
 #include "guilib/LocalizeStrings.h"
 #include "guilib/WindowIDs.h"
-#include "settings/GameSettings.h"
 #include "settings/MediaSettings.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
@@ -180,7 +180,7 @@ void CDialogGameVideoFilter::GetItems(CFileItemList &items)
 
 void CDialogGameVideoFilter::OnItemFocus(unsigned int index)
 {
-  if (static_cast<int>(index) < m_items.Size())
+  if (static_cast<int>(index) < m_items.Size() && m_gameVideoHandle)
   {
     CFileItemPtr item = m_items[index];
 
@@ -189,14 +189,13 @@ void CDialogGameVideoFilter::OnItemFocus(unsigned int index)
     std::string description;
     GetProperties(*item, presetToSet, scalingMethod, description);
 
-    ::CGameSettings &gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
+    RETRO::CGameSettings gameSettings = m_gameVideoHandle->GetGameSettings();
 
     if (gameSettings.VideoFilter() != presetToSet ||
         gameSettings.ScalingMethod() != scalingMethod)
     {
-      gameSettings.SetVideoFilter(presetToSet);
-      gameSettings.SetScalingMethod(scalingMethod);
-      gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
+      m_gameVideoHandle->SetVideoFilter(presetToSet);
+      m_gameVideoHandle->SetScalingMethod(scalingMethod);
 
       OnDescriptionChange(description);
       m_bHasDescription = true;
@@ -211,19 +210,20 @@ void CDialogGameVideoFilter::OnItemFocus(unsigned int index)
 
 unsigned int CDialogGameVideoFilter::GetFocusedItem() const
 {
-  ::CGameSettings &gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
-
-  for (int i = 0; i < m_items.Size(); i++)
+  if (m_gameVideoHandle)
   {
-    std::string presetToSet;
-    RETRO::SCALINGMETHOD scalingMethod;
-    std::string description;
-    GetProperties(*m_items[i], presetToSet, scalingMethod, description);
+    RETRO::CGameSettings gameSettings = m_gameVideoHandle->GetGameSettings();
 
-    if (presetToSet == gameSettings.VideoFilter() &&
-        scalingMethod == gameSettings.ScalingMethod())
+    for (int i = 0; i < m_items.Size(); i++)
     {
-      return i;
+      RETRO::SCALINGMETHOD scalingMethod;
+      std::string description;
+      GetProperties(*m_items[i], scalingMethod, description);
+
+      if (scalingMethod == gameSettings.ScalingMethod())
+      {
+        return i;
+      }
     }
   }
 
@@ -235,7 +235,8 @@ void CDialogGameVideoFilter::PostExit()
   m_items.Clear();
 }
 
-bool CDialogGameVideoFilter::IsCompatible(const TiXmlNode* presetNode)
+//bool CDialogGameVideoFilter::IsCompatible(const TiXmlNode* presetNode)
+void CDialogGameVideoFilter::GetProperties(const CFileItem &item, RETRO::SCALINGMETHOD &scalingMethod, std::string &description)
 {
   const TiXmlElement* presetElement = presetNode->ToElement();
   if (presetElement == nullptr)

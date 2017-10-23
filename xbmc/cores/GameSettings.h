@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2017-2018 Team Kodi
+ *      Copyright (C) 2017 Team Kodi
  *      http://kodi.tv
  *
  *  This Program is free software; you can redistribute it and/or modify
@@ -18,6 +18,10 @@
  *
  */
 #pragma once
+
+#include "cores/GameSettings.h"
+
+class CCriticalSection;
 
 namespace KODI
 {
@@ -49,6 +53,59 @@ enum class RENDERFEATURE
   STRETCH,
   ZOOM,
   PIXEL_RATIO,
+}
+
+class CGameSettings
+{
+  PIXEL_RATIO,
+public:
+  CGameSettings() { Reset(); }
+  ~CGameSettings() = default;
+
+  CGameSettings &operator=(const CGameSettings &rhs);
+
+  // Restore game settings to default
+  void Reset();
+
+  bool operator==(const CGameSettings &rhs) const;
+  bool operator!=(const CGameSettings &rhs) const { return !(*this == rhs); }
+
+  const std::string &VideoFilter() const { return m_videoFilter; }
+  void SetVideoFilter(const std::string &videoFilter);
+
+  SCALINGMETHOD ScalingMethod() const { return m_scalingMethod; }
+  void SetScalingMethod(SCALINGMETHOD scalingMethod);
+
+  VIEWMODE ViewMode() const { return m_viewMode; }
+  void SetViewMode(VIEWMODE viewMode);
+
+  unsigned int RotationDegCCW() const { return m_rotationDegCCW; }
+  void SetRotationDegCCW(unsigned int rotation);
+
+private:
+  // Render settings
+  std::string m_videoFilter;
+  SCALINGMETHOD m_scalingMethod;
+  VIEWMODE m_viewMode;
+  unsigned int m_rotationDegCCW;
+  unsigned int m_rotationDegCCW;
+};
+
+class CGameSettingsLocked
+{
+public:
+  CGameSettingsLocked(CGameSettings &gs, CCriticalSection &critSection);
+  virtual ~CGameSettingsLocked() = default;
+
+  CGameSettingsLocked(CGameSettingsLocked const &other) = delete;
+  void operator=(CGameSettingsLocked const &rhs) = delete;
+
+  void SetScalingMethod(SCALINGMETHOD scalingMethod);
+  void SetViewMode(VIEWMODE viewMode);
+
+protected:
+  CGameSettings &m_gameSettings;
+  CCriticalSection &m_critSection;
 };
 
 }

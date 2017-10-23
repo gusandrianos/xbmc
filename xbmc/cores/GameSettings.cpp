@@ -19,8 +19,15 @@
  */
 
 #include "GameSettings.h"
+#include "threads/CriticalSection.h"
+#include "threads/SingleLock.h"
 
 using namespace KODI;
+using namespace RETRO;
+
+//------------------------------------------------------------------------------
+// CGameSettings
+//------------------------------------------------------------------------------
 
 CGameSettings &CGameSettings::operator=(const CGameSettings &rhs)
 {
@@ -37,8 +44,8 @@ CGameSettings &CGameSettings::operator=(const CGameSettings &rhs)
 void CGameSettings::Reset()
 {
   m_videoFilter.clear();
-  m_scalingMethod = RETRO::SCALINGMETHOD::AUTO;
-  m_viewMode = RETRO::VIEWMODE::Normal;
+  m_scalingMethod = SCALINGMETHOD::AUTO;
+  m_viewMode = VIEWMODE::Normal;
   m_rotationDegCCW = 0;
 }
 
@@ -50,38 +57,23 @@ bool CGameSettings::operator==(const CGameSettings &rhs) const
          m_rotationDegCCW == rhs.m_rotationDegCCW;
 }
 
-void CGameSettings::SetVideoFilter(const std::string &videoFilter)
+//------------------------------------------------------------------------------
+// CGameSettingsLocked
+//------------------------------------------------------------------------------
+
+CGameSettingsLocked::CGameSettingsLocked(CGameSettings &gs, CCriticalSection &critSection) :
+  m_gameSettings(gs), m_critSection(critSection)
 {
-  if (videoFilter != m_videoFilter)
-  {
-    m_videoFilter = videoFilter;
-    SetChanged();
-  }
 }
 
-void CGameSettings::SetScalingMethod(RETRO::SCALINGMETHOD scalingMethod)
+void CGameSettingsLocked::SetScalingMethod(SCALINGMETHOD scalingMethod)
 {
-  if (scalingMethod != m_scalingMethod)
-  {
-    m_scalingMethod = scalingMethod;
-    SetChanged();
-  }
+  CSingleLock lock(m_critSection);
+  m_gameSettings.SetScalingMethod(scalingMethod);
 }
 
-void CGameSettings::SetViewMode(RETRO::VIEWMODE viewMode)
+void CGameSettingsLocked::SetViewMode(VIEWMODE viewMode)
 {
-  if (viewMode != m_viewMode)
-  {
-    m_viewMode = viewMode;
-    SetChanged();
-  }
-}
-
-void CGameSettings::SetRotationDegCCW(unsigned int rotation)
-{
-  if (rotation != m_rotationDegCCW)
-  {
-    m_rotationDegCCW = rotation;
-    SetChanged();
-  }
+  CSingleLock lock(m_critSection);
+  m_gameSettings.SetViewMode(viewMode);
 }

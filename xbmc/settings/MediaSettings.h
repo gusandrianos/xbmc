@@ -26,7 +26,7 @@
 #include "settings/lib/ISettingCallback.h"
 #include "settings/lib/ISettingsHandler.h"
 #include "settings/lib/ISubSettings.h"
-#include "settings/GameSettings.h"
+#include "cores/GameSettings.h"
 #include "settings/LibExportSettings.h"
 #include "threads/CriticalSection.h"
 
@@ -55,10 +55,8 @@ public:
   const CVideoSettings& GetDefaultVideoSettings() const { return m_defaultVideoSettings; }
   CVideoSettings& GetDefaultVideoSettings() { return m_defaultVideoSettings; }
 
-  const CGameSettings& GetDefaultGameSettings() const { return m_defaultGameSettings; }
-  CGameSettings& GetDefaultGameSettings() { return m_defaultGameSettings; }
-  const CGameSettings& GetCurrentGameSettings() const { return m_currentGameSettings; }
-  CGameSettings& GetCurrentGameSettings() { return m_currentGameSettings; }
+  const KODI::RETRO::CGameSettings& GetDefaultGameSettings() const { return m_defaultGameSettings; }
+  KODI::RETRO::CGameSettings& GetDefaultGameSettings() { return m_defaultGameSettings; }
 
   /*! \brief Retrieve the watched mode for the given content type
    \param content Current content type
@@ -107,8 +105,7 @@ protected:
 private:
   CVideoSettings m_defaultVideoSettings;
 
-  CGameSettings m_defaultGameSettings;
-  CGameSettings m_currentGameSettings;
+  KODI::RETRO::CGameSettings m_defaultGameSettings;
 
   typedef std::map<std::string, WatchedMode> WatchedModes;
   WatchedModes m_watchedModes;
