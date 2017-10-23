@@ -26,7 +26,6 @@
 
 class CCriticalSection;
 class CDisplaySettings;
-class CGameSettings;
 class CGraphicContext;
 class CGUIShaderDX;
 class CMediaSettings;
@@ -44,6 +43,8 @@ namespace KODI
 {
 namespace RETRO
 {
+  class CGameSettings;
+
   class CRenderContext
   {
   public:
@@ -100,7 +101,6 @@ namespace RETRO
     RESOLUTION_INFO& GetResolutionInfo(RESOLUTION resolution);
 
     // Media settings
-    CGameSettings &GetGameSettings();
     CGameSettings &GetDefaultGameSettings();
 
   private:

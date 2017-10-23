@@ -127,6 +127,11 @@ namespace RETRO
      */
     void ResetInfo();
 
+    // Game settings
+    CGameSettings GetGameSettings();
+    void SetGameSettings(const CGameSettings &settings);
+    CGameSettingsLocked& UpdateGameSettigs();
+
     /// @name Rendering functions
     ///{
 

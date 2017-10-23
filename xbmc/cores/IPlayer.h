@@ -24,6 +24,7 @@
 #include <string>
 
 #include "IPlayerCallback.h"
+#include "GameSettings.h"
 #include "VideoSettings.h"
 #include "Interface/StreamInfo.h"
 
@@ -233,9 +234,11 @@ public:
   virtual void RenderCapture(unsigned int captureId, unsigned int width, unsigned int height, int flags) {};
   virtual bool RenderCaptureGetPixels(unsigned int captureId, unsigned int millis, uint8_t *buffer, unsigned int size) { return false; };
 
-  // video and audio settings
+  // media settings
   virtual CVideoSettings GetVideoSettings() { return CVideoSettings(); };
   virtual void SetVideoSettings(CVideoSettings& settings) {};
+  virtual KODI::RETRO::CGameSettings GetGameSettings() { return KODI::RETRO::CGameSettings(); }
+  virtual void SetGameSettings(const KODI::RETRO::CGameSettings& settings) {}
 
   std::string m_name;
   std::string m_type;

@@ -105,6 +105,7 @@ namespace RETRO
     // Implementation of IRenderCallback
     bool SupportsRenderFeature(RENDERFEATURE feature) const override;
     bool SupportsScalingMethod(SCALINGMETHOD method) const override;
+    CGameSettings GetGameSettings() override;
 
   private:
     /*!
@@ -166,7 +167,6 @@ namespace RETRO
     };
     RENDER_STATE m_state = RENDER_STATE::UNCONFIGURED;
     std::atomic<double> m_speed;
-    std::shared_ptr<IGUIRenderSettings> m_renderSettings;
     std::set<std::shared_ptr<CRPBaseRenderer>> m_renderers;
     std::shared_ptr<CGUIRenderTargetFactory> m_renderControlFactory;
     std::vector<IRenderBuffer*> m_renderBuffers;

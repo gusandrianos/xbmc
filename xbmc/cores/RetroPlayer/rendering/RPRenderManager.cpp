@@ -50,7 +50,6 @@ CRPRenderManager::CRPRenderManager(CRPProcessInfo &processInfo) :
   m_processInfo(processInfo),
   m_renderContext(processInfo.GetRenderContext()),
   m_speed(1.0),
-  m_renderSettings(new CGUIGameSettings(processInfo)),
   m_renderControlFactory(new CGUIRenderTargetFactory(this))
 {
 }
@@ -300,6 +299,26 @@ bool CRPRenderManager::SupportsScalingMethod(SCALINGMETHOD method) const
   }
 
   return false;
+}
+
+CGameSettings CRPRenderManager::GetGameSettings()
+{
+
+  CRenderVideoSettings renderSettings = m_renderSettings->GetSettings().VideoSettings();
+  CGameSettings gameSettings;
+
+
+  return ;
+}
+
+void CRPRenderManager::SetScalingMethod(SCALINGMETHOD method)
+{
+  m_renderSettings->GetSettings().VideoSettings().SetScalingMethod(method);
+}
+
+void CRPRenderManager::SetViewMode(VIEWMODE viewMode)
+{
+  m_renderSettings->GetSettings().VideoSettings().SetRenderViewMode(viewMode);
 }
 
 void CRPRenderManager::RenderInternal(const std::shared_ptr<CRPBaseRenderer> &renderer, bool bClear, uint32_t alpha)

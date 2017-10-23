@@ -22,13 +22,13 @@
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "windowing/GraphicContext.h"
+#include "cores/GameSettings.h"
 #include "guilib/GUIBaseContainer.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "input/ActionIDs.h"
-#include "settings/GameSettings.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "view/GUIViewControl.h"
@@ -205,13 +205,16 @@ void CDialogGameVideoSelect::OnRefreshList()
 
 void CDialogGameVideoSelect::SaveSettings()
 {
-  CGameSettings &defaultSettings = CMediaSettings::GetInstance().GetDefaultGameSettings();
-  CGameSettings &currentSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
-
-  if (defaultSettings != currentSettings)
+  if (m_gameVideoHandle)
   {
-    defaultSettings = currentSettings;
-    CServiceBroker::GetSettings().Save();
+    RETRO::CGameSettings &defaultSettings = CMediaSettings::GetInstance().GetDefaultGameSettings();
+    RETRO::CGameSettings currentSettings = m_gameVideoHandle->GetGameSettings();
+
+    if (defaultSettings != currentSettings)
+    {
+      defaultSettings = currentSettings;
+      CServiceBroker::GetSettings().Save();
+    }
   }
 }
 

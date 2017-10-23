@@ -1,6 +1,5 @@
 set(SOURCES AdvancedSettings.cpp
             DisplaySettings.cpp
-            GameSettings.cpp
             LibExportSettings.cpp
             MediaSettings.cpp
             MediaSourceSettings.cpp
@@ -18,7 +17,6 @@ set(SOURCES AdvancedSettings.cpp
 set(HEADERS AdvancedSettings.h
             DiscSettings.h
             DisplaySettings.h
-            GameSettings.h
             LibExportSettings.h
             MediaSettings.h
             MediaSourceSettings.h

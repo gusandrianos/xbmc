@@ -19,8 +19,15 @@
  */
 
 #include "GameSettings.h"
+#include "threads/CriticalSection.h"
+#include "threads/SingleLock.h"
 
 using namespace KODI;
+using namespace RETRO;
+
+//------------------------------------------------------------------------------
+// CGameSettings
+//------------------------------------------------------------------------------
 
 CGameSettings &CGameSettings::operator=(const CGameSettings &rhs)
 {
@@ -47,29 +54,23 @@ bool CGameSettings::operator==(const CGameSettings &rhs) const
          m_rotationDegCCW == rhs.m_rotationDegCCW;
 }
 
-void CGameSettings::SetVideoFilter(const std::string &videoFilter)
+//------------------------------------------------------------------------------
+// CGameSettingsLocked
+//------------------------------------------------------------------------------
+
+CGameSettingsLocked::CGameSettingsLocked(CGameSettings &gs, CCriticalSection &critSection) :
+  m_gameSettings(gs), m_critSection(critSection)
 {
-  if (videoFilter != m_videoFilter)
-  {
-    m_videoFilter = videoFilter;
-    SetChanged();
-  }
 }
 
-void CGameSettings::SetViewMode(RETRO::VIEWMODE viewMode)
+void CGameSettingsLocked::SetScalingMethod(SCALINGMETHOD scalingMethod)
 {
-  if (viewMode != m_viewMode)
-  {
-    m_viewMode = viewMode;
-    SetChanged();
-  }
+  CSingleLock lock(m_critSection);
+  m_gameSettings.SetScalingMethod(scalingMethod);
 }
 
-void CGameSettings::SetRotationDegCCW(unsigned int rotation)
+void CGameSettingsLocked::SetViewMode(VIEWMODE viewMode)
 {
-  if (rotation != m_rotationDegCCW)
-  {
-    m_rotationDegCCW = rotation;
-    SetChanged();
-  }
+  CSingleLock lock(m_critSection);
+  m_gameSettings.SetViewMode(viewMode);
 }

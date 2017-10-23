@@ -21,48 +21,25 @@
 #include "GUIGameSettings.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
-#include "settings/GameSettings.h"
+#include "cores/GameSettings.h"
 #include "threads/SingleLock.h"
 
 using namespace KODI;
 using namespace RETRO;
 
 CGUIGameSettings::CGUIGameSettings(CRPProcessInfo &processInfo) :
-  m_processInfo(processInfo),
-  m_guiSettings(processInfo.GetRenderContext().GetGameSettings())
+  m_processInfo(processInfo)
 {
-  // Reset game settings
-  m_guiSettings = m_processInfo.GetRenderContext().GetDefaultGameSettings();
-
   UpdateSettings();
-
-  m_guiSettings.RegisterObserver(this);
 }
 
-CGUIGameSettings::~CGUIGameSettings()
-{
-  m_guiSettings.UnregisterObserver(this);
-}
+CGUIGameSettings::~CGUIGameSettings() = default;
 
 CRenderSettings CGUIGameSettings::GetSettings() const
 {
   CSingleLock lock(m_mutex);
 
   return m_renderSettings;
-}
-
-void CGUIGameSettings::Notify(const Observable &obs, const ObservableMessage msg)
-{
-  switch (msg)
-  {
-  case ObservableMessageSettingsChanged:
-  {
-    UpdateSettings();
-    break;
-  }
-  default:
-    break;
-  }
 }
 
 void CGUIGameSettings::UpdateSettings()
@@ -73,6 +50,12 @@ void CGUIGameSettings::UpdateSettings()
   std::string videoFilter = m_guiSettings.VideoFilter();
   VIEWMODE viewMode = m_guiSettings.ViewMode();
   unsigned int rotationDegCCW = m_guiSettings.RotationDegCCW();
+
+  // Reset game settings
+  CGameSettings guiSettings = m_processInfo.GetRenderContext().GetDefaultGameSettings();
+
+  SCALINGMETHOD scalingMethod = guiSettings.ScalingMethod();
+  VIEWMODE viewMode = guiSettings.ViewMode();
 
   // Save settings for renderer
   m_renderSettings.VideoSettings().SetVideoFilter(videoFilter);

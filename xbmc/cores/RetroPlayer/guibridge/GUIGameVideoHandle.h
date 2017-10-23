@@ -36,6 +36,7 @@ namespace RETRO
     bool IsPlayingGame();
     bool SupportsRenderFeature(RENDERFEATURE feature);
     bool SupportsScalingMethod(SCALINGMETHOD method);
+    CGameSettings GetGameSettings();
 
   private:
     // Construction parameters

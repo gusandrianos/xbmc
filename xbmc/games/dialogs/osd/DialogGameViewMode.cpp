@@ -20,9 +20,10 @@
 
 #include "DialogGameViewMode.h"
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
+#include "cores/GameSettings.h"
+#include "cores/IPlayer.h"
 #include "guilib/LocalizeStrings.h"
 #include "guilib/WindowIDs.h"
-#include "settings/GameSettings.h"
 #include "settings/MediaSettings.h"
 #include "utils/Variant.h"
 #include "FileItem.h"
@@ -94,28 +95,28 @@ void CDialogGameViewMode::GetItems(CFileItemList &items)
 
 void CDialogGameViewMode::OnItemFocus(unsigned int index)
 {
-  if (index < m_viewModes.size())
+  if (index < m_viewModes.size() && m_gameVideoHandle)
   {
     const RETRO::VIEWMODE viewMode = m_viewModes[index].viewMode;
 
-    CGameSettings &gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
+    RETRO::CGameSettings gameSettings = m_gameVideoHandle->GetGameSettings();
     if (gameSettings.ViewMode() != viewMode)
-    {
-      gameSettings.SetViewMode(viewMode);
-      gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
-    }
+      m_gameVideoHandle->SetViewMode(viewMode);
   }
 }
 
 unsigned int CDialogGameViewMode::GetFocusedItem() const
 {
-  CGameSettings &gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
-
-  for (unsigned int i = 0; i < m_viewModes.size(); i++)
+  if (m_gameVideoHandle)
   {
-    const RETRO::VIEWMODE viewMode = m_viewModes[i].viewMode;
-    if (viewMode == gameSettings.ViewMode())
-      return i;
+    RETRO::CGameSettings gameSettings = m_gameVideoHandle->GetGameSettings();
+
+    for (unsigned int i = 0; i < m_viewModes.size(); i++)
+    {
+      const RETRO::VIEWMODE viewMode = m_viewModes[i].viewMode;
+      if (viewMode == gameSettings.ViewMode())
+        return i;
+    }
   }
 
   return 0;

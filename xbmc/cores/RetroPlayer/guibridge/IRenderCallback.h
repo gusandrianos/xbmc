@@ -32,6 +32,7 @@ namespace RETRO
 
     virtual bool SupportsRenderFeature(RENDERFEATURE feature) const = 0;
     virtual bool SupportsScalingMethod(SCALINGMETHOD method) const = 0;
+    virtual CGameSettings GetGameSettings() = 0;
   };
 }
 }
