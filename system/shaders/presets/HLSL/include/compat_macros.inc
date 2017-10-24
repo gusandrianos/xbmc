@@ -48,8 +48,8 @@
 			{ \
 			  pass P0 \
 			  { \
-				SetVertexShader( CompileShader( vs_4_0, main_vertex() ) ); \
-				SetPixelShader( CompileShader( ps_4_0, main_fragment() ) ); \
+				SetVertexShader( CompileShader( vs_4_0_level_9_3, main_vertex() ) ); \
+				SetPixelShader( CompileShader( ps_4_0_level_9_3, main_fragment() ) ); \
 			  } \
 			};
 	#else
