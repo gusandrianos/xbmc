@@ -56,6 +56,7 @@ namespace PERIPHERALS
     ~CPeripheralJoystick(void) override;
 
     // implementation of CPeripheral
+    std::string GetIcon() const override;
     bool InitialiseFeature(const PeripheralFeature feature) override;
     void OnUserNotification() override;
     bool TestFeature(PeripheralFeature feature) override;

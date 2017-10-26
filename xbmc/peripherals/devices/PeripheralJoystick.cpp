@@ -75,6 +75,11 @@ CPeripheralJoystick::~CPeripheralJoystick(void)
   m_buttonMap.reset();
 }
 
+std::string CPeripheralJoystick::GetIcon() const
+{
+  return CPeripheral::GetIcon(); //! @todo
+}
+
 bool CPeripheralJoystick::InitialiseFeature(const PeripheralFeature feature)
 {
   bool bSuccess = false;
