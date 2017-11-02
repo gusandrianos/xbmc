@@ -2458,9 +2458,6 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
     // stop playing file
     if (m_appPlayer.IsPlayingVideo()) StopPlaying();
 
-    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO)
-      CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
-
     ResetScreenSaver();
     WakeUpScreenSaverAndDPMS();
 
