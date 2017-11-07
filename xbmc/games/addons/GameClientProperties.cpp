@@ -24,7 +24,6 @@
 #include "addons/IAddon.h"
 #include "addons/AddonManager.h"
 #include "addons/GameResource.h"
-#include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "settings/Settings.h"
@@ -91,29 +90,23 @@ const char** CGameClientProperties::GetProxyDllPaths(void)
 {
   if (m_proxyDllPaths.empty())
   {
+    // Check if another add-on should load this game client
+    AddonPtr addon;
+
     // Add all game client dependencies
     //! @todo Compare helper version with required dependency
     const ADDONDEPS& dependencies = m_parent->GetDeps();
     for (ADDONDEPS::const_iterator it = dependencies.begin(); it != dependencies.end(); ++it)
     {
       const std::string& strAddonId = it->first;
-      AddonPtr addon;
       if (CServiceBroker::GetAddonMgr().GetAddon(strAddonId, addon, ADDON_GAMEDLL, false))
-      {
-        // If add-on is disabled, ask the user to enable it
-        if (CServiceBroker::GetAddonMgr().IsAddonDisabled(addon->ID()))
-        {
-          // Failed to play game
-          // This game depends on a disabled add-on. Would you like to enable it?
-          if (CGUIDialogYesNo::ShowAndGetInput(CVariant{ 35210 }, CVariant{ 35215 }))
-            CServiceBroker::GetAddonMgr().EnableAddon(addon->ID());
-          else
-            addon.reset();
-        }
-      }
+        break;
+    }
 
-      if (addon)
-        AddProxyDll(std::static_pointer_cast<CGameClient>(addon));
+    if (addon)
+    {
+      m_loaderAddon = std::static_pointer_cast<CGameClient>(addon);
+      AddProxyDll(m_loaderAddon);
     }
   }
 

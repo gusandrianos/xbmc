@@ -32,6 +32,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
+#include "dialogs/GUIDialogYesNo.h"
 #include "games/addons/playback/GameClientRealtimePlayback.h"
 #include "games/addons/playback/GameClientReversiblePlayback.h"
 #include "games/controllers/Controller.h"
@@ -223,6 +224,33 @@ bool CGameClient::Initialize(void)
     CDirectory::Create(savestatesDir);
 
   m_libraryProps.InitializeProperties();
+
+  // If a loader is specified, ensure it can load this game client
+  GameClientPtr loader = m_libraryProps.GetLoaderAddon();
+  if (loader)
+  {
+    CLog::Log(LOGDEBUG, "Using game client %s as a loader", loader->ID().c_str());
+
+    // If add-on is disabled, ask the user to enable it
+    if (CServiceBroker::GetAddonMgr().IsAddonDisabled(loader->ID()))
+    {
+      // Failed to play game
+      // This game depends on a disabled add-on. Would you like to enable it?
+      if (CGUIDialogYesNo::ShowAndGetInput(CVariant{ 35210 }, CVariant{ 35215 }))
+      {
+        CLog::Log(LOGDEBUG, "Enabling game client %s", loader->ID().c_str());
+        CServiceBroker::GetAddonMgr().EnableAddon(loader->ID());
+      }
+      else
+      {
+        CLog::Log(LOGDEBUG, "Game client %s is disabled, aborting launch", loader->ID().c_str());
+        return false;
+      }
+    }
+  }
+
+  CLog::Log(LOGDEBUG, "Library path is %s", LibPath().c_str());
+  CLog::Log(LOGDEBUG, "Actual library path is %s", CAddon::LibPath().c_str());
 
   m_struct.toKodi.kodiInstance = this;
   m_struct.toKodi.CloseGame = cb_close_game;

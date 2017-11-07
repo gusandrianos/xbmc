@@ -46,6 +46,8 @@ public:
 
   void InitializeProperties(void);
 
+  GameClientPtr GetLoaderAddon() const { return m_loaderAddon; }
+
 private:
   // Release mutable resources
   void ReleaseResources(void);
@@ -80,6 +82,9 @@ private:
 
   const CGameClient* const  m_parent;
   AddonProps_Game&          m_properties;
+
+  // Properties exposed to game client
+  GameClientPtr m_loaderAddon;
 
   // Buffers to hold the strings
   std::string        m_strLibraryPath;
