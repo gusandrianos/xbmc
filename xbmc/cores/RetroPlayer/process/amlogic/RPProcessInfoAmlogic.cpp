@@ -26,7 +26,7 @@ using namespace KODI;
 using namespace RETRO;
 
 CRPProcessInfoAmlogic::CRPProcessInfoAmlogic() :
-  CRPProcessInfo("Amlogic")
+  CRPProcessInfoEGL("Amlogic")
 {
 }
 

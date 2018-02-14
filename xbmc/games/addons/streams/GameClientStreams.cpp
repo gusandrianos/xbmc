@@ -20,6 +20,7 @@
 
 #include "GameClientStreams.h"
 #include "GameClientStreamAudio.h"
+#include "GameClientStreamHwFramebuffer.h"
 #include "GameClientStreamSwFramebuffer.h"
 #include "GameClientStreamVideo.h"
 #include "cores/RetroPlayer/streams/IRetroPlayerStream.h"
@@ -98,6 +99,14 @@ void CGameClientStreams::CloseStream(IGameClientStream *stream)
   }
 }
 
+game_proc_address_t CGameClientStreams::GetHwProcedureAddress(const char *symbol)
+{
+  if (m_streamManager != nullptr)
+    return m_streamManager->GetHwProcedureAddress(symbol);
+
+  return nullptr;
+}
+
 std::unique_ptr<IGameClientStream> CGameClientStreams::CreateStream(GAME_STREAM_TYPE streamType) const
 {
   std::unique_ptr<IGameClientStream> gameStream;
@@ -112,6 +121,11 @@ std::unique_ptr<IGameClientStream> CGameClientStreams::CreateStream(GAME_STREAM_
   case GAME_STREAM_VIDEO:
   {
     gameStream.reset(new CGameClientStreamVideo);
+    break;
+  }
+  case GAME_STREAM_HW_FRAMEBUFFER:
+  {
+    gameStream.reset(new CGameClientStreamHwFramebuffer(m_gameClient));
     break;
   }
   case GAME_STREAM_SW_FRAMEBUFFER:

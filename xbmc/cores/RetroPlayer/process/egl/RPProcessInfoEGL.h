@@ -17,20 +17,21 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
-
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "cores/RetroPlayer/process/RPProcessInfo.h"
 
 namespace KODI
 {
 namespace RETRO
 {
-  class IRenderBufferPool;
-  using RenderBufferPoolPtr = std::shared_ptr<IRenderBufferPool>;
-  using RenderBufferPoolVector = std::vector<RenderBufferPoolPtr>;
+  class CRPProcessInfoEGL : public CRPProcessInfo
+  {
+  public:
+    CRPProcessInfoEGL(std::string platformName);
 
-  using HwProcedureAddress = void (*)();
+    // Implementation of CRPProcessInfo
+    HwProcedureAddress GetHwProcedureAddress(const char* symbol) override;
+  };
 }
 }

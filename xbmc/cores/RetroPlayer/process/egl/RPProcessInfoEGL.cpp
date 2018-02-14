@@ -18,19 +18,19 @@
  *
  */
 
-#pragma once
+#include "RPProcessInfoEGL.h"
 
-#include <memory>
-#include <vector>
+#include <EGL/egl.h>
 
-namespace KODI
+using namespace KODI;
+using namespace RETRO;
+
+CRPProcessInfoEGL::CRPProcessInfoEGL(std::string platformName) :
+  CRPProcessInfo(std::move(platformName))
 {
-namespace RETRO
-{
-  class IRenderBufferPool;
-  using RenderBufferPoolPtr = std::shared_ptr<IRenderBufferPool>;
-  using RenderBufferPoolVector = std::vector<RenderBufferPoolPtr>;
-
-  using HwProcedureAddress = void (*)();
 }
+
+HwProcedureAddress CRPProcessInfoEGL::GetHwProcedureAddress(const char* symbol)
+{
+  return static_cast<HwProcedureAddress>(eglGetProcAddress(symbol));
 }
