@@ -314,16 +314,7 @@ void CRPRenderManager::RenderInternal(const std::shared_ptr<CRPBaseRenderer> &re
 
   if (renderBuffer != nullptr)
   {
-    bool bUploaded = true;
-
-    if (!renderBuffer->IsLoaded())
-    {
-      bUploaded = renderBuffer->UploadTexture();
-      renderBuffer->SetLoaded(true);
-    }
-
-    if (bUploaded)
-      renderer->SetBuffer(renderBuffer);
+    renderer->SetBuffer(renderBuffer);
 
     renderBuffer->Release();
   }
