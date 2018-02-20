@@ -60,7 +60,7 @@ namespace RETRO
      * \brief Performs whatever necessary before rendering the frame
      */
     void PreRender(bool clear);
-    void SetTexture(IRenderTexture *texture);
+    void SetBuffer(IRenderBuffer *buffer);
     void RenderFrame(bool clear, uint8_t alpha);
     void SetSpeed(double speed);
 
