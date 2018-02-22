@@ -1,10 +1,12 @@
-set(SOURCES RetroPlayerAudio.cpp
+set(SOURCES Pipe.cpp
+            RetroPlayerAudio.cpp
             RetroPlayerStreamTypes.cpp
             RetroPlayerVideo.cpp
             RPStreamManager.cpp
 )
 
-set(HEADERS IRetroPlayerStream.h
+set(HEADERS Pipe.h
+            IRetroPlayerStream.h
             IStreamManager.h
             RetroPlayerAudio.h
             RetroPlayerStreamTypes.h
