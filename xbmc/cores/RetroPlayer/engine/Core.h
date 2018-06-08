@@ -27,6 +27,7 @@
 #include "threads/CriticalSection.h"
 #include "threads/Event.h"
 #include "threads/SingleLock.h"
+#include "utils/Variant.h"
 
 #include <algorithm>
 #include <map>
@@ -41,31 +42,36 @@ namespace RETRO
   using Object = std::deque<std::string>;
   using Metadata = std::map<Predicate, Object>;
 
-  std::string IsolateIfSingle(Object object)
+  CVariant IsolateIfSingle(Object object)
   {
     if (object.empty())
-      return "";
+      return CVariant{""};
     else if (object.size() == 1)
-      return *object.begin();
+      return CVariant{*object.begin()};
     else
-      return object; //! @todo
+    {
+      CVariant array(CVariant::VariantTypeArray);
+      for (const std::string &obj : object)
+        array.push_back(obj);
+      return array;
+    }
   }
 
   struct Subject
   {
-    Subject(Class clazz = "", Metadata metadata) :
+    Subject(Class clazz, Metadata metadata) :
       clazz(std::move(clazz)),
       metadata(std::move(metadata))
     {
     }
 
-    std::map<std::string, std::string> ToDict()
+    std::map<std::string, CVariant> ToDict()
     {
-      std::map<std::string, std::string> s;
+      std::map<std::string, CVariant> s;
 
       for (auto &it : metadata)
       {
-        std::string value = IsolateIfSingle(it.second);
+        CVariant value = IsolateIfSingle(it.second);
         if (!value.empty())
           s[it.first] = std::move(value);
       }
@@ -73,9 +79,9 @@ namespace RETRO
       return s;
     }
 
-    std::string GetItem(const std::string &name)
+    CVariant GetItem(const std::string &name)
     {
-      return IsolateIfSingle(metadata[name]));
+      return IsolateIfSingle(metadata[name]);
     }
 
     void Emit(std::string predicate, std::string object)
@@ -91,7 +97,7 @@ namespace RETRO
         metadata.erase(it);
 
       if (!object.empty())
-        metadata
+        metadata[predicate].push_back(std::move(object));
     }
 
     Class clazz;
