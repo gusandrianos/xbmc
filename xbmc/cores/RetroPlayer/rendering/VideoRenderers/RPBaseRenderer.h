@@ -27,7 +27,7 @@ extern "C" {
 #include "libavutil/pixfmt.h"
 }
 
-#include <atomic>
+#include <array>
 #include <memory>
 #include <stdint.h>
 
@@ -128,10 +128,9 @@ namespace RETRO
     IRenderBuffer *m_renderBuffer = nullptr;
 
     // Geometry properties
-    CPoint m_rotatedDestCoords[4];
+    std::array<CPoint, 4> m_rotatedDestCoords;
     CRect m_oldDestRect; // destrect of the previous frame
     CRect m_sourceRect; // original size of the video
-    CRect m_viewRect; // entire target rendering area for the video (including black bars)
 
     // ====== Video Shader Members =====
     void UpdateVideoShaders();
@@ -146,13 +145,13 @@ namespace RETRO
      */
     void PostRender();
 
-    void CalcNormalRenderRect(float offsetX, float offsetY, float width, float height, float inputFrameRatio, float zoomAmount);
-    void CalculateViewMode();
+    static void CalcNormalRenderRect(const CRect &viewRect, float inputFrameRatio, float zoomAmount, float pixelRatio, CRect &sourceRect, CRect &destRect);
+    static void ClipRect(const CRect &viewRect, CRect &sourceRect, CRect &destRect);
+    void CalculateViewMode(VIEWMODE viewMode, unsigned int sourceHeight, float &pixelRatio, float &zoomAmount);
 
-    void UpdateDrawPoints(const CRect &destRect);
-    void ReorderDrawPoints();
+    static std::array<CPoint, 4> ReorderDrawPoints(const CRect &destRect, const CRect &viewRect, unsigned int orientationDegCCW, float aspectRatio);
     void MarkDirty();
-    float GetAllowedErrorInAspect() const;
+    static float GetAllowedErrorInAspect();
 
     uint64_t m_renderFrameCount = 0;
     uint64_t m_lastRender = 0;
