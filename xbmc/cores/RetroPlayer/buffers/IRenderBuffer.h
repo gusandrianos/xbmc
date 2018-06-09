@@ -19,8 +19,6 @@
  */
 #pragma once
 
-#include "cores/IPlayer.h"
-
 extern "C" {
 #include "libavutil/pixfmt.h"
 }

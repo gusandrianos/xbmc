@@ -19,7 +19,7 @@
  */
 #pragma once
 
-#include "cores/IPlayer.h"
+#include "cores/GameSettings.h"
 #include "threads/CriticalSection.h"
 
 #include <map>
@@ -144,8 +144,8 @@ namespace RETRO
     // Functions exposed to friend class CGUIGameVideoHandle
     void UnregisterHandle(CGUIGameVideoHandle *handle) { }
     bool IsPlayingGame();
-    bool SupportsRenderFeature(ERENDERFEATURE feature);
-    bool SupportsScalingMethod(ESCALINGMETHOD method);
+    bool SupportsRenderFeature(RENDERFEATURE feature);
+    bool SupportsScalingMethod(SCALINGMETHOD method);
 
     // Functions exposed to CGUIGameSettingsHandle
     void UnregisterHandle(CGUIGameSettingsHandle *handle) { }
