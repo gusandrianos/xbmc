@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2017 Team Kodi
+ *      Copyright (C) 2017-2018 Team Kodi
  *      http://kodi.tv
  *
  *  This Program is free software; you can redistribute it and/or modify
@@ -17,34 +17,39 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "GUIGameVideoHandle.h"
-#include "GUIGameRenderManager.h"
-
-using namespace KODI;
-using namespace RETRO;
-
-CGUIGameVideoHandle::CGUIGameVideoHandle(CGUIGameRenderManager &renderManager) :
-  m_renderManager(renderManager)
+namespace KODI
 {
+namespace RETRO
+{
+
+// NOTE: Only append
+enum class SCALINGMETHOD
+{
+  AUTO = 0,
+  NEAREST = 1,
+  LINEAR = 2,
+  MAX = LINEAR
+};
+
+// NOTE: Only append
+enum class VIEWMODE
+{
+  Normal = 0,
+  Stretch4x3 = 1,
+  Stretch16x9 = 2,
+  Original = 3,
+  Max = Original
+};
+
+enum class RENDERFEATURE
+{
+  ROTATION,
+  STRETCH,
+  ZOOM,
+  PIXEL_RATIO,
+};
+
 }
-
-CGUIGameVideoHandle::~CGUIGameVideoHandle()
-{
-  m_renderManager.UnregisterHandle(this);
-}
-
-bool CGUIGameVideoHandle::IsPlayingGame()
-{
-  return m_renderManager.IsPlayingGame();
-}
-
-bool CGUIGameVideoHandle::SupportsRenderFeature(RENDERFEATURE feature)
-{
-  return m_renderManager.SupportsRenderFeature(feature);
-}
-
-bool CGUIGameVideoHandle::SupportsScalingMethod(SCALINGMETHOD method)
-{
-  return m_renderManager.SupportsScalingMethod(method);
 }

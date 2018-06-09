@@ -22,7 +22,7 @@
 #include "cores/RetroPlayer/guibridge/IGUIRenderSettings.h"
 #include "cores/RetroPlayer/rendering/RenderGeometry.h"
 #include "cores/RetroPlayer/rendering/RenderSettings.h"
-#include "cores/IPlayer.h"
+#include "cores/GameSettings.h"
 #include "threads/CriticalSection.h"
 
 namespace KODI
@@ -47,8 +47,8 @@ namespace RETRO
     void Reset();
     void SetSettings(CRenderSettings settings);
     void SetGeometry(CRenderGeometry geometry);
-    void SetScalingMethod(ESCALINGMETHOD scalingMethod);
-    void SetViewMode(ViewMode viewMode);
+    void SetScalingMethod(SCALINGMETHOD scalingMethod);
+    void SetViewMode(VIEWMODE viewMode);
     void SetRotationDegCCW(unsigned int rotationDegCCW);
 
   private:

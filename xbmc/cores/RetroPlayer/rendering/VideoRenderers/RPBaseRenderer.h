@@ -19,11 +19,13 @@
  */
 #pragma once
 
-#include "cores/IPlayer.h"
 #include "cores/RetroPlayer/rendering/RenderSettings.h"
+#include "cores/GameSettings.h"
 #include "utils/Geometry.h"
 
+extern "C" {
 #include "libavutil/pixfmt.h"
+}
 
 #include <atomic>
 #include <memory>
@@ -59,9 +61,9 @@ namespace RETRO
     void RenderFrame(bool clear, uint8_t alpha);
 
     // Feature support
-    virtual bool Supports(ERENDERFEATURE feature) const = 0;
+    virtual bool Supports(RENDERFEATURE feature) const = 0;
     bool IsCompatible(const CRenderVideoSettings &settings) const;
-    virtual ESCALINGMETHOD GetDefaultScalingMethod() const = 0;
+    virtual SCALINGMETHOD GetDefaultScalingMethod() const = 0;
 
     // Public renderer interface
     virtual void Flush();
@@ -71,8 +73,8 @@ namespace RETRO
     const CRenderSettings &GetRenderSettings() const { return m_renderSettings; }
 
     // Set render settings
-    void SetScalingMethod(ESCALINGMETHOD method);
-    void SetViewMode(ViewMode viewMode);
+    void SetScalingMethod(SCALINGMETHOD method);
+    void SetViewMode(VIEWMODE viewMode);
     void SetRenderRotation(unsigned int rotationDegCCW);
 
     bool IsVisible() const;
