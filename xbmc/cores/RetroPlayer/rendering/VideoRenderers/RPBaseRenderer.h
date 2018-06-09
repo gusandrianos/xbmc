@@ -73,6 +73,7 @@ namespace RETRO
     // Set render settings
     void SetScalingMethod(ESCALINGMETHOD method);
     void SetViewMode(ViewMode viewMode);
+    void SetRenderRotation(unsigned int rotationDegCCW);
 
     bool IsVisible() const;
 

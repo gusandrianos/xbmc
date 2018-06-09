@@ -17318,7 +17318,13 @@ msgctxt "#35226"
 msgid "Advanced settings"
 msgstr ""
 
-#empty strings from id 35227 to 35249
+#. Label of button in the in-game menu for changing the video rotation
+#: addons/skin.estuary/xml/Custom_1101_SettingsList.xml
+msgctxt "#35227"
+msgid "Rotation"
+msgstr ""
+
+#empty strings from id 35228 to 35249
 
 #: xbmc/windows/GUIMediaWindow.cpp
 msgctxt "#35250"

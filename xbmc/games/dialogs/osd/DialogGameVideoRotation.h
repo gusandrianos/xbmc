@@ -20,7 +20,6 @@
 #pragma once
 
 #include "DialogGameVideoSelect.h"
-#include "cores/IPlayer.h"
 
 #include <vector>
 
@@ -28,11 +27,11 @@ namespace KODI
 {
 namespace GAME
 {
-  class CDialogGameViewMode : public CDialogGameVideoSelect
+  class CDialogGameVideoRotation : public CDialogGameVideoSelect
   {
   public:
-    CDialogGameViewMode();
-    ~CDialogGameViewMode() override = default;
+    CDialogGameVideoRotation();
+    ~CDialogGameVideoRotation() override = default;
 
   protected:
     // implementation of CDialogGameVideoSelect
@@ -44,18 +43,7 @@ namespace GAME
     void PostExit() override;
 
   private:
-    struct ViewModeProperties
-    {
-      int stringIndex;
-      ViewMode viewMode;
-    };
-
-    std::vector<ViewModeProperties> m_viewModes;
-
-    /*!
-     * \brief The list of all the view modes along with their properties
-     */
-    static const std::vector<ViewModeProperties> m_allViewModes;
+    std::vector<unsigned int> m_rotations; // Degrees counter-clockwise
   };
 }
 }
