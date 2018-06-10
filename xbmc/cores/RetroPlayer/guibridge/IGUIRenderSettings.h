@@ -20,6 +20,7 @@
 #pragma once
 
 #include "cores/RetroPlayer/rendering/RenderSettings.h"
+#include "utils/Geometry.h"
 
 namespace KODI
 {
@@ -54,6 +55,15 @@ namespace RETRO
      * \return The render settings
      */
     virtual CRenderSettings GetSettings() const = 0;
+
+    /*!
+     * \brief Get the dimensions of this target
+     *
+     * Dimensions are ignored for fullscreen windows.
+     *
+     * \return The destination dimensions, or unused for fullscreen window
+     */
+    virtual CRect GetDimensions() const { return CRect{}; }
   };
 }
 }
