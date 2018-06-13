@@ -32,6 +32,10 @@ namespace RETRO
 
     static CRPProcessInfo* Create();
     static void Register();
+
+    // Implementation of CRPProcessInfo
+    void ConfigureRenderSystem(AVPixelFormat format) override;
+
   };
 }
 }

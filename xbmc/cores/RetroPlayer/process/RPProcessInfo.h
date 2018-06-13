@@ -149,6 +149,14 @@ namespace RETRO
      * \brief Get the default scaling method for this rendering system
      */
     SCALINGMETHOD GetDefaultScalingMethod() const { return m_defaultScalingMethod; }
+
+    /*!
+     * \brief Configure the render system
+     *
+     * \param format The pixel format of the video stream
+     */
+    virtual void ConfigureRenderSystem(AVPixelFormat format) { }
+
     ///}
 
     /// @name Player video info

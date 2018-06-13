@@ -177,6 +177,8 @@ void CRPRenderManager::FrameMove()
 
     if (m_state == RENDER_STATE::CONFIGURING)
     {
+      m_processInfo.ConfigureRenderSystem(m_format);
+
       MESSAGING::CApplicationMessenger::GetInstance().PostMsg(TMSG_SWITCHTOFULLSCREEN);
       m_state = RENDER_STATE::CONFIGURED;
 
