@@ -437,6 +437,8 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
   UpdateInternalStateWithResolution(res);
   RESOLUTION_INFO info_org  = CDisplaySettings::GetInstance().GetResolutionInfo(res);
 
+  CServiceBroker::GetWinSystem()->UpdateFullscreenRes(info_org);
+
   bool switched = false;
   if (g_advancedSettings.m_fullScreen)
   {

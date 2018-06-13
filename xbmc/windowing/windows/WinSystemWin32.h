@@ -112,6 +112,7 @@ public:
   std::unique_ptr<CVideoSync> GetVideoSync(void *clock) override;
 
   bool WindowedMode() const { return m_state != WINDOW_STATE_FULLSCREEN; }
+  void UpdateFullscreenRes(RESOLUTION_INFO& res) override;
   bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
 
   // CWinSystemWin32

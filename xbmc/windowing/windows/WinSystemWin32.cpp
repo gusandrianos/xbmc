@@ -438,6 +438,15 @@ void CWinSystemWin32::CenterCursor() const
   SetCursorPos(x, y);
 }
 
+void CWinSystemWin32::UpdateFullscreenRes(RESOLUTION_INFO& res)
+{
+  bool stereoChange = IsStereoEnabled() != (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() == RENDER_STEREO_MODE_HARDWAREBASED);
+
+  // entering to stereo mode, limit resolution to 1080p@23.976
+  if (stereoChange && !IsStereoEnabled() && res.iWidth > 1280)
+    res = CDisplaySettings::GetInstance().GetResolutionInfo(CResolutionUtils::ChooseBestResolution(24.f / 1.001f, 1920, true));
+}
+
 bool CWinSystemWin32::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
 {
   CWinSystemWin32::UpdateStates(fullScreen);
@@ -467,12 +476,6 @@ bool CWinSystemWin32::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool 
 
   if (state == m_state && !forceChange)
     return true;
-
-  // entering to stereo mode, limit resolution to 1080p@23.976
-  if (stereoChange && !IsStereoEnabled() && res.iWidth > 1280)
-  {
-    res = CDisplaySettings::GetInstance().GetResolutionInfo(CResolutionUtils::ChooseBestResolution(24.f / 1.001f, 1920, true));
-  }
 
   if (m_state == WINDOW_STATE_WINDOWED)
   {
