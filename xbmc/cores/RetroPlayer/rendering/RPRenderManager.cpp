@@ -64,6 +64,9 @@ void CRPRenderManager::Deinitialize()
 {
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Deinitializing render manager");
 
+  // Required to reset Amlogic chip to default state
+  m_processInfo.ConfigureRenderSystem(AV_PIX_FMT_NONE);
+
   for (auto &pixelScaler : m_scalers)
   {
     if (pixelScaler.second != nullptr)
