@@ -271,6 +271,7 @@ bool CGameClient::OpenFile(const CFileItem& file, RETRO::IStreamManager& streamM
 
   CloseFile();
 
+  // Initialize stream subsystem before loading game
   Streams().Initialize(streamManager);
 
   GAME_ERROR error = GAME_ERROR_FAILED;
@@ -305,6 +306,7 @@ bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager, IGameInpu
 
   CloseFile();
 
+  // Initialize stream subsystem before loading game
   Streams().Initialize(streamManager);
 
   GAME_ERROR error = GAME_ERROR_FAILED;
