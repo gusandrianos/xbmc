@@ -17463,7 +17463,13 @@ msgctxt "#35235"
 msgid "Press {0:s} to open the menu."
 msgstr ""
 
-#empty strings from id 35236 to 35249
+#. Label of the button in the in-game menu for rewinding the game
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35236"
+msgid "Rewind"
+msgstr ""
+
+#empty strings from id 35237 to 35249
 
 #: xbmc/windows/GUIMediaWindow.cpp
 msgctxt "#35250"
