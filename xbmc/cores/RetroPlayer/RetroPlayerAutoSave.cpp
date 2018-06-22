@@ -19,8 +19,8 @@
  */
 
 #include "RetroPlayerAutoSave.h"
+#include "cores/RetroPlayer/playback/IPlayback.h"
 #include "games/addons/GameClient.h"
-#include "games/addons/playback/IGameClientPlayback.h"
 #include "utils/log.h"
 #include "URL.h"
 

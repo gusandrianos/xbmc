@@ -18,11 +18,10 @@
  *
  */
 
-#include "GameClientReversiblePlayback.h"
-#include "ServiceBroker.h"
+#include "ReversiblePlayback.h"
+#include "cores/RetroPlayer/streams/memory/BasicMemoryStream.h"
+#include "cores/RetroPlayer/streams/memory/DeltaPairMemoryStream.h"
 #include "games/addons/GameClient.h"
-#include "games/addons/savestates/BasicMemoryStream.h"
-#include "games/addons/savestates/DeltaPairMemoryStream.h"
 #include "games/addons/savestates/Savestate.h"
 #include "games/addons/savestates/SavestateReader.h"
 #include "games/addons/savestates/SavestateWriter.h"
@@ -36,15 +35,15 @@
 #include <algorithm>
 
 using namespace KODI;
-using namespace GAME;
+using namespace RETRO;
 
 #define REWIND_FACTOR  0.25  // Rewind at 25% of gameplay speed
 
-CGameClientReversiblePlayback::CGameClientReversiblePlayback(CGameClient* gameClient, double fps, size_t serializeSize) :
+CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient, double fps, size_t serializeSize) :
   m_gameClient(gameClient),
   m_gameLoop(this, fps),
-  m_savestateWriter(new CSavestateWriter),
-  m_savestateReader(new CSavestateReader),
+  m_savestateWriter(new GAME::CSavestateWriter),
+  m_savestateReader(new GAME::CSavestateReader),
   m_totalFrameCount(0),
   m_pastFrameCount(0),
   m_futureFrameCount(0),
@@ -59,14 +58,14 @@ CGameClientReversiblePlayback::CGameClientReversiblePlayback(CGameClient* gameCl
   m_gameLoop.Start();
 }
 
-CGameClientReversiblePlayback::~CGameClientReversiblePlayback()
+CReversiblePlayback::~CReversiblePlayback()
 {
   CServiceBroker::GetGameServices().GameSettings().UnregisterObserver(this);
 
   m_gameLoop.Stop();
 }
 
-void CGameClientReversiblePlayback::SeekTimeMs(unsigned int timeMs)
+void CReversiblePlayback::SeekTimeMs(unsigned int timeMs)
 {
   const int offsetTimeMs = timeMs - GetTimeMs();
   const int offsetFrames = MathUtils::round_int(offsetTimeMs / 1000.0 * m_gameLoop.FPS());
@@ -93,12 +92,12 @@ void CGameClientReversiblePlayback::SeekTimeMs(unsigned int timeMs)
   }
 }
 
-double CGameClientReversiblePlayback::GetSpeed() const
+double CReversiblePlayback::GetSpeed() const
 {
   return m_gameLoop.GetSpeed();
 }
 
-void CGameClientReversiblePlayback::SetSpeed(double speedFactor)
+void CReversiblePlayback::SetSpeed(double speedFactor)
 {
   if (speedFactor >= 0.0)
     m_gameLoop.SetSpeed(speedFactor);
@@ -106,12 +105,12 @@ void CGameClientReversiblePlayback::SetSpeed(double speedFactor)
     m_gameLoop.SetSpeed(speedFactor * REWIND_FACTOR);
 }
 
-void CGameClientReversiblePlayback::PauseAsync()
+void CReversiblePlayback::PauseAsync()
 {
   m_gameLoop.PauseAsync();
 }
 
-std::string CGameClientReversiblePlayback::CreateSavestate()
+std::string CReversiblePlayback::CreateSavestate()
 {
   std::string empty;
 
@@ -149,7 +148,7 @@ std::string CGameClientReversiblePlayback::CreateSavestate()
 
   bool bSuccess = false;
 
-  if (m_savestateWriter->WriteSave(memoryStream.get()))
+  if (m_savestateWriter->WriteSave(memoryStream->CurrentFrame(), memoryStream->FrameSize()))
   {
     m_savestateWriter->WriteThumb();
 
@@ -168,7 +167,7 @@ std::string CGameClientReversiblePlayback::CreateSavestate()
   return bSuccess ? m_savestateWriter->GetPath() : "";
 }
 
-bool CGameClientReversiblePlayback::LoadSavestate(const std::string& path)
+bool CReversiblePlayback::LoadSavestate(const std::string& path)
 {
   // Game client must support serialization
   if (m_gameClient->SerializeSize() == 0)
@@ -197,10 +196,13 @@ bool CGameClientReversiblePlayback::LoadSavestate(const std::string& path)
 
   bool bSuccess = false;
 
-  if (m_savestateReader->ReadSave(memoryStream.get()))
+  if (m_savestateReader->ReadSave(memoryStream->BeginFrame(), memoryStream->FrameSize()))
   {
+    memoryStream->SubmitFrame();
+
     m_gameClient->Deserialize(memoryStream->CurrentFrame(), memoryStream->FrameSize());
     m_totalFrameCount = m_savestateReader->GetFrameCount();
+
     bSuccess = true;
   }
 
@@ -213,21 +215,21 @@ bool CGameClientReversiblePlayback::LoadSavestate(const std::string& path)
   return bSuccess;
 }
 
-void CGameClientReversiblePlayback::FrameEvent()
+void CReversiblePlayback::FrameEvent()
 {
   m_gameClient->RunFrame();
 
   AddFrame();
 }
 
-void CGameClientReversiblePlayback::RewindEvent()
+void CReversiblePlayback::RewindEvent()
 {
   RewindFrames(1);
 
   m_gameClient->RunFrame();
 }
 
-void CGameClientReversiblePlayback::AddFrame()
+void CReversiblePlayback::AddFrame()
 {
   CSingleLock lock(m_mutex);
 
@@ -243,7 +245,7 @@ void CGameClientReversiblePlayback::AddFrame()
   m_totalFrameCount++;
 }
 
-void CGameClientReversiblePlayback::RewindFrames(uint64_t frames)
+void CReversiblePlayback::RewindFrames(uint64_t frames)
 {
   CSingleLock lock(m_mutex);
 
@@ -257,7 +259,7 @@ void CGameClientReversiblePlayback::RewindFrames(uint64_t frames)
   m_totalFrameCount -= std::min(m_totalFrameCount, static_cast<uint64_t>(frames));
 }
 
-void CGameClientReversiblePlayback::AdvanceFrames(uint64_t frames)
+void CReversiblePlayback::AdvanceFrames(uint64_t frames)
 {
   CSingleLock lock(m_mutex);
 
@@ -271,7 +273,7 @@ void CGameClientReversiblePlayback::AdvanceFrames(uint64_t frames)
   m_totalFrameCount += frames;
 }
 
-void CGameClientReversiblePlayback::UpdatePlaybackStats()
+void CReversiblePlayback::UpdatePlaybackStats()
 {
   m_pastFrameCount = m_memoryStream->PastFramesAvailable();
   m_futureFrameCount = m_memoryStream->FutureFramesAvailable();
@@ -285,7 +287,7 @@ void CGameClientReversiblePlayback::UpdatePlaybackStats()
   m_cacheTimeMs = MathUtils::round_int(1000.0 * cached / m_gameLoop.FPS());
 }
 
-void CGameClientReversiblePlayback::Notify(const Observable &obs, const ObservableMessage msg)
+void CReversiblePlayback::Notify(const Observable &obs, const ObservableMessage msg)
 {
   switch (msg)
   {
@@ -297,7 +299,7 @@ void CGameClientReversiblePlayback::Notify(const Observable &obs, const Observab
   }
 }
 
-void CGameClientReversiblePlayback::UpdateMemoryStream()
+void CReversiblePlayback::UpdateMemoryStream()
 {
   CSingleLock lock(m_mutex);
 
