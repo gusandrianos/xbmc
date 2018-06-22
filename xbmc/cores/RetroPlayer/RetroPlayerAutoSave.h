@@ -20,17 +20,27 @@
 
 #pragma once
 
-#include "games/GameTypes.h"
 #include "threads/Thread.h"
+
+#include <string>
 
 namespace KODI
 {
 namespace RETRO
 {
+  class IAutoSaveCallback
+  {
+  public:
+    virtual ~IAutoSaveCallback() = default;
+
+    virtual bool IsAutoSaveEnabled() const = 0;
+    virtual std::string CreateSavestate() = 0;
+  };
+
   class CRetroPlayerAutoSave : protected CThread
   {
   public:
-    explicit CRetroPlayerAutoSave(GAME::CGameClient &gameClient);
+    explicit CRetroPlayerAutoSave(IAutoSaveCallback &callback);
 
     ~CRetroPlayerAutoSave() override;
 
@@ -40,7 +50,7 @@ namespace RETRO
 
   private:
     // Construction parameter
-    GAME::CGameClient &m_gameClient;
+    IAutoSaveCallback &m_callback;
   };
 }
 }

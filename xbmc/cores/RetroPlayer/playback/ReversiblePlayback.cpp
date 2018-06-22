@@ -54,14 +54,22 @@ CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient, double f
   UpdateMemoryStream();
 
   CServiceBroker::GetGameServices().GameSettings().RegisterObserver(this);
-
-  m_gameLoop.Start();
 }
 
 CReversiblePlayback::~CReversiblePlayback()
 {
   CServiceBroker::GetGameServices().GameSettings().UnregisterObserver(this);
 
+  Deinitialize();
+}
+
+void CReversiblePlayback::Initialize()
+{
+  m_gameLoop.Start();
+}
+
+void CReversiblePlayback::Deinitialize()
+{
   m_gameLoop.Stop();
 }
 
