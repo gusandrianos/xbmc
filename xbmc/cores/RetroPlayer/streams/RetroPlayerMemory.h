@@ -22,50 +22,42 @@
 
 #include "IRetroPlayerStream.h"
 
-#include <memory>
-
-class IAEStream;
-
 namespace KODI
 {
 namespace RETRO
 {
-  class CRPProcessInfo;
-
-  struct AudioStreamProperties
+  struct MemoryStreamProperties
   {
-    PCMFormat format;
-    double sampleRate;
-    AudioChannelMap channelMap;
-  };
-
-  struct AudioStreamPacket
-  {
-    const uint8_t* data;
     size_t size;
   };
 
-  class CRetroPlayerAudio : public IRetroPlayerStream
+  struct MemoryStreamBuffer
+  {
+    uint8_t *data;
+    size_t size;
+  };
+
+  struct MemoryStreamPacket
+  {
+    const uint8_t *data;
+    size_t size;
+  };
+
+  class CRetroPlayerMemory : public IRetroPlayerStream
   {
   public:
-    explicit CRetroPlayerAudio(CRPProcessInfo& processInfo);
-    ~CRetroPlayerAudio() override;
-
-    void Enable(bool bEnabled) { m_bAudioEnabled = bEnabled; }
+    CRetroPlayerMemory();
+    ~CRetroPlayerMemory() override;
 
     // implementation of IRetroPlayerStream
-    bool OpenStream(const StreamProperties& properties) override;
-    bool GetStreamBuffer(unsigned int width, unsigned int height, StreamBuffer& buffer) override { return false; }
-    void AddStreamData(const StreamPacket& packet) override;
+    bool OpenStream(const StreamProperties &properties) override;
+    bool GetStreamBuffer(unsigned int width, unsigned int height, StreamBuffer &buffer) override;
+    void AddStreamData(const StreamPacket &packet) override;
     void CloseStream() override;
 
   private:
-    // Construction parameters
-    CRPProcessInfo& m_processInfo;
-
-    // Audio parameters
-    IAEStream* m_pAudioStream;
-    bool m_bAudioEnabled;
+    // Stream properties
+    bool m_bOpen = false;
   };
 }
 }
