@@ -30,6 +30,7 @@
 #include "cores/RetroPlayer/guibridge/IGUIRenderSettings.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPBaseRenderer.h"
+#include "cores/RetroPlayer/streams/RetroPlayerVideo.h"
 #include "utils/TransformMatrix.h"
 #include "messaging/ApplicationMessenger.h"
 #include "threads/SingleLock.h"
@@ -117,10 +118,12 @@ bool CRPRenderManager::Configure(AVPixelFormat format, unsigned int nominalWidth
   return true;
 }
 
-bool CRPRenderManager::GetVideoBuffer(unsigned int width, unsigned int height, AVPixelFormat &format, uint8_t *&data, size_t &size)
+std::vector<VideoStreamBuffer> CRPRenderManager::GetVideoBuffers(unsigned int width, unsigned int height)
 {
+  std::vector<VideoStreamBuffer> buffers;
+
   if (m_bFlush || m_state != RENDER_STATE::CONFIGURED)
-    return false;
+    return buffers;
 
   for (IRenderBuffer *buffer : m_pendingBuffers)
     buffer->Release();
@@ -139,17 +142,18 @@ bool CRPRenderManager::GetVideoBuffer(unsigned int width, unsigned int height, A
       CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Unable to get video buffer for frame");
   }
 
-  if (m_pendingBuffers.empty())
-    return false;
+  for (IRenderBuffer *renderBuffer : m_pendingBuffers)
+  {
+    buffers.emplace_back(VideoStreamBuffer{
+      renderBuffer->GetFormat(),
+      renderBuffer->GetMemory(),
+      renderBuffer->GetFrameSize(),
+      renderBuffer->GetMemoryAccess(),
+      renderBuffer->GetMemoryAlignment()
+    });
+  }
 
-  //! @todo Handle multiple buffers
-  IRenderBuffer *renderBuffer = m_pendingBuffers.at(0);
-
-  format = renderBuffer->GetFormat();
-  data = renderBuffer->GetMemory();
-  size = renderBuffer->GetFrameSize();
-
-  return true;
+  return buffers;
 }
 
 void CRPRenderManager::AddFrame(const uint8_t* data, size_t size, unsigned int width, unsigned int height, unsigned int orientationDegCCW)
