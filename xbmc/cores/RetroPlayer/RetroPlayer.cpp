@@ -8,7 +8,6 @@
 
 #include "RetroPlayer.h"
 #include "RetroPlayerAutoSave.h"
-#include "RetroPlayerInput.h"
 #include "addons/AddonManager.h"
 #include "cores/DataCacheCore.h"
 #include "cores/IPlayerCallback.h"
@@ -121,18 +120,16 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
     {
       m_streamManager.reset(new CRPStreamManager(*m_renderManager, *m_processInfo));
 
-      m_input.reset(new CRetroPlayerInput(CServiceBroker::GetPeripherals()));
-
       if (!bStandalone)
       {
         std::string redactedPath = CURL::GetRedacted(fileCopy.GetDynPath());
         CLog::Log(LOGINFO, "RetroPlayer[PLAYER]: Opening: %s", redactedPath.c_str());
-        bSuccess = m_gameClient->OpenFile(fileCopy, *m_streamManager, m_input.get());
+        bSuccess = m_gameClient->OpenFile(fileCopy, *m_streamManager);
       }
       else
       {
         CLog::Log(LOGINFO, "RetroPlayer[PLAYER]: Opening standalone");
-        bSuccess = m_gameClient->OpenStandalone(*m_streamManager, m_input.get());
+        bSuccess = m_gameClient->OpenStandalone(*m_streamManager);
       }
 
       if (bSuccess)
@@ -180,7 +177,6 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
   }
   else
   {
-    m_input.reset();
     m_streamManager.reset();
     if (m_gameClient)
       m_gameClient->Unload();
@@ -214,7 +210,6 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
   if (m_gameClient)
     m_gameClient->CloseFile();
 
-  m_input.reset();
   m_streamManager.reset();
 
   if (m_gameClient)
@@ -532,7 +527,7 @@ void CRetroPlayer::SetSpeedInternal(double speed)
 void CRetroPlayer::OnSpeedChange(double newSpeed)
 {
   m_streamManager->EnableAudio(newSpeed == 1.0);
-  m_input->SetSpeed(newSpeed);
+  m_streamManager->SetSpeed(newSpeed);
   m_renderManager->SetSpeed(newSpeed);
   m_processInfo->SetSpeed(static_cast<float>(newSpeed));
   if (newSpeed != 0.0)

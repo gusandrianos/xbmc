@@ -16,13 +16,7 @@ namespace KODI
 namespace RETRO
 {
 class IRetroPlayerStream;
-
-struct DeleteStream
-{
-  void operator()(IRetroPlayerStream* stream);
-};
-
-using StreamPtr = std::unique_ptr<IRetroPlayerStream, DeleteStream>;
+using StreamPtr = std::shared_ptr<IRetroPlayerStream>;
 
 enum class StreamType
 {
@@ -30,6 +24,7 @@ enum class StreamType
   VIDEO,
   SW_BUFFER,
   HW_BUFFER,
+  INPUT,
 };
 
 enum class PCMFormat
