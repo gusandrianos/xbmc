@@ -75,8 +75,8 @@ public:
   // Start/stop gameplay
   bool Initialize(void);
   void Unload();
-  bool OpenFile(const CFileItem& file, RETRO::IStreamManager& streamManager, IGameInputCallback *input);
-  bool OpenStandalone(RETRO::IStreamManager& streamManager, IGameInputCallback *input);
+  bool OpenFile(const CFileItem& file, RETRO::IStreamManager& streamManager);
+  bool OpenStandalone(RETRO::IStreamManager& streamManager);
   void Reset();
   void CloseFile();
   const std::string& GetGamePath() const { return m_gamePath; }
@@ -107,7 +107,7 @@ public:
 
 private:
   // Private gameplay functions
-  bool InitializeGameplay(const std::string& gamePath, RETRO::IStreamManager& streamManager, IGameInputCallback *input);
+  bool InitializeGameplay(const std::string& gamePath, RETRO::IStreamManager& streamManager);
   bool LoadGameInfo();
   void NotifyError(GAME_ERROR error);
   std::string GetMissingResource();

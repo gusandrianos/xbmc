@@ -8,6 +8,7 @@
 
 #include "GameClientStreams.h"
 #include "GameClientStreamAudio.h"
+#include "GameClientStreamInput.h"
 #include "GameClientStreamMemory.h"
 #include "GameClientStreamSwFramebuffer.h"
 #include "GameClientStreamVideo.h"
@@ -111,6 +112,11 @@ std::unique_ptr<IGameClientStream> CGameClientStreams::CreateStream(GAME_STREAM_
   case GAME_STREAM_MEMORY:
   {
     gameStream.reset(new CGameClientStreamMemory);
+    break;
+  }
+  case GAME_STREAM_INPUT:
+  {
+    gameStream.reset(new CGameClientStreamInput);
     break;
   }
   default:
