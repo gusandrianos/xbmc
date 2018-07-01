@@ -21,6 +21,7 @@
 #pragma once
 
 #include "IRetroPlayerStream.h"
+#include "cores/RetroPlayer/RetroPlayerTypes.h"
 
 extern "C" {
 #include "libavutil/pixfmt.h"
@@ -58,6 +59,8 @@ namespace RETRO
     AVPixelFormat pixfmt;
     uint8_t *data;
     size_t size;
+    DataAccess access;
+    DataAlignment alignment;
   };
 
   struct VideoStreamPacket: public StreamPacket
@@ -102,6 +105,7 @@ namespace RETRO
 
     // Stream properties
     bool m_bOpen = false;
+    std::vector<VideoStreamBuffer> m_buffers;
   };
 }
 }
