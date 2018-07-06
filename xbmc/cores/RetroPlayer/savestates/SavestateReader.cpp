@@ -19,54 +19,50 @@
  */
 
 #include "SavestateReader.h"
+#include "cores/RetroPlayer/environment/Environment.h"
 #include "filesystem/File.h"
-#include "games/addons/GameClient.h"
 #include "utils/log.h"
+#include "URL.h"
 
 using namespace KODI;
 using namespace RETRO;
 
-CSavestateReader::~CSavestateReader() = default;
-
-bool CSavestateReader::Initialize(const std::string& path, const GAME::CGameClient* gameClient)
+std::vector<uint8_t> CSavestateReader::ReadSave(const std::string &savestatePath)
 {
-  bool bSuccess = false;
+  std::vector<uint8_t> data;
 
-  CLog::Log(LOGDEBUG, "Loading savestate from %s", path.c_str());
+  CLog::Log(LOGDEBUG, "Loading savestate from %s", CURL::GetRedacted(savestatePath).c_str());
 
-  if (m_db.GetSavestate(path, m_savestate))
+  XFILE::CFile savestateFile;
+  if (savestateFile.Open(savestatePath, XFILE::READ_TRUNCATED))
   {
-    // Sanity checks
-    if (m_savestate.GameClient() == gameClient->ID())
-      bSuccess = true;
+    int64_t size = savestateFile.GetLength();
+    if (size > 0)
+    {
+      data.resize(static_cast<size_t>(size));
+      if (savestateFile.Read(data.data(), data.size()) != static_cast<ssize_t>(data.size()))
+      {
+        CLog::Log(LOGERROR, "Failed to read savestate %s of size %d bytes",
+          CURL::GetRedacted(savestatePath).c_str(),
+          size);
+        data.clear();
+      }
+    }
     else
-      CLog::Log(LOGDEBUG, "Savestate game client %s doesn't match active %s", m_savestate.GameClient().c_str(), gameClient->ID().c_str());
+      CLog::Log(LOGERROR, "Failed to get savestate length: %s", CURL::GetRedacted(savestatePath).c_str());
   }
   else
-    CLog::Log(LOGERROR, "Failed to query savestate %s", path.c_str());
+    CLog::Log(LOGERROR, "Failed to open savestate file %s", CURL::GetRedacted(savestatePath).c_str());
 
-  return bSuccess;
+  return data;
 }
 
-bool CSavestateReader::ReadSave(uint8_t *data, size_t size)
+std::string CSavestateReader::LoadGameClient(const std::string &savestatePath)
 {
-  using namespace XFILE;
+  std::vector<uint8_t> data = ReadSave(savestatePath);
 
-  bool bSuccess = false;
+  if (!data.empty())
+    return CEnvironment::GetGameClient(data);
 
-  CFile file;
-  if (file.Open(m_savestate.Path()))
-  {
-    ssize_t read = file.Read(data, size);
-    if (read == static_cast<ssize_t>(size))
-    {
-      m_frameCount = m_savestate.PlaytimeFrames();
-      bSuccess = true;
-    }
-  }
-
-  if (!bSuccess)
-    CLog::Log(LOGERROR, "Failed to read savestate %s", m_savestate.Path().c_str());
-
-  return bSuccess;
+  return "";
 }

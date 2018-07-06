@@ -22,17 +22,13 @@
 
 #include <string>
 
-#define SAVESTATES_DATABASE_NAME  "Savestates"
-
-class CFileItem;
 class CFileItemList;
-class CVariant;
 
 namespace KODI
 {
 namespace RETRO
 {
-  class CSavestate;
+  class ISavestate;
 
   class CSavestateDatabase
   {
@@ -40,9 +36,9 @@ namespace RETRO
     CSavestateDatabase();
     virtual ~CSavestateDatabase() = default;
 
-    bool AddSavestate(const CSavestate& save);
+    bool AddSavestate(const std::string &gamePath, const ISavestate& save);
 
-    bool GetSavestate(const std::string& path, CSavestate& save);
+    bool GetSavestate(const std::string& gamePath, ISavestate& save);
 
     bool GetSavestatesNav(CFileItemList& items, const std::string& gamePath, const std::string& gameClient = "");
 
@@ -51,9 +47,6 @@ namespace RETRO
     bool DeleteSavestate(const std::string& path);
 
     bool ClearSavestatesOfGame(const std::string& gamePath, const std::string& gameClient = "");
-
-  private:
-    CFileItem* CreateFileItem(const CVariant& object) const;
   };
 }
 }

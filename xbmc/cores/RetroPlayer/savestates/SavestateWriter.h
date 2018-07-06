@@ -20,37 +20,27 @@
 
 #pragma once
 
-#include "Savestate.h"
-#include "SavestateDatabase.h"
-
 #include <stdint.h>
 #include <string>
 
 namespace KODI
 {
-namespace GAME
-{
-  class CGameClient;
-}
-
 namespace RETRO
 {
   class CSavestateWriter
   {
   public:
+    CSavestateWriter() = default;
     ~CSavestateWriter();
 
-    bool Initialize(const GAME::CGameClient* gameClient, uint64_t frameHistoryCount);
+    bool Initialize(const std::string &gamePath);
     bool WriteSave(const uint8_t *data, size_t size);
     void WriteThumb();
-    bool CommitToDatabase();
-    void CleanUpTransaction();
-    const std::string& GetPath() const { return m_savestate.Path(); }
+    const std::string& GetPath() const { return m_savestatePath; }
 
   private:
-    CSavestate         m_savestate;
-    double             m_fps = 0.0; //! @todo
-    CSavestateDatabase m_db;
+    // Initialization parameters
+    std::string m_savestatePath;
   };
 }
 }

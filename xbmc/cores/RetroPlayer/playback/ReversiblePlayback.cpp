@@ -19,7 +19,6 @@
  */
 
 #include "ReversiblePlayback.h"
-#include "cores/RetroPlayer/savestates/Savestate.h"
 #include "cores/RetroPlayer/savestates/SavestateReader.h"
 #include "cores/RetroPlayer/savestates/SavestateWriter.h"
 #include "cores/RetroPlayer/streams/memory/BasicMemoryStream.h"
@@ -41,8 +40,8 @@ using namespace RETRO;
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient, double fps, size_t serializeSize) :
   m_gameClient(gameClient),
   m_gameLoop(this, fps),
-  m_savestateWriter(new CSavestateWriter),
-  m_savestateReader(new CSavestateReader),
+  //m_savestateWriter(new CSavestateWriter),
+  //m_savestateReader(new CSavestateReader),
   m_totalFrameCount(0),
   m_pastFrameCount(0),
   m_futureFrameCount(0),
@@ -127,8 +126,10 @@ std::string CReversiblePlayback::CreateSavestate()
   if (m_gameClient->SerializeSize() == 0)
     return empty;
 
-  if (!m_savestateWriter->Initialize(m_gameClient, m_totalFrameCount))
+  /*! @todo
+  if (!m_savestateWriter->Initialize(m_gameClient->GetGamePath()))
     return empty;
+  */
 
   std::unique_ptr<IMemoryStream> memoryStream;
   bool bHasMemoryStream = false;
@@ -157,15 +158,13 @@ std::string CReversiblePlayback::CreateSavestate()
 
   bool bSuccess = false;
 
+  /*! @todo
   if (m_savestateWriter->WriteSave(memoryStream->CurrentFrame(), memoryStream->FrameSize()))
   {
     m_savestateWriter->WriteThumb();
-
-    if (m_savestateWriter->CommitToDatabase())
-      bSuccess = true;
-    else
-      m_savestateWriter->CleanUpTransaction();
+    bSuccess = true;
   }
+  */
 
   if (bHasMemoryStream)
   {
@@ -173,7 +172,12 @@ std::string CReversiblePlayback::CreateSavestate()
     m_memoryStream = std::move(memoryStream);
   }
 
-  return bSuccess ? m_savestateWriter->GetPath() : "";
+  /*! @todo
+  if (bSuccess)
+    return m_savestateWriter->GetPath();
+  */
+
+  return "";
 }
 
 bool CReversiblePlayback::LoadSavestate(const std::string& path)
@@ -182,8 +186,10 @@ bool CReversiblePlayback::LoadSavestate(const std::string& path)
   if (m_gameClient->SerializeSize() == 0)
     return false;
 
+  /*! @todo
   if (!m_savestateReader->Initialize(path, m_gameClient))
     return false;
+  */
 
   std::unique_ptr<IMemoryStream> memoryStream;
   bool bHasMemoryStream = false;
@@ -205,7 +211,8 @@ bool CReversiblePlayback::LoadSavestate(const std::string& path)
 
   bool bSuccess = false;
 
-  if (m_savestateReader->ReadSave(memoryStream->BeginFrame(), memoryStream->FrameSize()))
+  /*! @todo
+  if (CSavestateReader::ReadSave(memoryStream->BeginFrame(), memoryStream->FrameSize()))
   {
     memoryStream->SubmitFrame();
 
@@ -214,6 +221,7 @@ bool CReversiblePlayback::LoadSavestate(const std::string& path)
 
     bSuccess = true;
   }
+  */
 
   if (bHasMemoryStream)
   {

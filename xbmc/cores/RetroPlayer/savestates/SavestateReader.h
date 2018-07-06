@@ -20,34 +20,19 @@
 
 #pragma once
 
-#include "Savestate.h"
-#include "SavestateDatabase.h"
-
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 namespace KODI
 {
-namespace GAME
-{
-  class CGameClient;
-}
-
 namespace RETRO
 {
   class CSavestateReader
   {
   public:
-    ~CSavestateReader();
-
-    bool Initialize(const std::string& path, const GAME::CGameClient* gameClient);
-    bool ReadSave(uint8_t *data, size_t size);
-    uint64_t GetFrameCount(void) const { return m_frameCount; }
-
-  private:
-    CSavestate         m_savestate;
-    CSavestateDatabase m_db;
-    uint64_t           m_frameCount = 0;
+    static std::vector<uint8_t> ReadSave(const std::string &savestatePath);
+    static std::string LoadGameClient(const std::string &savestatePath);
   };
 }
 }

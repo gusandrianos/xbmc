@@ -1,0 +1,42 @@
+//
+//     Written in 2018 by Team Kodi
+//     http://kodi.tv
+//
+// To the extent possible under law, the author(s) have dedicated all
+// copyright and related and neighboring rights to this software to the
+// public domain worldwide. This software is distributed without any
+// warranty.
+//
+// You should have received a copy of the CC0 Public Domain Dedication
+// along with this software. If not, see
+// <http://creativecommons.org/publicdomain/zero/1.0/>.
+//
+
+include "action_controller.fbs";
+include "action_topology.fbs";
+
+namespace KODI.RETRO;
+
+/// @brief A controller used by the player to play the game
+table Controller {
+  /// @brief The port ID of the controller in the input topology
+  port_id:string;
+  /// @brief The state of the controller
+  state:ControllerState;
+}
+
+/// @brief A player in the game
+table Player {
+  /// @brief The index of the player
+  player_index:uint8;
+  /// @brief The controllers providing input
+  controllers:[Controller];
+}
+
+/// @brief The action taken by all players for the frame
+table Action {
+  /// @brief The input topology
+  input_topology:InputTopology;
+  /// @brief The player input
+  players:[Player];
+}

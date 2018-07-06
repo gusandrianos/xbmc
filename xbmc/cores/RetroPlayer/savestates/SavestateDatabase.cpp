@@ -19,30 +19,24 @@
  */
 
 #include "SavestateDatabase.h"
-#include "Savestate.h"
-#include "SavestateDefines.h"
+#include "ISavestate.h"
 #include "SavestateUtils.h"
-#include "ServiceBroker.h"
-#include "addons/AddonManager.h"
-#include "games/GameTypes.h"
-#include "games/tags/GameInfoTag.h"
-#include "utils/StringUtils.h"
-#include "utils/Variant.h"
-#include "FileItem.h"
 
 using namespace KODI;
 using namespace RETRO;
 
 CSavestateDatabase::CSavestateDatabase() = default;
 
-bool CSavestateDatabase::AddSavestate(const CSavestate& save)
+bool CSavestateDatabase::AddSavestate(const std::string &gamePath, const ISavestate& save)
 {
-  return save.Serialize(CSavestateUtils::MakeMetadataPath(save.GamePath()));
+  //return save.Serialize(CSavestateUtils::MakePath(gamePath));
+  return false;
 }
 
-bool CSavestateDatabase::GetSavestate(const std::string& path, CSavestate& save)
+bool CSavestateDatabase::GetSavestate(const std::string& gamePath, ISavestate& save)
 {
-  return save.Deserialize(path);
+  //return save.Deserialize(CSavestateUtils::MakePath(gamePath));
+  return false;
 }
 
 bool CSavestateDatabase::GetSavestatesNav(CFileItemList& items, const std::string& gamePath, const std::string& gameClient /* = "" */)
@@ -67,35 +61,4 @@ bool CSavestateDatabase::ClearSavestatesOfGame(const std::string& gamePath, cons
 {
   //! @todo
   return false;
-}
-
-CFileItem* CSavestateDatabase::CreateFileItem(const CVariant& object) const
-{
-  using namespace ADDON;
-
-  CSavestate save;
-  save.Deserialize(object);
-  CFileItem* item = new CFileItem(save.Label());
-
-  item->SetPath(save.Path());
-  if (!save.Thumbnail().empty())
-    item->SetArt("thumb", save.Thumbnail());
-  else
-  {
-    AddonPtr addon;
-    if (CServiceBroker::GetAddonMgr().GetAddon(save.GameClient(), addon, ADDON_GAMEDLL))
-      item->SetArt("thumb", addon->Icon());
-  }
-
-  // Use the slot number as the second label
-  if (save.Type() == SAVETYPE::SLOT)
-    item->SetLabel2(StringUtils::Format("%u", save.Slot()));
-
-  item->m_dateTime = save.Timestamp();
-  item->SetProperty(FILEITEM_PROPERTY_SAVESTATE_DURATION, static_cast<uint64_t>(save.PlaytimeWallClock()));
-  item->GetGameInfoTag()->SetGameClient(save.GameClient());
-  item->m_dwSize = save.Size();
-  item->m_bIsFolder = false;
-
-  return item;
 }

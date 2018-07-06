@@ -30,7 +30,8 @@
 #include "cores/RetroPlayer/playback/ReversiblePlayback.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "cores/RetroPlayer/rendering/RPRenderManager.h"
-#include "cores/RetroPlayer/savestates/Savestate.h"
+#include "cores/RetroPlayer/savestates/ISavestate.h"
+#include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/savestates/SavestateUtils.h"
 #include "cores/RetroPlayer/streams/RPStreamManager.h"
 #include "dialogs/GUIDialogYesNo.h"
@@ -156,8 +157,9 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
 
   if (bSuccess && !bStandalone)
   {
-    std::string savestatePath = CSavestateUtils::MakeMetadataPath(fileCopy.GetDynPath());
+    std::string savestatePath = CSavestateUtils::MakePath(fileCopy.GetDynPath());
 
+    /*! @todo
     CSavestate save;
     if (save.Deserialize(savestatePath))
     {
@@ -175,6 +177,7 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
         }
       }
     }
+    */
 
     if (bSuccess)
       CreatePlayback(savestatePath);
