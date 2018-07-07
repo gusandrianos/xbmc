@@ -21,8 +21,9 @@
 #pragma once
 
 #include "IGameClientStream.h"
+#include "addons/kodi-addon-dev-kit/include/kodi/kodi_game_types.h"
 
-struct game_stream_audio_properties;
+#include <vector>
 
 namespace KODI
 {

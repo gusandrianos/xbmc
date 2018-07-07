@@ -512,13 +512,7 @@ bool CGameClient::Serialize(uint8_t* data, size_t size)
   bool bSuccess = false;
   if (m_bIsPlaying)
   {
-    game_stream_memory_buffer buffer = {
-      data,
-      size
-    };
-
-    //! @todo: m_struct.toAddon.Serialize(buffer)
-    try { bSuccess = LogError(m_struct.toAddon.Serialize(buffer.data, buffer.size), "Serialize()"); }
+    try { bSuccess = LogError(m_struct.toAddon.Serialize(data, size), "Serialize()"); }
     catch (...) { LogException("Serialize()"); }
   }
 
@@ -535,13 +529,7 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
   bool bSuccess = false;
   if (m_bIsPlaying)
   {
-    game_stream_memory_packet packet = {
-      data,
-      size
-    };
-
-    //! @todo: m_struct.toAddon.Deserialize(packet)
-    try { bSuccess = LogError(m_struct.toAddon.Deserialize(packet.data, packet.size), "Deserialize()"); }
+    try { bSuccess = LogError(m_struct.toAddon.Deserialize(data, size), "Deserialize()"); }
     catch (...) { LogException("Deserialize()"); }
   }
 
