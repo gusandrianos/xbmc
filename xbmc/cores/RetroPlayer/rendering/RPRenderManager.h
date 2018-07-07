@@ -49,7 +49,6 @@ namespace RETRO
   class IGUIRenderSettings;
   class IRenderBuffer;
   class IRenderBufferPool;
-  struct VideoStreamBuffer;
 
   /*!
    * \brief Renders video frames provided by the game loop
@@ -89,7 +88,7 @@ namespace RETRO
 
     // Functions called from game loop
     bool Configure(AVPixelFormat format, unsigned int nominalWidth, unsigned int nominalHeight, unsigned int maxWidth, unsigned int maxHeight);
-    std::vector<VideoStreamBuffer> GetVideoBuffers(unsigned int width, unsigned int height);
+    bool GetVideoBuffer(unsigned int width, unsigned int height, AVPixelFormat &format, uint8_t *&data, size_t &size);
     void AddFrame(const uint8_t* data, size_t size, unsigned int width, unsigned int height, unsigned int orientationDegCW);
 
     // Functions called from the player
