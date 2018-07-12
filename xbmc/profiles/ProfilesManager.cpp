@@ -642,6 +642,14 @@ std::string CProfilesManager::GetDatabaseFolder() const
   return URIUtils::AddFileToFolder(GetUserDataFolder(), "Database");
 }
 
+std::string CProfilesManager::GetDataStoreFolder() const
+{
+  if (GetCurrentProfile().hasDatabases())
+    return URIUtils::AddFileToFolder(GetProfileUserDataFolder(), "Datastore");
+
+  return URIUtils::AddFileToFolder(GetUserDataFolder(), "Datastore");
+}
+
 std::string CProfilesManager::GetCDDBFolder() const
 {
   return URIUtils::AddFileToFolder(GetDatabaseFolder(), "CDDB");
