@@ -121,6 +121,7 @@ set(required_deps ASS
                   FriBidi
                   Iconv
                   LibDvd
+                  LMDB
                   Lzo2
                   OpenSSL
                   PCRE
