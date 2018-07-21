@@ -1,4 +1,10 @@
-set(MESSAGES savestate.fbs)
+set(MESSAGES action.fbs
+             action_controller.fbs
+             action_keyboard.fbs
+             action_topology.fbs
+             multicodec.fbs
+             savestate.fbs
+)
 
 foreach(_file ${MESSAGES})
   get_filename_component(FLATC_OUTPUT ${_file} NAME_WE)
