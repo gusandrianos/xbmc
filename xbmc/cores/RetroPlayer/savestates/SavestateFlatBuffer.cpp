@@ -19,6 +19,7 @@
  */
 
 #include "SavestateFlatBuffer.h"
+#include "utils/log.h"
 
 #include "savestate_generated.h"
 
@@ -27,6 +28,8 @@ using namespace RETRO;
 
 namespace
 {
+  const uint8_t SCHEMA_VERSION = 1;
+
   /*!
    * \brief The initial size of the FlatBuffer's memory buffer
    *
@@ -257,6 +260,8 @@ void CSavestateFlatBuffer::Finalize()
   // Helper class to build the nested Savestate table
   SavestateBuilder savestateBuilder(*m_builder);
 
+  savestateBuilder.add_version(SCHEMA_VERSION);
+
   savestateBuilder.add_type(TranslateType(m_type));
 
   savestateBuilder.add_slot(m_slot);
@@ -313,9 +318,20 @@ bool CSavestateFlatBuffer::Deserialize(std::vector<uint8_t> data)
   flatbuffers::Verifier verifier(data.data(), data.size());
   if (VerifySavestateBuffer(verifier))
   {
-    m_data = std::move(data);
-    m_savestate = GetSavestate(m_data.data());
-    return true;
+    const Savestate *savestate = GetSavestate(data.data());
+
+    if (savestate->version() != SCHEMA_VERSION)
+    {
+      CLog::Log(LOGERROR, "RetroPlayer[SAVE): Schema version %u not supported, must be version %u",
+        savestate->version(),
+        SCHEMA_VERSION);
+    }
+    else
+    {
+      m_data = std::move(data);
+      m_savestate = GetSavestate(m_data.data());
+      return true;
+    }
   }
 
   return false;

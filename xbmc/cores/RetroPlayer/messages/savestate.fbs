@@ -22,8 +22,10 @@
 
 namespace KODI.RETRO;
 
-file_identifier "SAV ";
-file_extension "sav";
+// Savestate schema
+// Version 1
+
+file_identifier "SAV_";
 
 enum SaveType : uint8 {
   Unknown,
@@ -32,6 +34,9 @@ enum SaveType : uint8 {
 }
 
 table Savestate {
+  // Schema version
+  version:uint8;
+
   // Savestate properties
   type:SaveType;
   slot:uint8;
