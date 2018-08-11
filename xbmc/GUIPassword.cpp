@@ -243,15 +243,15 @@ bool CGUIPassword::IsMasterLockUnlocked(bool bPromptUser, bool& bCanceled)
   if (iMasterLockRetriesLeft == -1)
     iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES);
 
-  const CProfilesManager &profileManager = CServiceBroker::GetProfileManager();
+  const CProfile &masterProfile = CServiceBroker::GetProfileManager().GetMasterProfile();
 
-  if ((LOCK_MODE_EVERYONE < profileManager.GetMasterProfile().getLockMode() && !bMasterUser) && !bPromptUser)
+  if ((LOCK_MODE_EVERYONE < masterProfile.getLockMode() && !bMasterUser) && !bPromptUser)
   {
     // not unlocked, but calling code doesn't want to prompt user
     return false;
   }
 
-  if (bMasterUser || profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE)
+  if (bMasterUser || masterProfile.getLockMode() == LOCK_MODE_EVERYONE)
     return true;
 
   if (iMasterLockRetriesLeft == 0)
@@ -262,9 +262,9 @@ bool CGUIPassword::IsMasterLockUnlocked(bool bPromptUser, bool& bCanceled)
 
   // no, unlock since we are allowed to prompt
   std::string strHeading = g_localizeStrings.Get(20075);
-  std::string strPassword = profileManager.GetMasterProfile().getLockCode();
+  std::string strPassword = masterProfile.getLockCode();
 
-  int iVerifyPasswordResult = VerifyPassword(profileManager.GetMasterProfile().getLockMode(), strPassword, strHeading);
+  int iVerifyPasswordResult = VerifyPassword(masterProfile.getLockMode(), strPassword, strHeading);
   if (1 == iVerifyPasswordResult)
     UpdateMasterLockRetryCount(false);
 
@@ -408,7 +408,7 @@ bool CGUIPassword::CheckMenuLock(int iWindowID)
       iSwitch = WINDOW_VIDEO_NAV;
   }
 
-  const CProfilesManager &profileManager = CServiceBroker::GetProfileManager();
+  const CProfile &currentProfile = CServiceBroker::GetProfileManager().GetCurrentProfile();
 
   switch (iSwitch)
   {
@@ -416,25 +416,25 @@ bool CGUIPassword::CheckMenuLock(int iWindowID)
       return CheckSettingLevelLock(CViewStateSettings::GetInstance().GetSettingLevel());
       break;
     case WINDOW_ADDON_BROWSER:  // Addons
-      bCheckPW = profileManager.GetCurrentProfile().addonmanagerLocked();
+      bCheckPW = currentProfile.addonmanagerLocked();
       break;
     case WINDOW_FILES:          // Files
-      bCheckPW = profileManager.GetCurrentProfile().filesLocked();
+      bCheckPW = currentProfile.filesLocked();
       break;
     case WINDOW_PROGRAMS:       // Programs
-      bCheckPW = profileManager.GetCurrentProfile().programsLocked();
+      bCheckPW = currentProfile.programsLocked();
       break;
     case WINDOW_MUSIC_NAV:      // Music
-      bCheckPW = profileManager.GetCurrentProfile().musicLocked();
+      bCheckPW = currentProfile.musicLocked();
       break;
     case WINDOW_VIDEO_NAV:      // Video
-      bCheckPW = profileManager.GetCurrentProfile().videoLocked();
+      bCheckPW = currentProfile.videoLocked();
       break;
     case WINDOW_PICTURES:       // Pictures
-      bCheckPW = profileManager.GetCurrentProfile().picturesLocked();
+      bCheckPW = currentProfile.picturesLocked();
       break;
     case WINDOW_GAMES:          // Games
-      bCheckPW = profileManager.GetCurrentProfile().gamesLocked();
+      bCheckPW = currentProfile.gamesLocked();
       break;
     case WINDOW_SETTINGS_PROFILES:
       bCheckPW = true;
