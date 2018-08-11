@@ -56,7 +56,7 @@ bool CGUIPassword::IsItemUnlocked(CFileItem* pItem, const std::string &strType)
     std::string strLabel = pItem->GetLabel();
     int iResult = 0;  // init to user succeeded state, doing this to optimize switch statement below
     char buffer[33]; // holds 32 places plus sign character
-    if(g_passwordManager.bMasterUser)// Check if we are the MasterUser!
+    if (bMasterUser)// Check if we are the MasterUser!
     {
       iResult = 0;
     }
@@ -88,7 +88,7 @@ bool CGUIPassword::IsItemUnlocked(CFileItem* pItem, const std::string &strType)
         // password entry succeeded
         pItem->m_iBadPwdCount = 0;
         pItem->m_iHasLock = 1;
-        g_passwordManager.LockSource(strType,strLabel,false);
+        LockSource(strType,strLabel,false);
         sprintf(buffer,"%i",pItem->m_iBadPwdCount);
         CMediaSourceSettings::GetInstance().UpdateSource(strType, strLabel, "badpwdcount", buffer);
         CMediaSourceSettings::GetInstance().Save();
@@ -125,8 +125,8 @@ bool CGUIPassword::CheckStartUpLock()
   if (iMasterLockRetriesLeft == -1)
     iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES);
 
-  if (g_passwordManager.iMasterLockRetriesLeft == 0)
-    g_passwordManager.iMasterLockRetriesLeft = 1;
+  if (iMasterLockRetriesLeft == 0)
+    iMasterLockRetriesLeft = 1;
 
   const CProfilesManager &profileManager = CServiceBroker::GetProfileManager();
 
@@ -136,27 +136,27 @@ bool CGUIPassword::CheckStartUpLock()
     iVerifyPasswordResult = 0;
   else
   {
-    for (int i=1; i <= g_passwordManager.iMasterLockRetriesLeft; i++)
+    for (int i=1; i <= iMasterLockRetriesLeft; i++)
     {
       iVerifyPasswordResult = VerifyPassword(profileManager.GetMasterProfile().getLockMode(), strPassword, strHeader);
       if (iVerifyPasswordResult != 0 )
       {
         std::string strLabel1;
         strLabel1 = g_localizeStrings.Get(12343);
-        int iLeft = g_passwordManager.iMasterLockRetriesLeft-i;
+        int iLeft = iMasterLockRetriesLeft-i;
         std::string strLabel = StringUtils::Format("%i %s", iLeft, strLabel1.c_str());
 
         // PopUp OK and Display: MasterLock mode has changed but no new Mastercode has been set!
         HELPERS::ShowOKDialogLines(CVariant{12360}, CVariant{12367}, CVariant{strLabel}, CVariant{""});
       }
       else
-        i=g_passwordManager.iMasterLockRetriesLeft;
+        i = iMasterLockRetriesLeft;
     }
   }
 
   if (iVerifyPasswordResult == 0)
   {
-    g_passwordManager.iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES);
+    iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES);
     return true;  // OK The MasterCode Accepted! XBMC Can Run!
   }
   else
@@ -191,7 +191,7 @@ bool CGUIPassword::IsProfileLockUnlocked(int iProfile)
 
 bool CGUIPassword::IsProfileLockUnlocked(int iProfile, bool& bCanceled, bool prompt)
 {
-  if (g_passwordManager.bMasterUser)
+  if (bMasterUser)
     return true;
 
   const CProfilesManager &profileManager = CServiceBroker::GetProfileManager();
@@ -251,7 +251,7 @@ bool CGUIPassword::IsMasterLockUnlocked(bool bPromptUser, bool& bCanceled)
     return false;
   }
 
-  if (g_passwordManager.bMasterUser || profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE)
+  if (bMasterUser || profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE)
     return true;
 
   if (iMasterLockRetriesLeft == 0)
@@ -289,29 +289,29 @@ void CGUIPassword::UpdateMasterLockRetryCount(bool bResetCount)
     if (0 < CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES))
     {
       // We're keeping track of how many bad passwords are entered
-      if (1 < g_passwordManager.iMasterLockRetriesLeft)
+      if (1 < iMasterLockRetriesLeft)
       {
         // user still has at least one retry after decrementing
-        g_passwordManager.iMasterLockRetriesLeft--;
+        iMasterLockRetriesLeft--;
       }
       else
       {
         // user has run out of retry attempts
-        g_passwordManager.iMasterLockRetriesLeft = 0;
+        iMasterLockRetriesLeft = 0;
         // Tell the user they ran out of retry attempts
         HELPERS::ShowOKDialogText(CVariant{12345}, CVariant{12346});
         return ;
       }
     }
     std::string dlgLine1 = "";
-    if (0 < g_passwordManager.iMasterLockRetriesLeft)
+    if (0 < iMasterLockRetriesLeft)
       dlgLine1 = StringUtils::Format("%d %s",
-                                     g_passwordManager.iMasterLockRetriesLeft,
+                                     iMasterLockRetriesLeft,
                                      g_localizeStrings.Get(12343).c_str());
     HELPERS::ShowOKDialogLines(CVariant{20075}, CVariant{12345}, CVariant{std::move(dlgLine1)}, CVariant{0});
   }
   else
-    g_passwordManager.iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES); // user entered correct mastercode, reset retries to max allowed
+    iMasterLockRetriesLeft = CServiceBroker::GetSettings().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES); // user entered correct mastercode, reset retries to max allowed
 }
 
 bool CGUIPassword::CheckLock(LockType btnType, const std::string& strPassword, int iHeading)
@@ -329,7 +329,7 @@ bool CGUIPassword::CheckLock(LockType btnType, const std::string& strPassword, i
   if (btnType == LOCK_MODE_EVERYONE ||
       strPassword == "-" ||
       profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE ||
-      g_passwordManager.bMasterUser)
+      bMasterUser)
   {
     return true;
   }
@@ -510,7 +510,7 @@ bool CGUIPassword::IsDatabasePathUnlocked(const std::string& strPath, VECSOURCES
 {
   const CProfilesManager &profileManager = CServiceBroker::GetProfileManager();
 
-  if (g_passwordManager.bMasterUser || profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE)
+  if (bMasterUser || profileManager.GetMasterProfile().getLockMode() == LOCK_MODE_EVERYONE)
     return true;
 
   // try to find the best matching source
