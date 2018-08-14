@@ -118,12 +118,6 @@ public:
     */
   void UpdateCurrentProfileDate();
 
-  /*! \brief Load the master user for the purposes of logging in
-    Loads the master user.  Identical to LoadProfile(0) but doesn't
-    update the last logged in details
-    */
-  void LoadMasterProfileForLogin();
-
   /*! \brief Retrieve the last used profile index
     \return the last used profile that logged in.  Does not count the
     master user during login.
@@ -185,6 +179,12 @@ protected:
   void OnSettingAction(std::shared_ptr<const CSetting> setting) override;
 
 private:
+  /*! \brief Load the master user for the purposes of logging in
+   Loads the master user.  Identical to LoadProfile(0) but doesn't
+   update the last logged in details
+   */
+  void LoadMasterProfileForLogin();
+
   /*! \brief Set the current profile id and update the special://profile path
     \param profileId profile index
     */
@@ -196,13 +196,20 @@ private:
   // Construction parameters
   CSettings &m_settings;
 
+  // Profiles
   std::vector<CProfile> m_profiles;
+
+  // Settings
   bool m_usingLoginScreen;
-  bool m_profileLoadedForLogin;
   int m_autoLoginProfile;
-  unsigned int m_lastUsedProfile;
   unsigned int m_currentProfile; // do not modify directly, use SetCurrentProfileId() function instead
   int m_nextProfileId; // for tracking the next available id to give to a new profile to ensure id's are not re-used
+
+  // State variables
+  bool m_profileLoadedForLogin;
+  unsigned int m_lastUsedProfile;
+
+  // Synchronization parameters
   mutable CCriticalSection m_critical;
 
   // Event properties
