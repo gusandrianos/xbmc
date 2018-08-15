@@ -12,4 +12,6 @@ class IProfileService
 {
 public:
   virtual ~IProfileService() = default;
+
+  virtual bool ProfileInitGUI(bool bUseLoginScreen) { return false; }
 };
