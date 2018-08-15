@@ -148,6 +148,10 @@ public:
    // Waits for the first network interface to become available
    void WaitForNet();
   std::unique_ptr<CNetworkServices> m_services;
+
+private:
+  // Construction parameters
+  CSettings &m_settings;
 };
 
 #if defined(TARGET_ANDROID)
