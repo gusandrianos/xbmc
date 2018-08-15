@@ -20,6 +20,7 @@
 class CEventLog;
 class CEventLogManager;
 class CSettings;
+class IProfileService;
 class TiXmlNode;
 
 class CProfilesManager : protected ISettingsHandler,
@@ -31,6 +32,10 @@ public:
   CProfilesManager& operator=(CProfilesManager const&) = delete;
   ~CProfilesManager() override;
 
+  void RegisterService(IProfileService *service);
+  void UnregisterService(IProfileService *service);
+
+  // Implementation of ISettingsHandler
   void OnSettingsLoaded() override;
   void OnSettingsSaved() const override;
   void OnSettingsCleared() override;
@@ -214,4 +219,7 @@ private:
 
   // Event properties
   std::unique_ptr<CEventLogManager> m_eventLogs;
+
+  // Callbacks
+  std::vector<IProfileService*> m_services;
 };

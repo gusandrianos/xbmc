@@ -103,6 +103,16 @@ CProfilesManager::~CProfilesManager()
   m_settings.GetSettingsManager()->UnregisterSettingsHandler(this);
 }
 
+void CProfilesManager::RegisterService(IProfileService *service)
+{
+  m_services.push_back(service);
+}
+
+void CProfilesManager::UnregisterService(IProfileService *service)
+{
+  m_services.erase(std::remove(m_services.begin(), m_services.end(), service), m_services.end());
+}
+
 void CProfilesManager::OnSettingsLoaded()
 {
   // check them all
