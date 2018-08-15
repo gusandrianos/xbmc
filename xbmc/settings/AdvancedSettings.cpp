@@ -16,7 +16,6 @@
 #include "Application.h"
 #include "ServiceBroker.h"
 #include "filesystem/File.h"
-#include "filesystem/SpecialProtocol.h"
 #include "guilib/LocalizeStrings.h"
 #include "LangInfo.h"
 #include "network/DNSNameCache.h"
@@ -1004,7 +1003,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
       std::string strFrom, strTo;
       TiXmlNode* pFrom = pSubstitute->FirstChild("from");
       if (pFrom)
-        strFrom = CSpecialProtocol::TranslatePath(pFrom->FirstChild()->Value()).c_str();
+        strFrom = pFrom->FirstChild()->Value();
       TiXmlNode* pTo = pSubstitute->FirstChild("to");
       if (pTo)
         strTo = pTo->FirstChild()->Value();

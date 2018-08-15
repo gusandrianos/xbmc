@@ -481,6 +481,8 @@ CURL URIUtils::SubstitutePath(const CURL& url, bool reverse /* = false */)
 
 std::string URIUtils::SubstitutePath(const std::string& strPath, bool reverse /* = false */)
 {
+  std::string translatedPath = CSpecialProtocol::TranslatePath(strPath);
+
   for (CAdvancedSettings::StringMapping::iterator i = g_advancedSettings.m_pathSubstitutions.begin();
       i != g_advancedSettings.m_pathSubstitutions.end(); ++i)
   {
@@ -489,20 +491,20 @@ std::string URIUtils::SubstitutePath(const std::string& strPath, bool reverse /*
 
     if (!reverse)
     {
-      fromPath = i->first;  // Fake path
-      toPath = i->second;   // Real path
+      fromPath = CSpecialProtocol::TranslatePath(i->first);  // Fake path
+      toPath = CSpecialProtocol::TranslatePath(i->second);   // Real path
     }
     else
     {
-      fromPath = i->second; // Real path
-      toPath = i->first;    // Fake path
+      fromPath = CSpecialProtocol::TranslatePath(i->second); // Real path
+      toPath = CSpecialProtocol::TranslatePath(i->first);    // Fake path
     }
 
-    if (strncmp(strPath.c_str(), fromPath.c_str(), HasSlashAtEnd(fromPath) ? fromPath.size() - 1 : fromPath.size()) == 0)
+    if (strncmp(translatedPath.c_str(), fromPath.c_str(), HasSlashAtEnd(fromPath) ? fromPath.size() - 1 : fromPath.size()) == 0)
     {
-      if (strPath.size() > fromPath.size())
+      if (translatedPath.size() > fromPath.size())
       {
-        std::string strSubPathAndFileName = strPath.substr(fromPath.size());
+        std::string strSubPathAndFileName = translatedPath.substr(fromPath.size());
         return ChangeBasePath(fromPath, strSubPathAndFileName, toPath); // Fix encoding + slash direction
       }
       else
