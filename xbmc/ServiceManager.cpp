@@ -151,12 +151,15 @@ bool CServiceManager::InitStageTwo(const CAppParamParser &params)
                                                   *m_binaryAddonManager));
   m_vfsAddonCache->Init();
 
-  m_PVRManager.reset(new PVR::CPVRManager());
+  m_binaryAddonCache.reset(new ADDON::CBinaryAddonCache());
+  m_binaryAddonCache->Init();
+
+  m_PVRManager.reset(new PVR::CPVRManager(*m_announcementManager,
+                                          *m_addonMgr,
+                                          *m_binaryAddonCache,
+                                          *m_network));
 
   m_dataCacheCore.reset(new CDataCacheCore());
-
-  m_binaryAddonCache.reset( new ADDON::CBinaryAddonCache());
-  m_binaryAddonCache->Init();
 
   m_favouritesService.reset(new CFavouritesService(m_profileManager->GetProfileUserDataFolder()));
 
@@ -234,9 +237,9 @@ void CServiceManager::DeinitStageTwo()
   m_contextMenuManager.reset();
   m_serviceAddons.reset();
   m_favouritesService.reset();
-  m_binaryAddonCache.reset();
   m_dataCacheCore.reset();
   m_PVRManager.reset();
+  m_binaryAddonCache.reset();
   m_vfsAddonCache.reset();
   m_repositoryUpdater.reset();
   m_binaryAddonManager.reset();

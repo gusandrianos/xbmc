@@ -10,7 +10,6 @@
 
 #include <utility>
 
-#include "ServiceBroker.h"
 #include "addons/PVRClient.h"
 #include "guilib/LocalizeStrings.h"
 #include "interfaces/AnnouncementManager.h"
@@ -116,14 +115,18 @@ bool CPVRManagerJobQueue::WaitForJobs(unsigned int milliSeconds)
   return m_triggerEvent.WaitMSec(milliSeconds);
 }
 
-CPVRManager::CPVRManager(void) :
+CPVRManager::CPVRManager(ANNOUNCEMENT::CAnnouncementManager &announcements,
+                         ADDON::CAddonMgr &addonManager,
+                         ADDON::CBinaryAddonCache &addonCache,
+                         CNetworkBase &network) :
     CThread("PVRManager"),
+    m_announcements(announcements),
     m_channelGroups(new CPVRChannelGroupsContainer),
     m_recordings(new CPVRRecordings),
     m_timers(new CPVRTimers),
-    m_addons(new CPVRClients),
+    m_addons(new CPVRClients(*this, addonManager, addonCache)),
     m_guiInfo(new CPVRGUIInfo),
-    m_guiActions(new CPVRGUIActions),
+    m_guiActions(new CPVRGUIActions(network)),
     m_database(new CPVRDatabase),
     m_parentalTimer(new CStopWatch),
     m_settings({
@@ -133,12 +136,12 @@ CPVRManager::CPVRManager(void) :
       CSettings::SETTING_PVRPARENTAL_DURATION
     })
 {
-  CServiceBroker::GetAnnouncementManager().AddAnnouncer(this);
+  m_announcements.AddAnnouncer(this);
 }
 
 CPVRManager::~CPVRManager(void)
 {
-  CServiceBroker::GetAnnouncementManager().RemoveAnnouncer(this);
+  m_announcements.RemoveAnnouncer(this);
   CLog::LogFC(LOGDEBUG, LOGPVR, "PVR Manager instance destroyed");
 }
 
