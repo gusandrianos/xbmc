@@ -257,45 +257,6 @@ void CProfilesManager::Clear()
   m_profiles.clear();
 }
 
-bool CProfilesManager::InitGUI()
-{
-  bool bInitializationFinished = false;
-
-  for (auto *service : m_services)
-    bInitializationFinished |= service->ProfileInitGUI(m_usingLoginScreen);
-
-  return bInitializationFinished;
-
-
-  /*
-  bool bUsingLoginScreen = false;
-
-  bool bInitializationFinished = false;
-
-  // check if we should use the login screen
-  if (bUsingLoginScreen)
-  {
-    ActivateWindow(WINDOW_LOGIN_SCREEN);
-  }
-  else
-  {
-    // activate the configured start window
-    int firstWindow = g_SkinInfo->GetFirstWindow();
-    ActivateWindow(firstWindow);
-
-    if (IsWindowActive(WINDOW_STARTUP_ANIM))
-    {
-      CLog::Log(LOGWARNING, "CApplication::Initialize - startup.xml taints init process");
-    }
-
-    // the startup window is considered part of the initialization as it most likely switches to the final window
-    uiInitializationFinished = firstWindow != WINDOW_STARTUP_ANIM;
-  }
-
-  return bInitializationFinished;
-  */
-}
-
 void CProfilesManager::PrepareLoadProfile(unsigned int profileIndex)
 {
   //! @todo Invert dependencies

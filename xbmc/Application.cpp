@@ -1078,7 +1078,25 @@ bool CApplication::Initialize()
       g_passwordManager.CheckStartUpLock();
     }
 
-    uiInitializationFinished = profileManager.InitGUI();
+    // check if we should use the login screen
+    if (m_ServiceManager->GetProfileManager().UsingLoginScreen())
+    {
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_LOGIN_SCREEN);
+    }
+    else
+    {
+      // activate the configured start window
+      int firstWindow = g_SkinInfo->GetFirstWindow();
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(firstWindow);
+
+      if (CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_STARTUP_ANIM))
+      {
+        CLog::Log(LOGWARNING, "CApplication::Initialize - startup.xml taints init process");
+      }
+
+      // the startup window is considered part of the initialization as it most likely switches to the final window
+      uiInitializationFinished = firstWindow != WINDOW_STARTUP_ANIM;
+    }
   }
   else //No GUI Created
   {

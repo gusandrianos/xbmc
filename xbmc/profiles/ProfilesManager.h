@@ -59,7 +59,6 @@ public:
 
   void Clear();
 
-  bool InitGUI();
   bool LoadProfile(unsigned int index);
   void LogOff();
 
