@@ -176,7 +176,7 @@ bool CServiceManager::InitStageTwo(const CAppParamParser &params)
   m_fileExtensionProvider.reset(new CFileExtensionProvider(*m_addonMgr,
                                                            *m_binaryAddonManager));
 
-  m_powerManager.reset(new CPowerManager());
+  m_powerManager.reset(new CPowerManager(*m_settings));
   m_powerManager->Initialize();
   m_powerManager->SetDefaults();
 
