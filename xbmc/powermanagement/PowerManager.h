@@ -16,15 +16,29 @@
 #include "IPowerSyscall.h"
 
 class CFileItem;
+class CNetworkBase;
 class CSetting;
 class CSettings;
+
+namespace ANNOUNCEMENT
+{
+  class CAnnouncementManager;
+}
+
+namespace PVR
+{
+  class CPVRManager;
+}
 
 // This class will wrap and handle PowerSyscalls.
 // It will handle and decide if syscalls are needed.
 class CPowerManager : public IPowerEventsCallback
 {
 public:
-  CPowerManager(CSettings &settings);
+  CPowerManager(ANNOUNCEMENT::CAnnouncementManager &announcements,
+                CSettings &settings,
+                CNetworkBase &network,
+                PVR::CPVRManager &pvr);
   ~CPowerManager() override;
 
   void Initialize();
@@ -54,7 +68,10 @@ private:
   void StorePlayerState();
 
   // Construction parameters
+  ANNOUNCEMENT::CAnnouncementManager &m_announcements;
   CSettings &m_settings;
+  CNetworkBase &m_network;
+  PVR::CPVRManager &m_pvr;
 
   std::unique_ptr<IPowerSyscall> m_instance;
   std::unique_ptr<CFileItem> m_lastPlayedFileItem;

@@ -13,7 +13,6 @@
 
 #include "PowerTypes.h"
 #include "Application.h"
-#include "ServiceBroker.h"
 #include "cores/AudioEngine/Interfaces/AE.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "dialogs/GUIDialogKaiToast.h"
@@ -36,8 +35,14 @@
 extern HWND g_hWnd;
 #endif
 
-CPowerManager::CPowerManager(CSettings &settings) :
-  m_settings(settings)
+CPowerManager::CPowerManager(ANNOUNCEMENT::CAnnouncementManager &announcements,
+                             CSettings &settings,
+                             CNetworkBase &network,
+                             PVR::CPVRManager &pvr) :
+  m_announcements(announcements),
+  m_settings(settings),
+  m_network(network),
+  m_pvr(pvr)
 {
   m_settings.GetSettingsManager()->RegisterSettingOptionsFiller("shutdownstates", SettingOptionsShutdownStatesFiller);
 }
@@ -62,30 +67,30 @@ void CPowerManager::SetDefaults()
         defaultShutdown = POWERSTATE_SHUTDOWN;
     break;
     case POWERSTATE_HIBERNATE:
-      if (!CServiceBroker::GetPowerManager().CanHibernate())
+      if (!CanHibernate())
       {
-        if (CServiceBroker::GetPowerManager().CanSuspend())
+        if (CanSuspend())
           defaultShutdown = POWERSTATE_SUSPEND;
         else
-          defaultShutdown = CServiceBroker::GetPowerManager().CanPowerdown() ? POWERSTATE_SHUTDOWN : POWERSTATE_QUIT;
+          defaultShutdown = CanPowerdown() ? POWERSTATE_SHUTDOWN : POWERSTATE_QUIT;
       }
     break;
     case POWERSTATE_SUSPEND:
-      if (!CServiceBroker::GetPowerManager().CanSuspend())
+      if (!CanSuspend())
       {
-        if (CServiceBroker::GetPowerManager().CanHibernate())
+        if (CanHibernate())
           defaultShutdown = POWERSTATE_HIBERNATE;
         else
-          defaultShutdown = CServiceBroker::GetPowerManager().CanPowerdown() ? POWERSTATE_SHUTDOWN : POWERSTATE_QUIT;
+          defaultShutdown = CanPowerdown() ? POWERSTATE_SHUTDOWN : POWERSTATE_QUIT;
       }
     break;
     case POWERSTATE_SHUTDOWN:
-      if (!CServiceBroker::GetPowerManager().CanPowerdown())
+      if (!CanPowerdown())
       {
-        if (CServiceBroker::GetPowerManager().CanSuspend())
+        if (CanSuspend())
           defaultShutdown = POWERSTATE_SUSPEND;
         else
-          defaultShutdown = CServiceBroker::GetPowerManager().CanHibernate() ? POWERSTATE_HIBERNATE : POWERSTATE_QUIT;
+          defaultShutdown = CanHibernate() ? POWERSTATE_HIBERNATE : POWERSTATE_QUIT;
       }
     break;
   }
@@ -123,7 +128,7 @@ bool CPowerManager::Reboot()
 
   if (success)
   {
-    CServiceBroker::GetAnnouncementManager().Announce(ANNOUNCEMENT::System, "xbmc", "OnRestart");
+    m_announcements.Announce(ANNOUNCEMENT::System, "xbmc", "OnRestart");
 
     CGUIDialogBusy* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogBusy>(WINDOW_DIALOG_BUSY);
     if (dialog)
@@ -168,7 +173,7 @@ void CPowerManager::ProcessEvents()
 
 void CPowerManager::OnSleep()
 {
-  CServiceBroker::GetAnnouncementManager().Announce(ANNOUNCEMENT::System, "xbmc", "OnSleep");
+  m_announcements.Announce(ANNOUNCEMENT::System, "xbmc", "OnSleep");
 
   CGUIDialogBusy* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogBusy>(WINDOW_DIALOG_BUSY);
   if (dialog)
@@ -176,7 +181,7 @@ void CPowerManager::OnSleep()
 
   CLog::Log(LOGNOTICE, "%s: Running sleep jobs", __FUNCTION__);
 
-  CServiceBroker::GetPVRManager().OnSleep();
+  m_pvr.OnSleep();
   StorePlayerState();
   g_application.StopPlaying();
   g_application.StopShutdownTimer();
@@ -189,7 +194,7 @@ void CPowerManager::OnWake()
 {
   CLog::Log(LOGNOTICE, "%s: Running resume jobs", __FUNCTION__);
 
-  CServiceBroker::GetNetwork().WaitForNet();
+  m_network.WaitForNet();
 
   // reset out timers
   g_application.ResetShutdownTimers();
@@ -215,7 +220,7 @@ void CPowerManager::OnWake()
   CServiceBroker::GetPVRManager().OnWake();
   RestorePlayerState();
 
-  CServiceBroker::GetAnnouncementManager().Announce(ANNOUNCEMENT::System, "xbmc", "OnWake");
+  m_announcements.Announce(ANNOUNCEMENT::System, "xbmc", "OnWake");
 }
 
 void CPowerManager::OnLowBattery()
@@ -224,7 +229,7 @@ void CPowerManager::OnLowBattery()
 
   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(13050), "");
 
-  CServiceBroker::GetAnnouncementManager().Announce(ANNOUNCEMENT::System, "xbmc", "OnLowBattery");
+  m_announcements.Announce(ANNOUNCEMENT::System, "xbmc", "OnLowBattery");
 }
 
 void CPowerManager::StorePlayerState()
