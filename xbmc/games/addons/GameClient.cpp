@@ -218,7 +218,7 @@ void CGameClient::Unload()
   Destroy();
 }
 
-bool CGameClient::OpenFile(const CFileItem& file, RETRO::IStreamManager& streamManager)
+bool CGameClient::OpenFile(const CFileItem& file, RETRO::IStreamManager& streamManager, IGameInputCallback *input)
 {
   const std::string filePath = file.GetDynPath();
 
@@ -270,13 +270,16 @@ bool CGameClient::OpenFile(const CFileItem& file, RETRO::IStreamManager& streamM
     return false;
   }
 
-  if (!InitializeGameplay(filePath, streamManager))
+  if (!InitializeGameplay(filePath, streamManager, input))
+  {
+    Streams().Deinitialize();
     return false;
+  }
 
   return true;
 }
 
-bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager)
+bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager, IGameInputCallback *input)
 {
   CLog::Log(LOGDEBUG, "GameClient: Loading %s in standalone mode", ID().c_str());
 
@@ -301,13 +304,16 @@ bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager)
     return false;
   }
 
-  if (!InitializeGameplay("", streamManager))
+  if (!InitializeGameplay("", streamManager, input))
+  {
+    Streams().Deinitialize();
     return false;
+  }
 
   return true;
 }
 
-bool CGameClient::InitializeGameplay(const std::string& gamePath, RETRO::IStreamManager& streamManager)
+bool CGameClient::InitializeGameplay(const std::string& gamePath, RETRO::IStreamManager& streamManager, IGameInputCallback *input)
 {
   if (LoadGameInfo())
   {
@@ -315,6 +321,7 @@ bool CGameClient::InitializeGameplay(const std::string& gamePath, RETRO::IStream
 
     m_bIsPlaying      = true;
     m_gamePath        = gamePath;
+    m_input           = input;
 
     m_inGameSaves.reset(new CGameClientInGameSaves(this, &m_struct.toAddon));
     m_inGameSaves->Load();

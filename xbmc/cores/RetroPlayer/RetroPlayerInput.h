@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "IRetroPlayerStream.h"
 #include "games/addons/GameClientCallbacks.h"
 #include "peripherals/PeripheralTypes.h"
 
@@ -21,24 +20,19 @@ namespace KODI
 {
 namespace RETRO
 {
-  class CRetroPlayerInput : public IRetroPlayerStream,
-                            public GAME::IGameInputCallback
+  class CRetroPlayerInput : public GAME::IGameInputCallback
   {
   public:
-    CRetroPlayerInput();
+    CRetroPlayerInput(PERIPHERALS::CPeripherals &peripheralManager);
     ~CRetroPlayerInput() override;
 
-    // Implementation of IRetroPlayerStream
-    bool OpenStream(const StreamProperties& properties) override;
-    bool GetStreamBuffer(unsigned int width, unsigned int height, StreamBuffer& buffer) override { return false; }
-    void AddStreamData(const StreamPacket& packet) override;
-    void CloseStream() override;
-    void SetSpeed(double speed) override;
+    void SetSpeed(double speed);
 
-    // implementation of IGameInputCallback
+    // implementation of IGameAudioCallback
     void PollInput() override;
 
   private:
+    // Construction parameters
     PERIPHERALS::CPeripherals &m_peripheralManager;
 
     // Input variables

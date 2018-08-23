@@ -1,5 +1,5 @@
 set(SOURCES RetroPlayerAudio.cpp
-            RetroPlayerInput.cpp
+            RetroPlayerStreamTypes.cpp
             RetroPlayerVideo.cpp
             RPStreamManager.cpp
 )
@@ -7,7 +7,6 @@ set(SOURCES RetroPlayerAudio.cpp
 set(HEADERS IRetroPlayerStream.h
             IStreamManager.h
             RetroPlayerAudio.h
-            RetroPlayerInput.h
             RetroPlayerStreamTypes.h
             RetroPlayerVideo.h
             RPStreamManager.h
