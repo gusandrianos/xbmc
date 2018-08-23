@@ -26,7 +26,6 @@ namespace GAME
 
 namespace RETRO
 {
-  class CEnvironment;
   class CRetroPlayerInput;
   class CRPProcessInfo;
   class CRPRenderManager;
@@ -117,7 +116,6 @@ namespace RETRO
     std::unique_ptr<CRPProcessInfo>    m_processInfo;
     std::unique_ptr<CRPRenderManager>  m_renderManager;
     std::unique_ptr<CRPStreamManager>  m_streamManager;
-    std::unique_ptr<CEnvironment>      m_environment;
     std::unique_ptr<IPlayback>         m_playback;
     std::unique_ptr<CRetroPlayerAutoSave> m_autoSave;
     GAME::GameClientPtr                m_gameClient;
