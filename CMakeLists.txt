@@ -50,6 +50,7 @@ option(ENABLE_UPNP        "Enable UPnP support?" ON)
 option(ENABLE_AIRTUNES    "Enable AirTunes support?" ON)
 option(ENABLE_OPTICAL     "Enable optical support?" ON)
 option(ENABLE_PYTHON      "Enable python support?" ON)
+option(ENABLE_JNI         "Enable Java support?" ON)
 # use ffmpeg from depends or system
 option(ENABLE_INTERNAL_FFMPEG "Enable internal ffmpeg?" OFF)
 if(UNIX)
@@ -150,6 +151,7 @@ set(optional_deps Alsa
                   CCache
                   CEC
                   DBus
+                  JNI
                   LCMS2
                   LircClient
                   MDNS
@@ -203,6 +205,10 @@ if(ENABLE_AIRTUNES)
   if(SHAIRPLAY_FOUND)
     core_require_dyload_dep(Shairplay)
   endif()
+endif()
+
+if(ENABLE_JNI)
+  list(APPEND DEP_DEFINES -DHAS_JAVA)
 endif()
 
 if(CORE_SYSTEM_NAME STREQUAL osx)

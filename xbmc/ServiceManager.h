@@ -22,6 +22,11 @@ class CServiceAddonManager;
 class CRepositoryUpdater;
 }
 
+namespace JAVA
+{
+class CJavaInterface;
+}
+
 namespace PVR
 {
 class CPVRManager;
@@ -151,6 +156,9 @@ protected:
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
 #ifdef HAS_PYTHON
   std::unique_ptr<XBPython> m_XBPython;
+#endif
+#ifdef HAS_JAVA
+  std::unique_ptr<JAVA::CJavaInterface> m_java;
 #endif
   std::unique_ptr<PVR::CPVRManager> m_PVRManager;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
