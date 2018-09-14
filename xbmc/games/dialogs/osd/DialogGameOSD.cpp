@@ -19,7 +19,8 @@
 using namespace KODI;
 using namespace GAME;
 
-#define CONTROL_OSD_GAME_CONTROLLER   1101
+static constexpr int CONTROL_OSD_HELP_TEXT = 1101;
+static constexpr int CONTROL_OSD_GAME_CONTROLLER = 1102;
 
 CDialogGameOSD::CDialogGameOSD() :
   CGUIDialog(WINDOW_DIALOG_GAME_OSD, "GameOSD.xml")
@@ -32,6 +33,12 @@ void CDialogGameOSD::OnInitWindow()
 {
   CGUIDialog::OnInitWindow();
 
+  // Set help text
+  // "Press {0:s} to open the menu."
+  std::string helpText = StringUtils::Format(g_localizeStrings.Get(35235), "Select + X");
+  SET_CONTROL_LABEL(CONTROL_OSD_HELP_TEXT, helpText);
+
+  // Set controller
   if (CServiceBroker::IsServiceManagerUp())
   {
     CGameServices& gameServices = CServiceBroker::GetGameServices();

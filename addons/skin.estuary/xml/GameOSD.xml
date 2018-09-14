@@ -10,57 +10,35 @@
 				<visible>System.GetBool(gamesgeneral.showosdhelp)</visible>
 				<defaultcontrol always="true">1103</defaultcontrol>
 				<centerleft>50%</centerleft>
-				<height>820</height>
+				<height>910</height>
 				<centertop>50%</centertop>
 				<width>700</width>
 				<animation effect="fade" time="200">VisibleChange</animation>
 				<include content="DialogBackgroundCommons">
 					<param name="width" value="700" />
-					<param name="height" value="820" />
+					<param name="height" value="910" />
 					<param name="header_label" value="$LOCALIZE[35221]" />
 					<param name="header_id" value="2" />
 				</include>
 				<control type="group" id="1000">
 					<top>80</top>
 					<control type="group" id="1100">
-						<control type="gamecontroller" id="1101">
-							<top>20</top>
+						<control type="textbox" id="1101">
+							<description>Help text</description>
+							<top>30</top>
+							<left>30</left>
+							<right>30</right>
+							<height>130</height>
+							<font>font13</font>
+						</control>
+						<control type="gamecontroller" id="1102">
+							<top>160</top>
 							<left>30</left>
 							<width>640</width>
 							<height>640</height>
 						</control>
-						<control type="image">
-							<description>Pause / Resume icon</description>
-							<left>8</left>
-							<bottom>8</bottom>
-							<width>64</width>
-							<height>64</height>
-							<texture>osd/fullscreen/buttons/play.png</texture>
-						</control>
-						<control type="label">
-							<description>Pause / Resume label</description>
-							<bottom>0</bottom>
-							<left>80</left>
-							<width>600</width>
-							<height>80</height>
-							<label>$LOCALIZE[35224]</label>
-							<font>font13</font>
-							<align>left</align>
-							<aligny>center</aligny>
-						</control>
-						<control type="label" id="1102">
-							<description>Pause / Resume button combo</description>
-							<bottom>0</bottom>
-							<right>20</right>
-							<width>600</width>
-							<height>80</height>
-							<label>Select + X</label>
-							<font>font13</font>
-							<align>right</align>
-							<aligny>center</aligny>
-							<textcolor>grey</textcolor>
-						</control>
 						<control type="button" id="1103">
+							<description>Button to close the dialog</description>
 							<top>0</top>
 							<bottom>0</bottom>
 							<left>0</left>

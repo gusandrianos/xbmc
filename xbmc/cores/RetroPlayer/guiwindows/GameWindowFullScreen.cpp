@@ -183,7 +183,7 @@ void CGameWindowFullScreen::OnInitWindow()
   // Show OSD help
   GAME::CGameSettings &gameSettings = CServiceBroker::GetGameServices().GameSettings();
   if (gameSettings.ShowOSDHelp())
-    CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_OSD);
+    TriggerOSD();
 }
 
 void CGameWindowFullScreen::OnDeinitWindow(int nextWindowID)
