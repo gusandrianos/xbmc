@@ -17457,10 +17457,10 @@ msgctxt "#35234"
 msgid "Controls"
 msgstr ""
 
-#. Help text shown when the user first plays a game. {0:s} - Button combo to open the OSD menu
+#. Help text shown when the user first plays a game. {0:s} - Button combo to open the in-game menu
 #: addons/skin.estuary/xml/GameOSD.xml
 msgctxt "#35235"
-msgid "Press {0:s} to open the menu."
+msgid "Press {0:s} to open the in-game menu."
 msgstr ""
 
 #. Label of the button in the in-game menu for rewinding the game
