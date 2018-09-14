@@ -70,6 +70,9 @@ public:
   static bool Remove(const std::string& strPath);
   static bool RemoveRecursive(const std::string& strPath);
 
+  static bool Copy(const std::string& strPath, const std::string &dest);
+  static bool Copy(const std::string& strPath, const std::string &dest, unsigned int &fileCount, unsigned int &dirCount);
+
   /*! \brief Filter files that act like directories from the list, replacing them with their directory counterparts
    \param items The item list to filter
    \param mask  The mask to apply when filtering files

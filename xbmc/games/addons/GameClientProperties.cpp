@@ -14,6 +14,7 @@
 #include "addons/GameResource.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
+#include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -133,8 +134,15 @@ const char** CGameClientProperties::GetResourceDirectories(void)
 
     if (!CDirectory::Exists(addonProfile))
     {
-      CLog::Log(LOGDEBUG, "Creating resource directory: %s", addonProfile.c_str());
-      CDirectory::Create(addonProfile);
+      // Copy resources directory
+      unsigned int fileCount = 0;
+      unsigned int dirCount = 0;
+      CLog::Log(LOGDEBUG, "Copying resource directory to %s", addonProfile.c_str());
+
+      if (CDirectory::Copy(addonProfile, addonPath, fileCount, dirCount))
+        CLog::Log(LOGDEBUG, "Copied %u files and %u directories", fileCount, dirCount);
+      else
+        CLog::Log(LOGWARNING, "Failed to copy resource directory! Games may be missing BIOSes, etc.");
     }
 
     char* addonProfileDir = new char[addonProfile.length() + 1];

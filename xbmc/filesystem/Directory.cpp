@@ -8,6 +8,7 @@
 
 #include "Directory.h"
 #include "DirectoryFactory.h"
+#include "File.h"
 #include "FileDirectoryFactory.h"
 #include "ServiceBroker.h"
 #include "commons/Exception.h"
@@ -434,6 +435,60 @@ bool CDirectory::RemoveRecursive(const CURL& url)
   }
   CLog::Log(LOGERROR, "%s - Error removing %s", __FUNCTION__, url.GetRedacted().c_str());
   return false;
+}
+
+bool CDirectory::Copy(const std::string &strPath, const std::string &dest)
+{
+  unsigned int fileCount = 0;
+  unsigned int dirCount = 0;
+  return Copy(strPath, dest, fileCount, dirCount);
+}
+
+bool CDirectory::Copy(const std::string &strPath, const std::string &dest, unsigned int &fileCount, unsigned int &dirCount)
+{
+  if (!CDirectory::Exists(dest))
+  {
+    if (!CDirectory::Create(dest))
+      return false;
+  }
+
+  ++dirCount;
+
+  CFileItemList itemList;
+  if (!GetDirectory(strPath, itemList, "", DIR_FLAG_DEFAULTS))
+    return false;
+
+  bool bSuccess = true;
+
+  const VECFILEITEMS &items = itemList.GetList();
+  for(VECFILEITEMS::const_iterator it = items.begin(); it != items.end(); ++it)
+  {
+    const CFileItem &item = **it;
+    const std::string &itemPath = item.GetPath();
+    const std::string itemName = URIUtils::GetFileName(itemPath);
+    const std::string destPath = URIUtils::AddFileToFolder(dest, itemName);
+
+    if (item.m_bIsFolder)
+    {
+      if (!Copy(itemPath, destPath, fileCount, dirCount))
+      {
+        bSuccess = false;
+        break;
+      }
+    }
+    else
+    {
+      if (CFile::Copy(itemPath, destPath))
+        ++fileCount;
+      else
+      {
+        bSuccess = false;
+        break;
+      }
+    }
+  }
+
+  return true;
 }
 
 void CDirectory::FilterFileDirectories(CFileItemList &items, const std::string &mask,
