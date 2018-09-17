@@ -14,11 +14,6 @@ class CGUIDialog;
 
 namespace KODI
 {
-namespace GAME
-{
-  class CDialogGameOSD;
-}
-
 namespace RETRO
 {
   class CGameWindowFullScreenText;
@@ -51,7 +46,7 @@ namespace RETRO
   private:
     void ToggleOSD();
     void TriggerOSD();
-    GAME::CDialogGameOSD *GetOSD();
+    CGUIDialog *GetOSD();
 
     void RegisterWindow();
     void UnregisterWindow();

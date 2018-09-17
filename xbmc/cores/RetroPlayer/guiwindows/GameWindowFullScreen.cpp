@@ -11,7 +11,6 @@
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "cores/RetroPlayer/guibridge/GUIRenderHandle.h"
 #include "windowing/GraphicContext.h" //! @todo Remove me
-#include "games/dialogs/osd/DialogGameOSD.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "guilib/GUIDialog.h"
@@ -199,7 +198,7 @@ void CGameWindowFullScreen::OnDeinitWindow(int nextWindowID)
 
 void CGameWindowFullScreen::ToggleOSD()
 {
-  GAME::CDialogGameOSD *pOSD = GetOSD();
+  CGUIDialog *pOSD = GetOSD();
   if (pOSD != nullptr)
   {
     if (pOSD->IsDialogRunning())
@@ -213,7 +212,7 @@ void CGameWindowFullScreen::ToggleOSD()
 
 void CGameWindowFullScreen::TriggerOSD()
 {
-  GAME::CDialogGameOSD *pOSD = GetOSD();
+  CGUIDialog *pOSD = GetOSD();
   if (pOSD != nullptr)
   {
     if (!pOSD->IsDialogRunning())
@@ -221,13 +220,9 @@ void CGameWindowFullScreen::TriggerOSD()
   }
 }
 
-GAME::CDialogGameOSD *CGameWindowFullScreen::GetOSD()
+CGUIDialog *CGameWindowFullScreen::GetOSD()
 {
-  CGUIWindowManager &wm = CServiceBroker::GetGUI()->GetWindowManager();
-
-  GAME::CDialogGameOSD *dialog = wm.GetDialog<GAME::CDialogGameOSD>(WINDOW_DIALOG_GAME_OSD);
-
-  return dialog;
+  return CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_GAME_OSD);
 }
 
 void CGameWindowFullScreen::RegisterWindow()
