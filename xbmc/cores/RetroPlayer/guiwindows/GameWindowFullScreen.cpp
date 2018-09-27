@@ -10,6 +10,7 @@
 #include "GameWindowFullScreenText.h"
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "cores/RetroPlayer/guibridge/GUIRenderHandle.h"
+#include "cores/RetroPlayer/guiinput/GUIGameInput.h"
 #include "windowing/GraphicContext.h" //! @todo Remove me
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
@@ -115,6 +116,9 @@ bool CGameWindowFullScreen::OnAction(const CAction &action)
     break;
   }
 
+  if (m_input && m_input->OnAction(action))
+    return true;
+
   return CGUIWindow::OnAction(action);
 }
 
@@ -167,6 +171,9 @@ void CGameWindowFullScreen::OnWindowLoaded()
 
 void CGameWindowFullScreen::OnInitWindow()
 {
+  // Register input
+  m_input.reset(new CGUIGameInput);
+
   GUIINFO::CPlayerGUIInfo& guiInfo = CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPlayerInfoProvider();
   guiInfo.SetShowInfo(false);
   guiInfo.SetDisplayAfterSeek(0); // Make sure display after seek is off
@@ -191,6 +198,9 @@ void CGameWindowFullScreen::OnDeinitWindow(int nextWindowID)
   CGUIWindow::OnDeinitWindow(nextWindowID);
 
   CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false); //! @todo
+
+  // Unregister input
+  m_input.reset();
 }
 
 void CGameWindowFullScreen::TriggerOSD()

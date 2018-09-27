@@ -17,6 +17,7 @@ namespace KODI
 namespace RETRO
 {
   class CGameWindowFullScreenText;
+  class CGUIGameInput;
   class CGUIRenderHandle;
 
   class CGameWindowFullScreen : public CGUIWindow
@@ -52,6 +53,7 @@ namespace RETRO
 
     // GUI parameters
     std::unique_ptr<CGameWindowFullScreenText> m_fullscreenText;
+    std::unique_ptr<CGUIGameInput> m_input;
 
     // Rendering parameters
     std::shared_ptr<CGUIRenderHandle> m_renderHandle;
