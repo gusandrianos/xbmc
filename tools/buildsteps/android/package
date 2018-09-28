@@ -23,4 +23,4 @@ then
 fi
 
 cd $WORKSPACE; git clean -dffx -- tools/depends/target/binary-addons
-find $WORKSPACE/tools/depends/xbmc-depends/arm-linux-androideabi-*-*/ -type d -name game.libretro.* ! -name game.libretro.2048 ! -name game.libretro.mrboom -exec rm -rf {} \;
+find $WORKSPACE/tools/depends/xbmc-depends/arm-linux-androideabi-*-*/ -name 'game.*' ! -name game.libretro ! -name game.libretro.2048 ! -name game.libretro.mrboom -type d -prune -exec rm -rf {} \;
