@@ -379,6 +379,10 @@ case $host in
     deps_dir="${sdk_name}_${use_cpu}-target-${build_type}"
     AC_CHECK_LIB([z], [main], has_zlib=1, AC_MSG_WARN("No zlib support in toolchain. Will build libz."); has_zlib=0)
   ;;
+  aarch64-none-elf)
+    # Switch build
+    # Everything is set on the use_platform switch
+  ;;
   *)
     AC_MSG_ERROR(unsupported host ($use_host))
 esac
@@ -419,6 +423,14 @@ case $use_platform in
      platform_cxxflags="-fPIC -mcpu=cortex-a53 -mfloat-abi=hard -mfpu=neon-fp-armv8 -mvectorize-with-neon-quad"
      platform_ldflags="-lpthread"
      ;;
+  switch)
+     target_platform=switch
+     use_cpu=cortex-a57
+     platform_os="horizon"
+     platform_cflags="-g -Wall -ffunction-sections -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -D__SWITCH__ -DTARGET_SWITCH"
+     platform_cxxflags=""
+     platform_ldflags="-specs=$DEVKITPRO/libnx/switch.specs -g $ARCH -Wl,-Map,kodi-switch-deps.map"
+    ;;
   auto)
     ;;
   *)
@@ -620,8 +632,8 @@ else
 fi
 
 # add user supplied flags to the end, so they override our defaults
-platform_cflags_release="$tmp_cflags $relase_cflags $optimize_flags $target_cflags"
-platform_cxxflags_release="$tmp_cxxflags $relase_cflags $optimize_flags $target_cxxflags"
+platform_cflags_release="$tmp_cflags $release_cflags $optimize_flags $target_cflags"
+platform_cxxflags_release="$tmp_cxxflags $release_cflags $optimize_flags $target_cxxflags"
 platform_cflags_debug="$tmp_cflags $debug_cflags $target_cflags"
 platform_cxxflags_debug="$tmp_cxxflags $debug_cflags $target_cxxflags"
 platform_ldflags+=" $target_ldflags $LIBS"
