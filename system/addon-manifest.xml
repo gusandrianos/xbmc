@@ -33,7 +33,6 @@
   <addon>metadata.themoviedb.org</addon>
   <addon>metadata.tvdb.com</addon>
   <addon>plugin.video.youtube</addon>
-  <addon optional="true">repository.iarl</addon>
   <addon>repository.xbmc.org</addon>
   <addon>resource.images.weathericons.default</addon>
   <addon>resource.language.en_gb</addon>
