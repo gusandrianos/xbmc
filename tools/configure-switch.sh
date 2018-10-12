@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source /etc/profile.d/devkit-env.sh
 
 ./configure \
@@ -7,4 +9,3 @@ source /etc/profile.d/devkit-env.sh
     --with-toolchain="${DEVKITPRO}/devkitA64" \
     --prefix="${HOME}/switch-tools/kodi-deps" \
     --with-tarballs="${HOME}/switch-tools/kodi-tarballs"
-
