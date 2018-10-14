@@ -1,10 +1,12 @@
 set(SOURCES DataCacheCore.cpp
             FFmpeg.cpp
+            PlaybackControl.cpp
             VideoSettings.cpp)
 
 set(HEADERS DataCacheCore.h
             FFmpeg.h
             GameSettings.h
+            PlaybackControl.h
             IPlayer.h
             IPlayerCallback.h
             VideoSettings.h)
