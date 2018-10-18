@@ -95,7 +95,7 @@ public:
   {
     m_dir.CancelDirectory();
   }
-  bool m_result;
+  bool m_result = false;
 protected:
   XFILE::CVirtualDirectory &m_dir;
   CURL m_url;
