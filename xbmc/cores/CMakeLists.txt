@@ -6,9 +6,10 @@ set(SOURCES DataCacheCore.cpp
 set(HEADERS DataCacheCore.h
             FFmpeg.h
             GameSettings.h
-            PlaybackControl.h
+            IPlaybackControl.h
             IPlayer.h
             IPlayerCallback.h
+            PlaybackControl.h
             VideoSettings.h)
 
 if(CORE_PLATFORM_NAME_LC STREQUAL rbpi)
