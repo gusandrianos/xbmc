@@ -3,7 +3,7 @@ DEPS=Makefile
 
 # lib name, version
 LIBNAME=liblmdb
-VERSION=0.9.23
+VERSION=0.9.22
 SOURCE=LMDB_$(VERSION)
 ARCHIVE=$(SOURCE).tar.gz
 BASE_URL := https://github.com/LMDB/lmdb/archive
