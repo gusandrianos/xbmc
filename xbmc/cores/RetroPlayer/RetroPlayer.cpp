@@ -12,6 +12,8 @@
 #include "addons/AddonManager.h"
 #include "cores/DataCacheCore.h"
 #include "cores/IPlayerCallback.h"
+#include "cores/RetroPlayer/engine/Core.h"
+#include "cores/RetroPlayer/engine/ThreadPools.h"
 #include "cores/RetroPlayer/environment/Environment.h"
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "cores/RetroPlayer/guiplayback/GUIPlaybackControl.h"
@@ -121,6 +123,7 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
       m_streamManager.reset(new CRPStreamManager(*m_renderManager, *m_processInfo));
 
       m_input.reset(new CRetroPlayerInput(CServiceBroker::GetPeripherals()));
+      m_engine.reset(new Engine);
 
       if (!bStandalone)
       {
@@ -185,6 +188,7 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
   }
   else
   {
+    m_engine.reset();
     m_input.reset();
     m_streamManager.reset();
     if (m_gameClient)
@@ -221,6 +225,7 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
   if (m_gameClient)
     m_gameClient->CloseFile();
 
+  m_engine.reset();
   m_input.reset();
   m_streamManager.reset();
 
