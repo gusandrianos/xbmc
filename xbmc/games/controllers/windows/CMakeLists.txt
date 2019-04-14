@@ -2,8 +2,7 @@ set(SOURCES ControllerInstaller.cpp
             GUIConfigurationWizard.cpp
             GUIControllerList.cpp
             GUIControllerWindow.cpp
-            GUIFeatureList.cpp
-            GUIHelpWizard.cpp)
+            GUIFeatureList.cpp)
 
 set(HEADERS ControllerInstaller.h
             GUIConfigurationWizard.h
@@ -11,7 +10,6 @@ set(HEADERS ControllerInstaller.h
             GUIControllerList.h
             GUIControllerWindow.h
             GUIFeatureList.h
-            GUIHelpWizard.h
             IConfigurationWindow.h)
 
 core_add_library(games_controller_windows)

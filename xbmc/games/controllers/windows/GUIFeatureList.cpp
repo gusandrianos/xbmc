@@ -8,7 +8,6 @@
 
 #include "GUIFeatureList.h"
 #include "GUIConfigurationWizard.h"
-#include "GUIHelpWizard.h"
 #include "GUIControllerDefines.h"
 #include "games/addons/input/GameClientInput.h"
 #include "games/addons/GameClient.h"
@@ -35,15 +34,13 @@ CGUIFeatureList::CGUIFeatureList(CGUIWindow* window, GameClientPtr gameClient) :
   m_guiGroupTitle(nullptr),
   m_guiFeatureSeparator(nullptr),
   m_gameClient(std::move(gameClient)),
-  m_wizard(new CGUIConfigurationWizard),
-  m_helpWizard(new CGUIHelpWizard)
+  m_wizard(new CGUIConfigurationWizard)
 {
 }
 
 CGUIFeatureList::~CGUIFeatureList(void)
 {
   Deinitialize();
-  m_helpWizard.reset();
   delete m_wizard;
 }
 
@@ -159,11 +156,6 @@ void CGUIFeatureList::OnSelect(unsigned int buttonIndex)
       break;
     }
   }
-
-  /*
-  if (!buttons.empty())
-    m_helpWizard->Run();
-  */
 
   m_wizard->Run(m_controller->ID(), buttons);
 }

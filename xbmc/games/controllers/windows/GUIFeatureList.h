@@ -14,8 +14,6 @@
 #include "games/GameTypes.h"
 #include "input/joysticks/JoystickTypes.h"
 
-#include <memory>
-
 class CGUIButtonControl;
 class CGUIControlGroupList;
 class CGUIImage;
@@ -72,7 +70,6 @@ namespace GAME
     GameClientPtr           m_gameClient;
     ControllerPtr           m_controller;
     IConfigurationWizard*   m_wizard;
-    std::unique_ptr<IHelpWizard> m_helpWizard;
   };
 }
 }
