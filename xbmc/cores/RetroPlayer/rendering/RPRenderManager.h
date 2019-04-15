@@ -112,6 +112,17 @@ namespace RETRO
     void RenderInternal(const std::shared_ptr<CRPBaseRenderer> &renderer, bool bClear, uint32_t alpha);
 
     /*!
+     * \brief Callback when a GUI component is rendering
+     *
+     * This function is called before a GUI component is rendered. It is
+     * responsible for handling state updates.
+     *
+     * \return True to allow rendering, false to suppress rendering of the
+     *         GUI component
+     */
+    bool OnRender();
+
+    /*!
      * \brief Return true if we have a render buffer belonging to the specified pool
      */
     bool HasRenderBuffer(IRenderBufferPool *bufferPool);
@@ -188,8 +199,10 @@ namespace RETRO
       UNCONFIGURED,
       CONFIGURING,
       CONFIGURED,
+      RENDERING,
     };
     RENDER_STATE m_state = RENDER_STATE::UNCONFIGURED;
+    bool m_bConfigured = false;
     bool m_bHasCachedFrame = false; // Invariant: m_cachedFrame is empty if false
     std::set<std::string> m_failedShaderPresets;
     std::atomic<bool> m_bFlush = {false};
