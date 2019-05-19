@@ -138,6 +138,9 @@ bool CGUIWindowGames::OnClick(int iItem, const std::string &player /* = "" */)
   CFileItemPtr item = m_vecItems->Get(iItem);
   if (item)
   {
+    if (URIUtils::IsAddonsPath(item->GetPath()))
+      return CGUIMediaWindow::OnClick(iItem, player);
+
     // Compensate for DIR_FLAG_NO_FILE_DIRS flag
     if (URIUtils::IsArchive(item->GetPath()))
     {
