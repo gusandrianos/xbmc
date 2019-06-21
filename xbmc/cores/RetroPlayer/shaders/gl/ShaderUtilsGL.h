@@ -14,12 +14,13 @@
 
 namespace KODI
 {
-    namespace SHADER
-    {
-        class CShaderUtilsGL
-        {
-        public:
-            static GLint TranslateWrapType(WRAP_TYPE wrap);
-        };
-    }
+namespace SHADER
+{
+
+class CShaderUtilsGL
+{
+public:
+  static GLint TranslateWrapType(WRAP_TYPE wrap);
+};
+}
 }

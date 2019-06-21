@@ -13,21 +13,21 @@ using namespace SHADER;
 
 GLint CShaderUtilsGL::TranslateWrapType(WRAP_TYPE wrap)
 {
-    GLint glWrap;
-    switch(wrap)
-    {
-        case WRAP_TYPE_EDGE:
-            glWrap = GL_CLAMP_TO_EDGE;
-            break;
-        case WRAP_TYPE_REPEAT:
-            glWrap = GL_REPEAT;
-            break;
-        case WRAP_TYPE_MIRRORED_REPEAT:
-            glWrap = GL_MIRRORED_REPEAT;
-            break;
-        case WRAP_TYPE_BORDER:
-        default:
-            glWrap = GL_CONSTANT_BORDER;
-    }
-    return glWrap;
+GLint glWrap;
+switch(wrap)
+{
+  case WRAP_TYPE_EDGE:
+    glWrap = GL_CLAMP_TO_EDGE;
+    break;
+  case WRAP_TYPE_REPEAT:
+    glWrap = GL_REPEAT;
+    break;
+  case WRAP_TYPE_MIRRORED_REPEAT:
+    glWrap = GL_MIRRORED_REPEAT;
+    break;
+  case WRAP_TYPE_BORDER:
+  default:
+    glWrap = GL_CONSTANT_BORDER;
+  }
+  return glWrap;
 }
