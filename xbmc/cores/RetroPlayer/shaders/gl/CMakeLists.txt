@@ -1,4 +1,5 @@
 set(SOURCES ShaderUtilsGL.cpp
+        ShaderPresetGL.cpp
         ShaderLutGL.cpp)
 
 set(HEADERS ShaderTextureGL.h
