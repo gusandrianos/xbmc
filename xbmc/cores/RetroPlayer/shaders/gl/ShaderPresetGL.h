@@ -19,12 +19,12 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <xbmc/cores/RetroPlayer/shaders/IShader.h>
+#include <set>
 
-namespace ADDON {
-class CShaderPreset;
-
-class CShaderPresetAddon;
+namespace ADDON
+{
+  class CShaderPreset;
+  class CShaderPresetAddon;
 }
 
 namespace KODI
@@ -32,16 +32,16 @@ namespace KODI
 namespace RETRO
 {
 
-class CRenderContext;
+  class CRenderContext;
 
 }
 
 namespace SHADER
 {
 
-class IShaderTexture;
+  class IShaderTexture;
+  class CShaderPresetGL : public IShaderPreset
 
-class CShaderPresetGL : public IShaderPreset
 {
 public:
   // Instance of CShaderPreset
@@ -51,44 +51,24 @@ public:
 
   // implementation of IShaderPreset
   bool ReadPresetFile(const std::string &presetPath) override;
-
   bool RenderUpdate(const CPoint dest[], IShaderTexture *source, IShaderTexture *target) override;
-
   void SetSpeed(double speed) override;
-
   void SetVideoSize(const unsigned videoWidth, const unsigned videoHeight) override;
-
   bool SetShaderPreset(const std::string &shaderPresetPath) override;
-
   const std::string &GetShaderPreset() const override;
-
   ShaderPassVec &GetPasses() override;
-
   bool Update();
 
 private:
   bool CreateShaderTextures();
-
   bool CreateShaders();
-
-  bool CreateSamplers();
-
-  bool CreateLayouts();
-
   bool CreateBuffers();
-
   void UpdateViewPort();
-
   void UpdateViewPort(CRect viewPort);
-
   void UpdateMVPs();
-
   void DisposeShaders();
-
   void PrepareParameters(const IShaderTexture *texture, const CPoint dest[]);
-
   void RenderShader(IShader *shader, IShaderTexture *source, IShaderTexture *target) const;
-
   bool HasPathFailed(const std::string &path) const;
 
   // Construction parameters
@@ -102,7 +82,7 @@ private:
   std::vector<std::unique_ptr<IShader>> m_pShaders;
 
   // Intermediate textures used for pixel shader passes
-  //std::vector<std::unique_ptr<CShaderTextureCD3D>> m_pShaderTextures;
+  std::vector<std::unique_ptr<CShaderTextureGL>> m_pShaderTextures;
 
   // First texture (this won't be needed when we have RGB rendering
   //std::unique_ptr<CShaderTextureCD3D> firstTexture;
@@ -131,7 +111,7 @@ private:
 
   // Set of paths of presets that are known to not load correctly
   // Should not contain "" (empty path) because this signifies that a preset is not loaded
-  //std::set<std::string> m_failedPaths;
+  std::set<std::string> m_failedPaths;
 
   // Array of vertices that comprise the full viewport
   CPoint m_dest[4];
@@ -139,8 +119,7 @@ private:
   // Playback speed
   double m_speed = 0.0;
 
-  ShaderParameterMap
-  GetShaderParameters(const std::vector<ShaderParameter> &parameters, const std::string &sourceStr) const;
+  ShaderParameterMap GetShaderParameters(const std::vector<ShaderParameter> &parameters, const std::string &sourceStr) const;
 
   ShaderPassVec m_passes;
 };

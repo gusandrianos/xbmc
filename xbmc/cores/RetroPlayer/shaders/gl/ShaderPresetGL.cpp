@@ -13,8 +13,12 @@
 #include "cores/RetroPlayer/shaders/ShaderPresetFactory.h"
 #include "cores/RetroPlayer/shaders/gl/ShaderGL.h"
 #include "ServiceBroker.h"
+#include <xbmc/utils/log.h>
 
 #include <regex>
+#include <xbmc/rendering/gl/RenderSystemGL.h>
+
+#define MAX_FLOAT 3.402823466E+38
 
 
 using namespace KODI;
@@ -71,29 +75,94 @@ ShaderParameterMap CShaderPresetGL::GetShaderParameters(const std::vector<Shader
   return matchParams;
 }
 
-bool CShaderPresetGL::ReadPresetFile(const std::string &presetPath)
-{
-  return CServiceBroker::GetGameServices().VideoShaders().LoadPreset(presetPath, *this);
-}
-
-void CShaderPresetGL::SetSpeed(double speed)
-{
-  m_speed = speed;
-}
-
-ShaderPassVec &CShaderPresetGL::GetPasses()
-{
-  return m_passes;
-}
-
 bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, IShaderTexture *target)
 {
-  return false;
+  // Save the viewport
+  CRect viewPort;
+  m_context.GetViewPort(viewPort);
+
+  // Handle resizing of the viewport (window)
+  UpdateViewPort(viewPort);
+
+  // Update shaders/shader textures if required
+  if (!Update())
+    return false;
+
+  PrepareParameters(target, dest);
+
+  // At this point, the input video has been rendered to the first texture ("source", not m_pShaderTextures[0])
+
+  IShader* firstShader = m_pShaders.front().get();
+  CShaderTextureGL* firstShaderTexture = m_pShaderTextures.front().get();
+  IShader* lastShader = m_pShaders.back().get();
+
+  const unsigned passesNum = static_cast<unsigned int>(m_pShaderTextures.size());
+
+  if (passesNum == 1)
+    m_pShaders.front()->Render(source, target);
+  else if (passesNum == 2)
+  {
+    // Apply first pass
+    RenderShader(firstShader, source, firstShaderTexture);
+    // Apply last pass
+    RenderShader(lastShader, firstShaderTexture, target);
+  }
+  else
+  {
+    // Apply first pass
+    RenderShader(firstShader, source, firstShaderTexture);
+
+    // Apply all passes except the first and last one (which needs to be applied to the backbuffer)
+    for (unsigned int shaderIdx = 1;
+         shaderIdx < static_cast<unsigned int>(m_pShaders.size()) - 1;
+         ++shaderIdx)
+    {
+      IShader* shader = m_pShaders[shaderIdx].get();
+      CShaderTextureGL* prevTexture = m_pShaderTextures[shaderIdx - 1].get();
+      CShaderTextureGL* texture = m_pShaderTextures[shaderIdx].get();
+      RenderShader(shader, prevTexture, texture);
+    }
+
+    // Apply last pass and write to target (backbuffer) instead of the last texture
+    CShaderTextureGL* secToLastTexture = m_pShaderTextures[m_pShaderTextures.size() - 2].get();
+    RenderShader(lastShader, secToLastTexture, target);
+  }
+  return true;
 }
 
 bool CShaderPresetGL::Update()
 {
-  return false;
+  auto updateFailed = [this](const std::string& msg)
+  {
+    m_failedPaths.insert(m_presetPath);
+    auto message = "CShaderPresetDX::Update: " + msg + ". Disabling video shaders.";
+    CLog::Log(LOGWARNING, message.c_str());
+    DisposeShaders();
+    return false;
+  };
+
+  if (m_bPresetNeedsUpdate && !HasPathFailed(m_presetPath)) {
+    DisposeShaders();
+
+    if (m_presetPath.empty())
+      return false;
+
+    if (!ReadPresetFile(m_presetPath)) {
+      CLog::Log(LOGERROR, "%s - couldn't load shader preset %s or the shaders it references", __func__, m_presetPath.c_str());
+      return false;
+    }
+
+    if (!CreateShaders())
+      return updateFailed("Failed to initialize shaders");
+
+    if (!CreateBuffers())
+      return updateFailed("Failed to initialize buffers");
+
+    if (!CreateShaderTextures())
+      return updateFailed("A shader texture failed to init");
+  }
+
+  return true;
 }
 
 void CShaderPresetGL::SetVideoSize(const unsigned videoWidth, const unsigned videoHeight)
@@ -117,7 +186,109 @@ const std::string &CShaderPresetGL::GetShaderPreset() const
 
 bool CShaderPresetGL::CreateShaderTextures()
 {
-  return false;
+  m_pShaderTextures.clear();
+
+  float2 prevSize = m_videoSize;
+
+  unsigned int numPasses = static_cast<unsigned  int>(m_passes.size());
+
+  for (unsigned shaderIdx = 0; shaderIdx < numPasses; ++shaderIdx)
+  {
+    ShaderPass& pass = m_passes[shaderIdx];
+
+    // resolve final texture resolution, taking scale type and scale multiplier into account
+    float2 scaledSize;
+    switch (pass.fbo.scaleX.type)
+    {
+      case SCALE_TYPE_ABSOLUTE:
+        scaledSize.x = static_cast<float>(pass.fbo.scaleX.abs);
+        break;
+      case SCALE_TYPE_VIEWPORT:
+        scaledSize.x = m_outputSize.x;
+        break;
+      case SCALE_TYPE_INPUT:
+      default:
+        scaledSize.x = prevSize.x;
+        break;
+    }
+    switch (pass.fbo.scaleY.type)
+    {
+      case SCALE_TYPE_ABSOLUTE:
+        scaledSize.y = static_cast<float>(pass.fbo.scaleY.abs);
+        break;
+      case SCALE_TYPE_VIEWPORT:
+        scaledSize.y = m_outputSize.y;
+        break;
+      case SCALE_TYPE_INPUT:
+      default:
+        scaledSize.y = prevSize.y;
+        break;
+    }
+
+    // if the scale was unspecified
+    if (pass.fbo.scaleX.scale == 0 && pass.fbo.scaleY.scale == 0)
+    {
+      // if the last shader has the scale unspecified
+      if (shaderIdx == numPasses - 1)
+      {
+        // we're supposed to output at full (viewport) res
+        scaledSize.x = m_outputSize.x;
+        scaledSize.y = m_outputSize.y;
+      }
+    }
+    else
+    {
+      scaledSize.x *= pass.fbo.scaleX.scale;
+      scaledSize.y *= pass.fbo.scaleY.scale;
+    }
+
+    // Determine the framebuffer data format
+    unsigned int textureFormat;
+    if (pass.fbo.floatFramebuffer)
+    {
+      // Give priority to float framebuffer parameter (we can't use both float and sRGB)
+      textureFormat = GL_RGB32F;
+    }
+    else
+    {
+      if (pass.fbo.sRgbFramebuffer)
+        textureFormat = GL_SRGB8;
+      else
+        textureFormat = GL_RGBA8;
+    }
+
+    // For reach pass, create the texture
+    const std::unique_ptr<CGLTexture> texture(new CGLTexture(
+            static_cast<unsigned int>(scaledSize.x),
+            static_cast<unsigned int>(scaledSize.y),
+            textureFormat));
+
+    if (!texture)
+    {
+      CLog::Log(LOGERROR, "Couldn't create a texture for video shader %s.", pass.sourcePath.c_str());
+      return false;
+    }
+
+    texture->CreateTextureObject();
+    glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CONSTANT_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CONSTANT_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CONSTANT_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NEVER);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
+    GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, blackBorder);
+
+    m_pShaderTextures.emplace_back(new CShaderTextureGL(*texture));
+    m_pShaders[shaderIdx]->SetSizes(prevSize, scaledSize);
+
+    prevSize = scaledSize;
+
+  }
+  return true;
 }
 
 bool CShaderPresetGL::CreateShaders()
@@ -144,44 +315,88 @@ bool CShaderPresetGL::CreateShaders()
   return false;
 }
 
-bool CShaderPresetGL::CreateSamplers()
-{
-  return false;
-}
-
-bool CShaderPresetGL::CreateLayouts()
-{
-  return false;
-}
-
 bool CShaderPresetGL::CreateBuffers()
 {
-  return false;
+  for (auto& videoShader : m_pShaders)
+  {
+    GLuint vao, vbo[3];
+    glGenVertexArrays(1,&vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(3, vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(2);
+
+    videoShader->CreateInputBuffer();
+  }
+  return true;
 }
 
 void CShaderPresetGL::UpdateViewPort()
 {
-
+  CRect viewPort;
+  m_context.GetViewPort(viewPort);
+  UpdateViewPort(viewPort);
 }
 
 void CShaderPresetGL::UpdateViewPort(CRect viewPort)
 {
-
+  float2 currentViewPortSize = { viewPort.Width(), viewPort.Height() };
+  if (currentViewPortSize != m_outputSize)
+  {
+    m_outputSize = currentViewPortSize;
+    m_bPresetNeedsUpdate = true;
+    Update();
+  }
 }
 
 void CShaderPresetGL::UpdateMVPs()
 {
-
+  for (auto& videoShader : m_pShaders)
+    videoShader->UpdateMVP();
 }
 
 void CShaderPresetGL::DisposeShaders()
 {
-
+  m_pShaders.clear();
+  m_pShaderTextures.clear();
+  m_passes.clear();
+  m_bPresetNeedsUpdate = true;
 }
 
 void CShaderPresetGL::PrepareParameters(const IShaderTexture *texture, const CPoint *dest)
 {
+  for (unsigned shaderIdx = 0; shaderIdx < m_pShaders.size() - 1; ++shaderIdx)
+  {
+    auto& videoShader = m_pShaders[shaderIdx];
+    videoShader->PrepareParameters(m_dest, false, static_cast<uint64_t>(m_frameCount));
+  }
 
+  m_pShaders.back()->PrepareParameters(m_dest, true, static_cast<uint64_t>(m_frameCount));
+
+  if (m_dest[0] != dest[0] || m_dest[1] != dest[1]
+      || m_dest[2] != dest[2] || m_dest[3] != dest[3]
+      || texture->GetWidth() != m_outputSize.x
+      || texture->GetHeight() != m_outputSize.y)
+  {
+    for (size_t i = 0; i < 4; ++i)
+      m_dest[i] = dest[i];
+
+    m_outputSize = { texture->GetWidth(), texture->GetHeight() };
+
+    UpdateMVPs();
+    UpdateViewPort();
+  }
 }
 
 void CShaderPresetGL::RenderShader(IShader *shader, IShaderTexture *source, IShaderTexture *target) const
@@ -193,9 +408,24 @@ void CShaderPresetGL::RenderShader(IShader *shader, IShaderTexture *source, ISha
   shader->Render(source, target);
 }
 
+bool CShaderPresetGL::ReadPresetFile(const std::string &presetPath)
+{
+  return CServiceBroker::GetGameServices().VideoShaders().LoadPreset(presetPath, *this);
+}
+
+void CShaderPresetGL::SetSpeed(double speed)
+{
+  m_speed = speed;
+}
+
+ShaderPassVec &CShaderPresetGL::GetPasses()
+{
+  return m_passes;
+}
+
 bool CShaderPresetGL::HasPathFailed(const std::string &path) const
 {
-  return false;
+  return m_failedPaths.find(path) != m_failedPaths.end();
 }
 
 
