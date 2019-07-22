@@ -56,7 +56,7 @@ std::unique_ptr<IShaderTexture> CShaderLutGL::CreateLUTTexture(RETRO::CRenderCon
     return std::unique_ptr<IShaderTexture>();
   }
 
-  glGenTextures(1, reinterpret_cast<GLuint *>(texture->getMTexture()));
+  texture->CreateTextureObject();
   glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
