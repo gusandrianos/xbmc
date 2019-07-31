@@ -92,7 +92,7 @@ private:
 
   std::array<std::array<GLfloat, 4>, 3> m_VertexCoords;
   std::array<std::array<GLfloat, 4>, 3> m_colors;
-  std::array<std::array<GLfloat, 4>, 3> m_TexCoords;
+  std::array<std::array<GLfloat, 4>, 2> m_TexCoords;
 
   // Value to modulo (%) frame count with
   // Unused if 0
