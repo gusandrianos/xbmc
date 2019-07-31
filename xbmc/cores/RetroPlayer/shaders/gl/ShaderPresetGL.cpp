@@ -319,24 +319,6 @@ bool CShaderPresetGL::CreateBuffers()
 {
   for (auto& videoShader : m_pShaders)
   {
-    GLuint vao, vbo[3];
-    glGenVertexArrays(1,&vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(3, vbo);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(2);
-
     videoShader->CreateInputBuffer();
   }
   return true;
