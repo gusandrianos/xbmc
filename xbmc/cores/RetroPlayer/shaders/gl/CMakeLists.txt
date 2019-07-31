@@ -6,6 +6,7 @@ set(SOURCES ShaderUtilsGL.cpp
 set(HEADERS ShaderTextureGL.h
         ShaderUtilsGL.h
         ShaderLutGL.h
-        ShaderGL.h)
+        ShaderGL.h
+        ShaderTypesGL.h)
 
 core_add_library(rp-shaders-gl)

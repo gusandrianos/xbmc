@@ -10,6 +10,7 @@
 
 #include "ShaderTextureGL.h"
 #include "cores/RetroPlayer/shaders/IShader.h"
+#include "cores/RetroPlayer/shaders/gl/ShaderTypesGL.h"
 #include "rendering/gl/GLShader.h"
 #include "guilib/TextureGL.h"
 
@@ -26,7 +27,7 @@ class CRenderContext;
 
 namespace SHADER
 {
-class CShaderGL : public CGLShader, public IShader
+class CShaderGL : public IShader
 {
 public:
   CShaderGL(RETRO::CRenderContext &context);
@@ -38,25 +39,22 @@ public:
   void Render(IShaderTexture* source, IShaderTexture* target) override;
   void SetSizes(const float2& prevSize, const float2& nextSize) override;
   void PrepareParameters(CPoint dest[4], bool isLastPass, uint64_t frameCount) override;
-//  CD3DEffect& GetEffect();
   void UpdateMVP() override;
   bool CreateInputBuffer() override;
   void UpdateInputBuffer(uint64_t frameCount);
-
-  // expose these from CWinShader
-//  bool CreateVertexBuffer(unsigned vertCount, unsigned vertSize) override;
+  bool GetUniformLocs();
 
 protected:
-//  void SetShaderParameters(CD3DTexture& sourceTexture);
+  void SetShaderParameters(CGLTexture& sourceTexture);
 
 private:
-  struct cbInput
+  struct uniformInputs
   {
     float2 video_size;
     float2 texture_size;
     float2 output_size;
-    float frame_count;
-    float frame_direction;
+    GLint frame_count;
+    GLint frame_direction;
   };
 
   // Currently loaded shader's source code
@@ -84,18 +82,31 @@ private:
   // Resolution of the texture that holds the input
   //float2 m_textureSize;
 
-  // Holds the data bount to the input cbuffer (cbInput here)
-//  ID3D11Buffer* m_pInputBuffer = nullptr;
+  // Holds the generated buffer id from glGenBuffers in CShaderGL::CreateInputBuffer
+//  GLuint m_inputBuffer = 0;
+
+  GLuint m_shaderProgram;
 
   // Projection matrix
-//  XMFLOAT4X4 m_MVP;
+  std::array<std::array<GLfloat, 4>, 4> m_MVP;
+
+  std::array<std::array<GLfloat, 4>, 3> m_VertexCoords;
+  std::array<std::array<GLfloat, 4>, 3> m_colors;
+  std::array<std::array<GLfloat, 4>, 3> m_TexCoords;
 
   // Value to modulo (%) frame count with
   // Unused if 0
   unsigned m_frameCountMod = 0;
 
+  GLint m_FrameDirectionLoc = -1;
+  GLint m_FrameCountLoc = -1;
+  GLint m_OutputSizeLoc = -1;
+  GLint m_TextureSizeLoc = -1;
+  GLint m_InputSizeLoc = -1;
+  GLint m_MVPMatrixLoc = -1;
+
 private:
-  cbInput GetInputData(uint64_t frameCount = 0);
+  uniformInputs GetInputData(uint64_t frameCount = 0);
 
   // Construction parameters
   RETRO::CRenderContext &m_context;

@@ -10,14 +10,11 @@
 #include "ShaderTextureGL.h"
 #include "Application.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
-#include "cores/RetroPlayer/rendering/RenderContext.h"
-//#include "cores/RetroPlayer/shaders/gl/ShaderTypesGL.h"
 #include "cores/RetroPlayer/shaders/IShaderLut.h"
-#include "cores/RetroPlayer/shaders/ShaderUtils.h"
 #include "rendering/gl/RenderSystemGL.h"
 #include "utils/log.h"
 #include "utils/URIUtils.h"
-#include "system.h"
+#include "ShaderUtilsGL.h"
 
 using namespace KODI;
 using namespace SHADER;
@@ -27,11 +24,11 @@ CShaderGL::CShaderGL(RETRO::CRenderContext &context) :
 {
 }
 
-
 bool CShaderGL::Create(const std::string& shaderSource, const std::string& shaderPath, ShaderParameterMap shaderParameters,
         IShaderSampler* sampler, ShaderLutVec luts,
         float2 viewPortSize, unsigned frameCountMod)
 {
+  //TODO:Remove sampler input from IShader.h
   if(shaderPath.empty())
   {
     CLog::Log(LOGERROR, "ShaderDX: Can't load empty shader path");
@@ -45,41 +42,185 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   m_viewportSize = viewPortSize;
   m_frameCountMod = frameCountMod;
 
-  std::string defines = "";
+  std::string shaderFile = CShaderUtilsGL::FileToString(shaderSource);
 
-  if(!this->LoadShaderSources(shaderSource.c_str(), defines))
-  {
-    CLog::Log(LOGERROR, "%s: failed to load video shader: %s", __func__, shaderPath.c_str());
-    return false;
-  }
+  std::string vertexShaderSourceStr = "#define VERTEX\n" + shaderFile;
+  std::string fragmentShaderSourceStr = "#define FRAGMENT\n" + shaderFile;
+  const char *vertexShaderSource = vertexShaderSourceStr.c_str();
+  const char *fragmentShaderSource = fragmentShaderSourceStr.c_str();
+
+  GLuint vShader;
+  vShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vShader, 1, &vertexShaderSource, NULL);
+
+  GLuint fShader;
+  fShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fShader, 1, &fragmentShaderSource, NULL);
+
+  m_shaderProgram = glCreateProgram();
+  glAttachShader(m_shaderProgram, vShader);
+  glAttachShader(m_shaderProgram, fShader);
+  glLinkProgram(m_shaderProgram);
 
   return true;
 }
 
-void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target) {
+void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
+{
   auto* sourceGL = static_cast<CShaderTextureGL*> (source);
 }
 
-void CShaderGL::SetSizes(const float2 &prevSize, const float2 &nextSize) {
+void CShaderGL::SetShaderParameters(CGLTexture& sourceTexture)
+{
+  glUniformMatrix4fv(m_MVPMatrixLoc, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(&m_MVP));
 
 }
 
-void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameCount) {
+void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameCount)
+{
+  UpdateInputBuffer(frameCount);
 
+  if (!isLastPass)
+  {
+    // top left x,y
+    m_VertexCoords[0][0] = -m_outputSize.x / 2;
+    m_VertexCoords[0][1] = -m_outputSize.y / 2;
+    // top right x,y
+    m_VertexCoords[1][0] = m_outputSize.x / 2;
+    m_VertexCoords[1][1] = -m_outputSize.y / 2;
+    // bottom right x,y
+    m_VertexCoords[2][0] = m_outputSize.x / 2;
+    m_VertexCoords[2][1] = m_outputSize.y / 2;
+    // bottom left x,y
+    m_VertexCoords[3][0] = -m_outputSize.x / 2;
+    m_VertexCoords[3][1] = m_outputSize.y / 2;
+  }
+  else  // last pass
+  {
+    // top left x,y
+    m_VertexCoords[0][0] = dest[0].x - m_outputSize.x / 2;
+    m_VertexCoords[0][1] = dest[0].y - m_outputSize.y / 2;
+    // top right x,y
+    m_VertexCoords[1][0] = dest[1].x - m_outputSize.x / 2;
+    m_VertexCoords[1][1] = dest[1].y - m_outputSize.y / 2;
+    // bottom right x,y
+    m_VertexCoords[2][0] = dest[2].x - m_outputSize.x / 2;
+    m_VertexCoords[2][1] = dest[2].y - m_outputSize.y / 2;
+    // bottom left x,y
+    m_VertexCoords[3][0] = dest[3].x - m_outputSize.x / 2;
+    m_VertexCoords[3][1] = dest[3].y - m_outputSize.y / 2;
+  }
+
+  // top left z, tu, tv, r, g, b
+  m_VertexCoords[0][2] = 0;
+  m_TexCoords[0][1] = 0;
+  m_TexCoords[0][2] = 0;
+  m_colors[0][1] = 0;
+  m_colors[0][2] = 0;
+  m_colors[0][3] = 0;
+
+  // top right z, tu, tv, r, g, b
+  m_VertexCoords[1][2] = 0;
+  m_TexCoords[1][1] = 1;
+  m_TexCoords[1][2] = 0;
+  m_colors[1][1] = 0;
+  m_colors[1][2] = 0;
+  m_colors[1][3] = 0;
+
+  // bottom right z, tu, tv, r, g, b
+  m_VertexCoords[2][2] = 0;
+  m_TexCoords[2][1] = 1;
+  m_TexCoords[2][2] = 1;
+  m_colors[2][1] = 0;
+  m_colors[2][2] = 0;
+  m_colors[2][3] = 0;
+
+  // bottom left z, tu, tv, r, g, b
+  m_VertexCoords[3][2] = 0;
+  m_TexCoords[3][1] = 0;
+  m_TexCoords[3][2] = 1;
+  m_colors[3][1] = 0;
+  m_colors[3][2] = 0;
+  m_colors[3][3] = 0;
 }
 
-void CShaderGL::UpdateMVP() {
+void CShaderGL::UpdateMVP()
+{
+  GLfloat xScale = 1.0f / m_outputSize.x * 2.0f;
+  GLfloat yScale = -1.0f / m_outputSize.y * 2.0f;
 
+  // Update projection matrix
+  m_MVP = {{
+    {xScale, 0, 0, 0},
+    {0, yScale, 0, 0},
+    {0, 0, 1, 0},
+    {0, 0, 0, 1}
+  }};
 }
 
-bool CShaderGL::CreateInputBuffer() {
-  return false;
+bool CShaderGL::GetUniformLocs()
+{
+  CShaderGL::m_FrameDirectionLoc = glGetUniformLocation(m_shaderProgram, "FrameDirection");
+  CShaderGL::m_FrameCountLoc = glGetUniformLocation(m_shaderProgram, "FrameCount");
+  CShaderGL::m_OutputSizeLoc = glGetUniformLocation(m_shaderProgram, "OutputSize");
+  CShaderGL::m_TextureSizeLoc = glGetUniformLocation(m_shaderProgram, "TextureSize");
+  CShaderGL::m_InputSizeLoc = glGetUniformLocation(m_shaderProgram, "InputSize");
+  CShaderGL::m_MVPMatrixLoc = glGetUniformLocation(m_shaderProgram, "MVPMatrix");
+
+  return !(m_FrameDirectionLoc == -1 ||
+    m_FrameCountLoc == -1 ||
+    m_OutputSizeLoc == -1 ||
+    m_TextureSizeLoc == -1 ||
+    m_InputSizeLoc == -1 ||
+    m_MVPMatrixLoc == -1);
 }
 
-void CShaderGL::UpdateInputBuffer(uint64_t frameCount) {
-
+//TODO:Change name of this method in IShader.h to CreateInputs
+bool CShaderGL::CreateInputBuffer()
+{
+  if(!GetUniformLocs())
+  {
+    //TODO:Meaningful error log
+    return false;
+  }
+  UpdateInputBuffer(0);
+  return true;
 }
 
-CShaderGL::cbInput CShaderGL::GetInputData(uint64_t frameCount) {
-  return CShaderGL::cbInput();
+//TODO:Change name of this method in IShader.h to UpdateInputs
+void CShaderGL::UpdateInputBuffer(uint64_t frameCount)
+{
+  uniformInputs inputInitData = GetInputData(frameCount);
+  glUniform1i(m_FrameDirectionLoc, inputInitData.frame_direction);
+  glUniform1i(m_FrameCountLoc, inputInitData.frame_count);
+  glUniform2f(m_OutputSizeLoc, inputInitData.output_size.x, inputInitData.output_size.y);
+  glUniform2f(m_TextureSizeLoc, inputInitData.texture_size.x, inputInitData.texture_size.y);
+  glUniform2f(m_InputSizeLoc, inputInitData.video_size.x, inputInitData.video_size.y);
+}
+
+CShaderGL::uniformInputs CShaderGL::GetInputData(uint64_t frameCount)
+{
+  if (m_frameCountMod != 0)
+    frameCount %= m_frameCountMod;
+
+  uniformInputs input = {
+    // Resolution of texture passed to the shader
+    { m_inputSize },       // video_size
+    { m_inputSize },      // texture_size
+    // As per the spec, this is the viewport resolution (not the
+    // output res of each shader)
+    { m_viewportSize },   // output_size
+    // Current frame count that can be modulo'ed
+    static_cast<GLint>(frameCount),  // frame_count
+    // Time always flows forward
+    1                 // frame_direction
+  };
+
+  return input;
+}
+
+void CShaderGL::SetSizes(const float2 &prevSize, const float2 &nextSize)
+{
+  m_inputSize = prevSize;
+  m_outputSize = nextSize;
 }
