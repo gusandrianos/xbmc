@@ -6,6 +6,8 @@
  *  See LICENSES/README.md for more information.
  */
 
+#include <fstream>
+#include <sstream>
 #include "ShaderUtilsGL.h"
 
 using namespace KODI;
@@ -30,4 +32,12 @@ switch(wrap)
     glWrap = GL_CONSTANT_BORDER;
   }
   return glWrap;
+}
+
+std::string CShaderUtilsGL::FileToString(std::string source)
+{
+  std::ifstream t(source);
+  std::stringstream target;
+  target << t.rdbuf();
+  return target.str();
 }

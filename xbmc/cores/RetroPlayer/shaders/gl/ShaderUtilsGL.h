@@ -21,6 +21,7 @@ class CShaderUtilsGL
 {
 public:
   static GLint TranslateWrapType(WRAP_TYPE wrap);
+  static std::string FileToString(std::string source);
 };
 }
 }
