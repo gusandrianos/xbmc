@@ -45,7 +45,7 @@ public:
   bool GetUniformLocs();
 
 protected:
-  void SetShaderParameters(CGLTexture& sourceTexture);
+  void SetShaderParameters();
 
 private:
   struct uniformInputs
@@ -105,6 +105,8 @@ private:
   GLint m_TextureSizeLoc = -1;
   GLint m_InputSizeLoc = -1;
   GLint m_MVPMatrixLoc = -1;
+
+  GLuint VAO, VBO[4];
 
 private:
   uniformInputs GetInputData(uint64_t frameCount = 0);

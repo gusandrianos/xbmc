@@ -69,14 +69,20 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
 
 void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
 {
-  auto* sourceGL = static_cast<CShaderTextureGL*> (source);
+  CShaderTextureGL* sourceGL = static_cast<CShaderTextureGL*> (source);
+  GLuint texture = sourceGL->GetPointer()->getMTexture();
+  glUseProgram(m_shaderProgram);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  SetShaderParameters();
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void CShaderGL::SetShaderParameters(CGLTexture& sourceTexture)
+void CShaderGL::SetShaderParameters()
 {
   glUniformMatrix4fv(m_MVPMatrixLoc, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(&m_MVP));
 
-  GLuint VAO, VBO[4];
+
   glGenVertexArrays(1, &VAO);
   glGenBuffers(4, VBO);
   glBindVertexArray(VAO);
