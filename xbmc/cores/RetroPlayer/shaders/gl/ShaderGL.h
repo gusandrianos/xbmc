@@ -90,9 +90,10 @@ private:
   // Projection matrix
   std::array<std::array<GLfloat, 4>, 4> m_MVP;
 
-  std::array<std::array<GLfloat, 4>, 3> m_VertexCoords;
-  std::array<std::array<GLfloat, 4>, 3> m_colors;
-  std::array<std::array<GLfloat, 4>, 2> m_TexCoords;
+  GLfloat m_VertexCoords[4][3];
+  GLfloat m_colors[4][3];
+  GLfloat m_TexCoords[4][2];
+  unsigned int m_indices[2][3];
 
   // Value to modulo (%) frame count with
   // Unused if 0

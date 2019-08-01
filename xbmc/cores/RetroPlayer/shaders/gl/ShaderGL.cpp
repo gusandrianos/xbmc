@@ -61,6 +61,8 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   glAttachShader(m_shaderProgram, vShader);
   glAttachShader(m_shaderProgram, fShader);
   glLinkProgram(m_shaderProgram);
+  glDeleteShader(vShader);
+  glDeleteShader(fShader);
 
   return true;
 }
@@ -74,6 +76,31 @@ void CShaderGL::SetShaderParameters(CGLTexture& sourceTexture)
 {
   glUniformMatrix4fv(m_MVPMatrixLoc, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(&m_MVP));
 
+  GLuint VAO, VBO[4];
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(4, VBO);
+  glBindVertexArray(VAO);
+
+  GLuint VertexCoordIndex = glGetAttribLocation(m_shaderProgram, "VertexCoord");
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexCoords), m_VertexCoords, GL_STATIC_DRAW);
+  glVertexAttribPointer(VertexCoordIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(VertexCoordIndex);
+
+  GLuint ColorIndex = glGetAttribLocation(m_shaderProgram, "COLOR");
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(m_colors), m_colors, GL_STATIC_DRAW);
+  glVertexAttribPointer(ColorIndex, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(ColorIndex);
+
+  GLuint TexCoordIndex = glGetAttribLocation(m_shaderProgram, "TexCoord");
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(m_TexCoords), m_TexCoords, GL_STATIC_DRAW);
+  glVertexAttribPointer(TexCoordIndex, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(TexCoordIndex);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
 }
 
 void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameCount)
@@ -113,35 +140,42 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
 
   // top left z, tu, tv, r, g, b
   m_VertexCoords[0][2] = 0;
+  m_TexCoords[0][0] = 0;
   m_TexCoords[0][1] = 0;
-  m_TexCoords[0][2] = 0;
+  m_colors[0][0] = 0;
   m_colors[0][1] = 0;
   m_colors[0][2] = 0;
-  m_colors[0][3] = 0;
 
   // top right z, tu, tv, r, g, b
   m_VertexCoords[1][2] = 0;
-  m_TexCoords[1][1] = 1;
-  m_TexCoords[1][2] = 0;
+  m_TexCoords[1][0] = 1;
+  m_TexCoords[1][1] = 0;
+  m_colors[1][0] = 0;
   m_colors[1][1] = 0;
   m_colors[1][2] = 0;
-  m_colors[1][3] = 0;
 
   // bottom right z, tu, tv, r, g, b
   m_VertexCoords[2][2] = 0;
+  m_TexCoords[2][0] = 1;
   m_TexCoords[2][1] = 1;
-  m_TexCoords[2][2] = 1;
+  m_colors[2][0] = 0;
   m_colors[2][1] = 0;
   m_colors[2][2] = 0;
-  m_colors[2][3] = 0;
 
   // bottom left z, tu, tv, r, g, b
   m_VertexCoords[3][2] = 0;
-  m_TexCoords[3][1] = 0;
-  m_TexCoords[3][2] = 1;
+  m_TexCoords[3][0] = 0;
+  m_TexCoords[3][1] = 1;
+  m_colors[3][0] = 0;
   m_colors[3][1] = 0;
   m_colors[3][2] = 0;
-  m_colors[3][3] = 0;
+
+  m_indices[0][0] = 0;
+  m_indices[0][1] = 1;
+  m_indices[0][2] = 3;
+  m_indices[1][0] = 1;
+  m_indices[1][1] = 2;
+  m_indices[1][2] = 3;
 }
 
 void CShaderGL::UpdateMVP()
