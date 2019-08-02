@@ -308,11 +308,23 @@ bool CShaderPresetGL::CreateShaders()
       if (passLut->Create(m_context, lutStruct))
         passLUTsGL.emplace_back(std::move(passLut));
     }
+
+    std::unique_ptr<CShaderGL> videoShader(new CShaderGL(m_context));
+
+    auto shaderSource = pass.vertexSource; //also contains fragment source
+    auto shaderPath = pass.sourcePath;
+
+    // Get only the parameters belonging to this specific shader
+    ShaderParameterMap passParameters = GetShaderParameters(pass.parameters, pass.vertexSource);
+
+    if (!videoShader->Create(shaderSource, shaderPath, passParameters, nullptr, passLUTsGL, m_outputSize, pass.frameCountMod))
+    {
+      CLog::Log(LOGERROR, "Couldn't create a video shader");
+      return false;
+    }
+    m_pShaders.push_back(std::move(videoShader));
   }
-
-//  std::unique_ptr<CShaderGL> videoShader(new CShaderGL(m_context));
-
-  return false;
+  return true;
 }
 
 bool CShaderPresetGL::CreateBuffers()
