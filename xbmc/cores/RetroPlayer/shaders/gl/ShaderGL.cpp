@@ -264,3 +264,7 @@ void CShaderGL::SetSizes(const float2 &prevSize, const float2 &nextSize)
   m_inputSize = prevSize;
   m_outputSize = nextSize;
 }
+
+bool CShaderGL::CreateVertexBuffer(unsigned vertCount, unsigned vertSize) {
+  return false;
+}

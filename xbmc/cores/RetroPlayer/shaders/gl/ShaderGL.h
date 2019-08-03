@@ -32,6 +32,7 @@ class CShaderGL : public IShader
 public:
   CShaderGL(RETRO::CRenderContext &context);
 //  ~CShaderGL() override;
+  bool CreateVertexBuffer(unsigned vertCount, unsigned vertSize) override;
 
   // implementation of IShader
   bool Create(const std::string& shaderSource, const std::string& shaderPath, ShaderParameterMap shaderParameters,
