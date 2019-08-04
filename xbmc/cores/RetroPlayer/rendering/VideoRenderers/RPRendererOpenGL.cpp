@@ -10,6 +10,7 @@
 #include "cores/RetroPlayer/buffers/RenderBufferOpenGL.h"
 #include "cores/RetroPlayer/buffers/RenderBufferPoolOpenGL.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
+#include "cores/RetroPlayer/shaders/gl/ShaderPresetGL.h"
 #include "utils/log.h"
 
 #define BUFFER_OFFSET(i) (static_cast<char *>(NULL) + (i))
@@ -41,6 +42,7 @@ CRPRendererOpenGL::CRPRendererOpenGL(const CRenderSettings &renderSettings, CRen
 {
   // Initialize CRPRendererOpenGL
   m_clearColour = m_context.UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+  m_shaderPreset.reset(new SHADER::CShaderPresetGL(m_context));
 }
 
 CRPRendererOpenGL::~CRPRendererOpenGL() = default;
@@ -275,6 +277,9 @@ void CRPRendererOpenGL::DrawBlackBars()
 
 void CRPRendererOpenGL::Render(uint8_t alpha)
 {
+
+//  m_bUseShaderPreset = m_shaderPreset->SetShaderPreset(m_renderSettings.VideoSettings().GetShaderPreset());
+
   CRenderBufferOpenGL *renderBuffer = static_cast<CRenderBufferOpenGL*>(m_renderBuffer);
 
   if (renderBuffer == nullptr)
@@ -299,49 +304,72 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
   glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  m_context.EnableGUIShader(GL_SHADER_METHOD::TEXTURE);
+  Updateshaders();
 
-  GLubyte colour[4];
-  GLubyte idx[4] = {0, 1, 3, 2}; // Determines order of triangle strip
-  PackedVertex vertex[4];
 
-  GLint uniColLoc = m_context.GUIShaderGetUniCol();
-
-  // Setup color values
-  colour[0] = static_cast<GLubyte>(GET_R(color));
-  colour[1] = static_cast<GLubyte>(GET_G(color));
-  colour[2] = static_cast<GLubyte>(GET_B(color));
-  colour[3] = static_cast<GLubyte>(GET_A(color));
-
-  for (unsigned int i = 0; i < 4; i++)
+  if (!m_bUseShaderPreset)
   {
-    // Setup vertex position values
-    vertex[i].x = m_rotatedDestCoords[i].x;
-    vertex[i].y = m_rotatedDestCoords[i].y;
-    vertex[i].z = 0.0f;
+    const CPoint destPoints[4] = {
+            m_rotatedDestCoords[0],
+            m_rotatedDestCoords[1],
+            m_rotatedDestCoords[2],
+            m_rotatedDestCoords[3]
+    };
+
+    if (!m_shaderPreset->RenderUpdate(destPoints, nullptr, nullptr))
+    {
+      m_shadersNeedUpdate = false;
+      m_bUseShaderPreset = false;
+    }
+
+  }
+  else
+  {
+    m_context.EnableGUIShader(GL_SHADER_METHOD::TEXTURE);
+
+    GLubyte colour[4];
+    GLubyte idx[4] = {0, 1, 3, 2}; // Determines order of triangle strip
+    PackedVertex vertex[4];
+
+    GLint uniColLoc = m_context.GUIShaderGetUniCol();
+
+    // Setup color values
+    colour[0] = static_cast<GLubyte>(GET_R(color));
+    colour[1] = static_cast<GLubyte>(GET_G(color));
+    colour[2] = static_cast<GLubyte>(GET_B(color));
+    colour[3] = static_cast<GLubyte>(GET_A(color));
+
+    for (unsigned int i = 0; i < 4; i++)
+    {
+      // Setup vertex position values
+      vertex[i].x = m_rotatedDestCoords[i].x;
+      vertex[i].y = m_rotatedDestCoords[i].y;
+      vertex[i].z = 0.0f;
+    }
+
+    // Setup texture coordinates
+    vertex[0].u1 = vertex[3].u1 = rect.x1;
+    vertex[0].v1 = vertex[1].v1 = rect.y1;
+    vertex[1].u1 = vertex[2].u1 = rect.x2;
+    vertex[2].v1 = vertex[3].v1 = rect.y2;
+
+    glBindVertexArray(m_mainVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_mainVertexVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(PackedVertex)*4, &vertex[0], GL_STATIC_DRAW);
+
+    // No need to bind the index VBO, it's part of VAO state
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*4, idx, GL_STATIC_DRAW);
+
+    glUniform4f(uniColLoc,(colour[0] / 255.0f), (colour[1] / 255.0f), (colour[2] / 255.0f), (colour[3] / 255.0f));
+
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
+
+    // Unbind VAO/VBO just to be safe
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_context.DisableGUIShader();
   }
 
-  // Setup texture coordinates
-  vertex[0].u1 = vertex[3].u1 = rect.x1;
-  vertex[0].v1 = vertex[1].v1 = rect.y1;
-  vertex[1].u1 = vertex[2].u1 = rect.x2;
-  vertex[2].v1 = vertex[3].v1 = rect.y2;
-
-  glBindVertexArray(m_mainVAO);
-  
-  glBindBuffer(GL_ARRAY_BUFFER, m_mainVertexVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(PackedVertex)*4, &vertex[0], GL_STATIC_DRAW);
-
-  // No need to bind the index VBO, it's part of VAO state
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*4, idx, GL_STATIC_DRAW);
-
-  glUniform4f(uniColLoc,(colour[0] / 255.0f), (colour[1] / 255.0f), (colour[2] / 255.0f), (colour[3] / 255.0f));
-
-  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
-
-  // Unbind VAO/VBO just to be safe
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  m_context.DisableGUIShader();
 }

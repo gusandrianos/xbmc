@@ -10,6 +10,7 @@
 
 #include "RPBaseRenderer.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
+#include "cores/RetroPlayer/shaders/gl/ShaderTextureGL.h"
 
 #include "system_gl.h"
 
