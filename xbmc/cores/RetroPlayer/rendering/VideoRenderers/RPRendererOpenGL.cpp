@@ -307,7 +307,7 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
   Updateshaders();
 
 
-  if (!m_bUseShaderPreset)
+  if (m_bUseShaderPreset)
   {
     const CPoint destPoints[4] = {
             m_rotatedDestCoords[0],
