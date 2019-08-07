@@ -21,7 +21,7 @@ class CShaderUtilsGL
 {
 public:
   static GLint TranslateWrapType(WRAP_TYPE wrap);
-  static std::string FileToString(std::string source);
+  static void MoveVersionToFirstLine(std::string& source, std::string& defineVertex, std::string& defineFragment);
 };
 }
 }

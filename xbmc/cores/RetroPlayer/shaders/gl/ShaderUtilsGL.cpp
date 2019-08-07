@@ -34,10 +34,23 @@ switch(wrap)
   return glWrap;
 }
 
-std::string CShaderUtilsGL::FileToString(std::string source)
+void CShaderUtilsGL::MoveVersionToFirstLine(std::string &source, std::string &defineVertex, std::string &defineFragment)
 {
-  std::ifstream t(source);
-  std::stringstream target;
-  target << t.rdbuf();
-  return target.str();
+  std::istringstream str_stream(source);
+  source.clear();
+  std::string line;
+  bool firstLine = true;
+  while (std::getline(str_stream, line))
+  {
+    if (!firstLine)
+    {
+      source += line;
+    }
+    else
+    {
+      defineVertex = line + "\n" + defineVertex;
+      defineFragment = line + "\n" + defineFragment;
+      firstLine = false;
+    }
+  }
 }
