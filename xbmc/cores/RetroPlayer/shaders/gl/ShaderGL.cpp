@@ -42,10 +42,16 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   m_viewportSize = viewPortSize;
   m_frameCountMod = frameCountMod;
 
-  std::string shaderFile = CShaderUtilsGL::FileToString(shaderSource);
+  std::string defineVertex = "#define VERTEX\n";
+  std::string defineFragment = "#define FRAGMENT\n";
 
-  std::string vertexShaderSourceStr = "#define VERTEX\n" + shaderFile;
-  std::string fragmentShaderSourceStr = "#define FRAGMENT\n" + shaderFile;
+  if (m_shaderSource.rfind("#version", 0) == 0)
+  {
+    CShaderUtilsGL::MoveVersionToFirstLine(m_shaderSource, defineVertex, defineFragment);
+  }
+
+  std::string vertexShaderSourceStr = defineVertex + m_shaderSource;
+  std::string fragmentShaderSourceStr = defineFragment + m_shaderSource;
   const char *vertexShaderSource = vertexShaderSourceStr.c_str();
   const char *fragmentShaderSource = fragmentShaderSourceStr.c_str();
 
