@@ -75,7 +75,7 @@ void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
   glBindTexture(GL_TEXTURE_2D, texture);
   SetShaderParameters();
   glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void CShaderGL::SetShaderParameters()
