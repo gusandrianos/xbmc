@@ -277,9 +277,6 @@ void CRPRendererOpenGL::DrawBlackBars()
 
 void CRPRendererOpenGL::Render(uint8_t alpha)
 {
-
-//  m_bUseShaderPreset = m_shaderPreset->SetShaderPreset(m_renderSettings.VideoSettings().GetShaderPreset());
-
   CRenderBufferOpenGL *renderBuffer = static_cast<CRenderBufferOpenGL*>(m_renderBuffer);
 
   if (renderBuffer == nullptr)
@@ -294,7 +291,15 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
-  glBindTexture(m_textureTarget, renderBuffer->TextureID());
+  const std::unique_ptr<CGLTexture> sourcetTexture(new CGLTexture(
+          static_cast<unsigned int>(renderBuffer->GetWidth()),
+          static_cast<unsigned int>(renderBuffer->GetHeight()),
+          XB_FMT_A8R8G8B8,
+          renderBuffer->TextureID()));
+          
+  sourcetTexture->CreateTextureObject();
+
+  glBindTexture(m_textureTarget, sourcetTexture->getMTexture());
 
   GLint filter = GL_NEAREST;
   if (GetRenderSettings().VideoSettings().GetScalingMethod() == SCALINGMETHOD::LINEAR)
@@ -306,7 +311,6 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
   Updateshaders();
 
-
   if (m_bUseShaderPreset)
   {
     const CPoint destPoints[4] = {
@@ -316,7 +320,21 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
             m_rotatedDestCoords[3]
     };
 
-    if (!m_shaderPreset->RenderUpdate(destPoints, nullptr, nullptr))
+    const std::unique_ptr<CGLTexture> renderTargetTexture(new CGLTexture(
+            static_cast<unsigned int>(renderBuffer->GetWidth()),
+            static_cast<unsigned int>(renderBuffer->GetHeight())));
+
+    renderTargetTexture->CreateTextureObject();
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, rect.x2 - rect.x1, rect.y2 - rect.y1, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+
+    auto source = new SHADER::CShaderTextureGL(*sourcetTexture);
+    auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
+    if (!m_shaderPreset->RenderUpdate(destPoints, source, target))
     {
       m_shadersNeedUpdate = false;
       m_bUseShaderPreset = false;
