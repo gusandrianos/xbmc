@@ -296,8 +296,6 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
           static_cast<unsigned int>(renderBuffer->GetHeight()),
           XB_FMT_A8R8G8B8,
           renderBuffer->TextureID()));
-          
-  sourcetTexture->CreateTextureObject();
 
   glBindTexture(m_textureTarget, sourcetTexture->getMTexture());
 
@@ -322,15 +320,15 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
     const std::unique_ptr<CGLTexture> renderTargetTexture(new CGLTexture(
             static_cast<unsigned int>(renderBuffer->GetWidth()),
-            static_cast<unsigned int>(renderBuffer->GetHeight())));
+            static_cast<unsigned int>(renderBuffer->GetWidth())));
 
     renderTargetTexture->CreateTextureObject();
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, rect.x2 - rect.x1, rect.y2 - rect.y1, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-
+    glBindTexture(m_textureTarget, renderTargetTexture->getMTexture());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     auto source = new SHADER::CShaderTextureGL(*sourcetTexture);
     auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
@@ -389,5 +387,4 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
     m_context.DisableGUIShader();
   }
-
 }
