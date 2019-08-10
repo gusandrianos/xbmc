@@ -291,9 +291,10 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
+  //TODO: Get the width and size dynamically.
   const std::unique_ptr<CGLTexture> sourcetTexture(new CGLTexture(
-          static_cast<unsigned int>(renderBuffer->GetWidth()),
-          static_cast<unsigned int>(renderBuffer->GetHeight()),
+          static_cast<unsigned int>(1920),
+          static_cast<unsigned int>(1080),
           XB_FMT_A8R8G8B8,
           renderBuffer->TextureID()));
 
@@ -318,17 +319,19 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
             m_rotatedDestCoords[3]
     };
 
+    //TODO: Get the width and size dynamically.
     const std::unique_ptr<CGLTexture> renderTargetTexture(new CGLTexture(
-            static_cast<unsigned int>(renderBuffer->GetWidth()),
-            static_cast<unsigned int>(renderBuffer->GetWidth())));
+            static_cast<unsigned int>(1920),
+            static_cast<unsigned int>(1080)));
 
     renderTargetTexture->CreateTextureObject();
 
     glBindTexture(m_textureTarget, renderTargetTexture->getMTexture());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //TODO: Get the width and size dynamically.
+    glTexImage2D(m_textureTarget, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(m_textureTarget, 0);
 
     auto source = new SHADER::CShaderTextureGL(*sourcetTexture);
     auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
