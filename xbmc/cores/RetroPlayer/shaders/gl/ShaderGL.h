@@ -43,7 +43,7 @@ public:
   void UpdateMVP() override;
   bool CreateInputBuffer() override;
   void UpdateInputBuffer(uint64_t frameCount);
-  bool GetUniformLocs();
+  void GetUniformLocs();
 
 protected:
   void SetShaderParameters();
@@ -83,17 +83,14 @@ private:
   // Resolution of the texture that holds the input
   //float2 m_textureSize;
 
-  // Holds the generated buffer id from glGenBuffers in CShaderGL::CreateInputBuffer
-//  GLuint m_inputBuffer = 0;
-
   GLuint m_shaderProgram;
 
   // Projection matrix
   std::array<std::array<GLfloat, 4>, 4> m_MVP;
 
-  GLfloat m_VertexCoords[4][3];
-  GLfloat m_colors[4][3];
-  GLfloat m_TexCoords[4][2];
+  float m_VertexCoords[4][3];
+  float m_colors[4][3];
+  float m_TexCoords[4][2];
   unsigned int m_indices[2][3];
 
   // Value to modulo (%) frame count with
@@ -107,7 +104,7 @@ private:
   GLint m_InputSizeLoc = -1;
   GLint m_MVPMatrixLoc = -1;
 
-  GLuint VAO, VBO[4];
+  GLuint VAO, EBO, VBO[2];
 
 private:
   uniformInputs GetInputData(uint64_t frameCount = 0);
