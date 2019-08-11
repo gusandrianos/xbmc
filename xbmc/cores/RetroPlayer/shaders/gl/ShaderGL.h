@@ -104,7 +104,7 @@ private:
   GLint m_InputSizeLoc = -1;
   GLint m_MVPMatrixLoc = -1;
 
-  GLuint VAO, EBO, VBO[2];
+  GLuint VAO, EBO, VBO[3];
 
 private:
   uniformInputs GetInputData(uint64_t frameCount = 0);
