@@ -74,6 +74,8 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   glDeleteShader(vShader);
   glDeleteShader(fShader);
 
+  glUseProgram(m_shaderProgram);
+
   glGenVertexArrays(1, &VAO);
   glGenBuffers(3, VBO);
   glGenBuffers(1, &EBO);
@@ -87,9 +89,9 @@ void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
   glUseProgram(m_shaderProgram);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
-  SetShaderParameters();
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CShaderGL::SetShaderParameters()
@@ -124,36 +126,36 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
 
   if (!isLastPass)
   {
-    // top left x,y
-    m_VertexCoords[0][0] = -m_outputSize.x / 2;
-    m_VertexCoords[0][1] = m_outputSize.y / 2;
-    // top right x,y
-    m_VertexCoords[1][0] = m_outputSize.x / 2;
-    m_VertexCoords[1][1] = m_outputSize.y / 2;
-    // bottom right x,y
-    m_VertexCoords[2][0] = m_outputSize.x / 2;
-    m_VertexCoords[2][1] = -m_outputSize.y / 2;
     // bottom left x,y
+    m_VertexCoords[0][0] = -m_outputSize.x / 2;
+    m_VertexCoords[0][1] = -m_outputSize.y / 2;
+    // bottom right x,y
+    m_VertexCoords[1][0] = m_outputSize.x / 2;
+    m_VertexCoords[1][1] = -m_outputSize.y / 2;
+    // top right x,y
+    m_VertexCoords[2][0] = m_outputSize.x / 2;
+    m_VertexCoords[2][1] = m_outputSize.y / 2;
+    // top left x,y
     m_VertexCoords[3][0] = -m_outputSize.x / 2;
-    m_VertexCoords[3][1] = -m_outputSize.y / 2;
+    m_VertexCoords[3][1] = m_outputSize.y / 2;
   }
   else  // last pass
   {
-    // top left x,y
+    // bottom left x,y
     m_VertexCoords[0][0] = dest[3].x - m_outputSize.x / 2;
     m_VertexCoords[0][1] = dest[3].y - m_outputSize.y / 2;
-    // top right x,y
+    // bottom right x,y
     m_VertexCoords[1][0] = dest[2].x - m_outputSize.x / 2;
     m_VertexCoords[1][1] = dest[2].y - m_outputSize.y / 2;
-    // bottom right x,y
+    // top right x,y
     m_VertexCoords[2][0] = dest[1].x - m_outputSize.x / 2;
     m_VertexCoords[2][1] = dest[1].y - m_outputSize.y / 2;
-    // bottom left x,y
+    // top left x,y
     m_VertexCoords[3][0] = dest[0].x - m_outputSize.x / 2;
     m_VertexCoords[3][1] = dest[0].y - m_outputSize.y / 2;
   }
 
-  // top left z, tu, tv, r, g, b
+  // bottom left z, tu, tv, r, g, b
   m_VertexCoords[0][2] = 0;
   m_TexCoords[0][0] = 0.0f;
   m_TexCoords[0][1] = 1.0f;
@@ -161,7 +163,7 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
   m_colors[0][1] = 0.5f;
   m_colors[0][2] = 0.5f;
 
-  // top right z, tu, tv, r, g, b
+  // bottom right z, tu, tv, r, g, b
   m_VertexCoords[1][2] = 0;
   m_TexCoords[1][0] = 1.0f;
   m_TexCoords[1][1] = 1.0f;
@@ -169,7 +171,7 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
   m_colors[1][1] = 0.5f;
   m_colors[1][2] = 0.5f;
 
-  // bottom right z, tu, tv, r, g, b
+  // top right z, tu, tv, r, g, b
   m_VertexCoords[2][2] = 0;
   m_TexCoords[2][0] = 1.0f;
   m_TexCoords[2][1] = 0.0f;
@@ -177,7 +179,7 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
   m_colors[2][1] = 0.5f;
   m_colors[2][2] = 0.5f;
 
-  // bottom left z, tu, tv, r, g, b
+  // top left z, tu, tv, r, g, b
   m_VertexCoords[3][2] = 0;
   m_TexCoords[3][0] = 0.0f;
   m_TexCoords[3][1] = 0.0f;
@@ -191,6 +193,8 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
   m_indices[1][0] = 1;
   m_indices[1][1] = 2;
   m_indices[1][2] = 3;
+
+  SetShaderParameters();
 }
 
 void CShaderGL::UpdateMVP()
@@ -209,7 +213,6 @@ void CShaderGL::UpdateMVP()
 
 void CShaderGL::GetUniformLocs()
 {
-  glUseProgram(m_shaderProgram);
   CShaderGL::m_FrameDirectionLoc = glGetUniformLocation(m_shaderProgram, "FrameDirection");
   CShaderGL::m_FrameCountLoc = glGetUniformLocation(m_shaderProgram, "FrameCount");
   CShaderGL::m_OutputSizeLoc = glGetUniformLocation(m_shaderProgram, "OutputSize");
