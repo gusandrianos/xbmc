@@ -29,7 +29,7 @@ switch(wrap)
     break;
   case WRAP_TYPE_BORDER:
   default:
-    glWrap = GL_CONSTANT_BORDER;
+    glWrap = GL_CLAMP_TO_BORDER;
   }
   return glWrap;
 }
