@@ -1,4 +1,5 @@
-set(SOURCES ShaderUtilsGL.cpp
+set(SOURCES ShaderTextureGL.cpp
+        ShaderUtilsGL.cpp
         ShaderPresetGL.cpp
         ShaderLutGL.cpp
         ShaderGL.cpp)

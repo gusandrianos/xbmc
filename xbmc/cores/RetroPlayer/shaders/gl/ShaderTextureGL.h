@@ -33,9 +33,13 @@ public:
 
   void SetTexture(CGLTexture *newTexture) { m_texture = newTexture; }
   CGLTexture *GetPointer() { return m_texture; }
+  bool UpdateFBO();
+  void BindFBO();
+  void UnbindFBO();
 
 private:
   CGLTexture *m_texture = nullptr;
+  GLuint FBO = 0;
 };
 }
 }
