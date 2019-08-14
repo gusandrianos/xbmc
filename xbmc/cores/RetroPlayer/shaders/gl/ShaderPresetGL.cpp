@@ -96,28 +96,27 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
 
   const unsigned passesNum = static_cast<unsigned int>(m_pShaderTextures.size());
 
-//  if(passesNum > 1)
-//  {
-//    // Create the FBO to draw in-between textures
-//    if (!UpdateFBO(firstShaderTexture))
-//      return false;
-//  }
-
   if (passesNum == 1)
     m_pShaders.front()->Render(source, target);
   else if (passesNum == 2)
   {
+    // Initialize FBO
+    firstShaderTexture->UpdateFBO();
     // Apply first pass
-    RenderShader(firstShader, source, firstShaderTexture);
-    // Back to default FrameBuffer
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    firstShaderTexture->BindFBO();
+    RenderShader(firstShader, source, target);
+    firstShaderTexture->UnbindFBO();
     // Apply last pass
     RenderShader(lastShader, firstShaderTexture, target);
   }
   else
   {
+    // Initialize FBO
+    firstShaderTexture->UpdateFBO();
     // Apply first pass
-    RenderShader(firstShader, source, firstShaderTexture);
+    firstShaderTexture->BindFBO();
+    RenderShader(firstShader, source, target);
+    firstShaderTexture->UnbindFBO();
 
     // Apply all passes except the first and last one (which needs to be applied to the backbuffer)
     for (unsigned int shaderIdx = 1;
@@ -127,13 +126,11 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
       IShader* shader = m_pShaders[shaderIdx].get();
       CShaderTextureGL* prevTexture = m_pShaderTextures[shaderIdx - 1].get();
       CShaderTextureGL* texture = m_pShaderTextures[shaderIdx].get();
-//      if (!UpdateFBO(firstShaderTexture))
-//        return false;
-      RenderShader(shader, prevTexture, texture);
+      texture->UpdateFBO();
+      texture->BindFBO();
+      RenderShader(shader, prevTexture, target); // The target on each call is only used for setting the viewport
+      texture->UnbindFBO();
     }
-
-    // Back to default FrameBuffer
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Apply last pass
     CShaderTextureGL* secToLastTexture = m_pShaderTextures[m_pShaderTextures.size() - 2].get();
@@ -142,23 +139,6 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
   return true;
 }
 
-//bool CShaderPresetGL::UpdateFBO(IShaderTexture* target)
-//{
-//  if (FBO == 0)
-//    glGenFramebuffers(1, &FBO);
-//
-//  glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-//  CShaderTextureGL* fboTexture = static_cast<CShaderTextureGL*> (target);
-//  glBindTexture(GL_TEXTURE_2D, fboTexture->GetPointer()->getMTexture());
-//  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO, 0);
-//
-//  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-//  {
-//    CLog::Log(LOGERROR, "%s: Framebuffer is not complete!", __func__);
-//    return false;
-//  }
-//  return true;
-//}
 
 bool CShaderPresetGL::Update()
 {
@@ -305,28 +285,14 @@ bool CShaderPresetGL::CreateShaderTextures()
     glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
     GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, blackBorder);
-
-
-//    texture->CreateTextureObject();
-//
-//    glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scaledSize.x, scaledSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-//    GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-//    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, blackBorder);
-//    glBindTexture(GL_TEXTURE_2D, 0);
 
     m_pShaderTextures.emplace_back(new CShaderTextureGL(*texture));
     m_pShaders[shaderIdx]->SetSizes(prevSize, scaledSize);

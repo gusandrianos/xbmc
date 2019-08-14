@@ -69,7 +69,6 @@ private:
   void PrepareParameters(const IShaderTexture *texture, const CPoint dest[]);
   void RenderShader(IShader *shader, IShaderTexture *source, IShaderTexture *target) const;
   bool HasPathFailed(const std::string &path) const;
-//  bool UpdateFBO(IShaderTexture* target);
 
   // Construction parameters
   RETRO::CRenderContext &m_context;
@@ -118,8 +117,6 @@ private:
 
   // Playback speed
   double m_speed = 0.0;
-
-//  GLuint FBO = 0;
 
   ShaderParameterMap GetShaderParameters(const std::vector<ShaderParameter> &parameters, const std::string &sourceStr) const;
 
