@@ -55,7 +55,7 @@ private:
     float2 texture_size;
     float2 output_size;
     GLint frame_count;
-    GLint frame_direction;
+    GLfloat frame_direction;
   };
 
   // Currently loaded shader's source code

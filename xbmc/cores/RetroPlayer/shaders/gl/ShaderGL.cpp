@@ -31,7 +31,7 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   //TODO:Remove sampler input from IShader.h
   if(shaderPath.empty())
   {
-    CLog::Log(LOGERROR, "ShaderDX: Can't load empty shader path");
+    CLog::Log(LOGERROR, "ShaderGL: Can't load empty shader path");
     return false;
   }
 
@@ -91,7 +91,6 @@ void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
   glBindTexture(GL_TEXTURE_2D, texture);
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CShaderGL::SetShaderParameters()
@@ -159,33 +158,33 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
   m_VertexCoords[0][2] = 0;
   m_TexCoords[0][0] = 0.0f;
   m_TexCoords[0][1] = 1.0f;
-  m_colors[0][0] = 0.5f;
-  m_colors[0][1] = 0.5f;
-  m_colors[0][2] = 0.5f;
+  m_colors[0][0] = 0.0f;
+  m_colors[0][1] = 0.0f;
+  m_colors[0][2] = 0.0f;
 
   // bottom right z, tu, tv, r, g, b
   m_VertexCoords[1][2] = 0;
   m_TexCoords[1][0] = 1.0f;
   m_TexCoords[1][1] = 1.0f;
-  m_colors[1][0] = 0.5f;
-  m_colors[1][1] = 0.5f;
-  m_colors[1][2] = 0.5f;
+  m_colors[1][0] = 0.0f;
+  m_colors[1][1] = 0.0f;
+  m_colors[1][2] = 0.0f;
 
   // top right z, tu, tv, r, g, b
   m_VertexCoords[2][2] = 0;
   m_TexCoords[2][0] = 1.0f;
   m_TexCoords[2][1] = 0.0f;
-  m_colors[2][0] = 0.5f;
-  m_colors[2][1] = 0.5f;
-  m_colors[2][2] = 0.5f;
+  m_colors[2][0] = 0.0f;
+  m_colors[2][1] = 0.0f;
+  m_colors[2][2] = 0.0f;
 
   // top left z, tu, tv, r, g, b
   m_VertexCoords[3][2] = 0;
   m_TexCoords[3][0] = 0.0f;
   m_TexCoords[3][1] = 0.0f;
-  m_colors[3][0] = 0.5f;
-  m_colors[3][1] = 0.5f;
-  m_colors[3][2] = 0.5f;
+  m_colors[3][0] = 0.0f;
+  m_colors[3][1] = 0.0f;
+  m_colors[3][2] = 0.0f;
 
   m_indices[0][0] = 0;
   m_indices[0][1] = 1;
@@ -256,7 +255,7 @@ CShaderGL::uniformInputs CShaderGL::GetInputData(uint64_t frameCount)
     // Current frame count that can be modulo'ed
     static_cast<GLint>(frameCount),  // frame_count
     // Time always flows forward
-    1                 // frame_direction
+    1.0f                 // frame_direction
   };
 
   return input;
