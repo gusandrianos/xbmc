@@ -26,12 +26,11 @@ public:
 
   // Destructor
   // Don't delete texture since it wasn't created here
-  ~CShaderTextureGL() override = default;
+  ~CShaderTextureGL() override;
 
   float GetWidth() const override { return static_cast<float>(m_texture->GetWidth()); }
   float GetHeight() const override { return static_cast<float>(m_texture->GetHeight()); }
 
-  void SetTexture(CGLTexture *newTexture) { m_texture = newTexture; }
   CGLTexture *GetPointer() { return m_texture; }
   bool UpdateFBO();
   void BindFBO();

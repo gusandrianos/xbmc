@@ -44,3 +44,9 @@ void CShaderTextureGL::UnbindFBO()
 {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+CShaderTextureGL::~CShaderTextureGL()
+{
+  if (FBO != 0)
+    glDeleteFramebuffers(1, &FBO);
+}
