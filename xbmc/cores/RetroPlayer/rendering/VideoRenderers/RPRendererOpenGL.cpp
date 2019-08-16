@@ -325,12 +325,6 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
     renderTargetTexture->CreateTextureObject();
 
-    glBindTexture(m_textureTarget, renderTargetTexture->getMTexture());
-    //TODO: Get the width and size dynamically.
-    glTexImage2D(m_textureTarget, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
     auto source = new SHADER::CShaderTextureGL(*sourcetTexture);
     auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
     if (!m_shaderPreset->RenderUpdate(destPoints, source, target))
