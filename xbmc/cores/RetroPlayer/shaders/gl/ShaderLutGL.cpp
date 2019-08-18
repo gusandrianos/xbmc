@@ -43,8 +43,6 @@ bool CShaderLutGL::Create(RETRO::CRenderContext &context, const ShaderLut &lut)
 
 std::unique_ptr<IShaderTexture> CShaderLutGL::CreateLUTTexture(RETRO::CRenderContext &context, const KODI::SHADER::ShaderLut &lut)
 {
-  CRenderSystemGL *renderingGL = static_cast<CRenderSystemGL*>(context.Rendering());
-
   auto wrapType = CShaderUtilsGL::TranslateWrapType(lut.wrap);
   auto filterType = lut.filter ? GL_LINEAR : GL_NEAREST;
 
@@ -72,9 +70,6 @@ std::unique_ptr<IShaderTexture> CShaderLutGL::CreateLUTTexture(RETRO::CRenderCon
 
   if(lut.mipmap)
     texture->SetMipmapping();
-
-  if(texture)
-    texture->LoadToGPU();
 
   return std::unique_ptr<IShaderTexture>(new CShaderTextureGL(texture));
 }
