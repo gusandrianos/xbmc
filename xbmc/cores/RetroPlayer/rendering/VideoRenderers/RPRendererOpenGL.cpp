@@ -292,8 +292,8 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
   const std::unique_ptr<CGLTexture> sourcetTexture(new CGLTexture(
-          static_cast<unsigned int>(rect.x2),
-          static_cast<unsigned int>(rect.y2),
+          static_cast<unsigned int>(renderBuffer->GetWidth()),
+          static_cast<unsigned int>(renderBuffer->GetHeight()),
           GL_RGB,
           renderBuffer->TextureID()));
 
@@ -332,7 +332,11 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
       m_shadersNeedUpdate = false;
       m_bUseShaderPreset = false;
     }
-
+//    delete source;
+//    delete target;
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//    glBindVertexArray(0);
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
   else
   {

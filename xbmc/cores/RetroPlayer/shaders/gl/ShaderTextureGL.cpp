@@ -17,10 +17,15 @@ bool CShaderTextureGL::UpdateFBO()
   if (FBO == 0)
     glGenFramebuffers(1, &FBO);
 
-  BindFBO();
   GLuint renderTargetID = GetPointer()->getMTexture();
+  if (renderTargetID == 0)
+    return false;
+
+  BindFBO();
   glBindTexture(GL_TEXTURE_2D, renderTargetID);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
+  GLuint w = GetWidth();
+  GLuint h = GetHeight();
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,  GetWidth(),  GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTargetID, 0);

@@ -92,22 +92,23 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
 
   IShader* firstShader = m_pShaders.front().get();
   CShaderTextureGL* firstShaderTexture = m_pShaderTextures.front().get();
+  CShaderTextureGL* lastShaderTexture = m_pShaderTextures.back().get();
   IShader* lastShader = m_pShaders.back().get();
 
   const unsigned passesNum = static_cast<unsigned int>(m_pShaderTextures.size());
 
   if (passesNum == 1)
-    m_pShaders.front()->Render(source, target);
+    firstShader->Render(source, target);
   else if (passesNum == 2)
   {
     // Initialize FBO
-    firstShaderTexture->UpdateFBO();
+    lastShaderTexture->UpdateFBO();
     // Apply first pass
-    firstShaderTexture->BindFBO();
+    lastShaderTexture->BindFBO();
     RenderShader(firstShader, source, target);
-    firstShaderTexture->UnbindFBO();
+    lastShaderTexture->UnbindFBO();
     // Apply last pass
-    RenderShader(lastShader, firstShaderTexture, target);
+    RenderShader(lastShader, lastShaderTexture, target);
   }
   else
   {
@@ -131,11 +132,17 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
       RenderShader(shader, prevTexture, target); // The target on each call is only used for setting the viewport
       texture->UnbindFBO();
     }
-
+    // TODO: Remove last texture, useless
     // Apply last pass
     CShaderTextureGL* secToLastTexture = m_pShaderTextures[m_pShaderTextures.size() - 2].get();
     RenderShader(lastShader, secToLastTexture, target);
   }
+
+  m_frameCount += static_cast<float>(m_speed);
+
+  // Restore our view port.
+  m_context.SetViewPort(viewPort);
+
   return true;
 }
 
@@ -171,6 +178,13 @@ bool CShaderPresetGL::Update()
     if (!CreateShaderTextures())
       return updateFailed("A shader texture failed to init");
   }
+
+  if (m_pShaders.empty())
+    return false;
+
+  // Each pass must have its own texture and the opposite is also true
+  if (m_pShaders.size() != m_pShaderTextures.size())
+    return updateFailed("A shader or texture failed to init");
 
   m_bPresetNeedsUpdate = false;
   return true;
@@ -265,30 +279,29 @@ bool CShaderPresetGL::CreateShaderTextures()
       if (pass.fbo.sRgbFramebuffer)
         textureFormat = GL_SRGB8;
       else
-        textureFormat = GL_BGRA;
+        textureFormat = GL_RGBA;
     }
 
-    // For reach pass, create the texture
-    const std::unique_ptr<CGLTexture> texture(new CGLTexture(
+    auto texture = new CGLTexture(
             static_cast<unsigned int>(scaledSize.x),
             static_cast<unsigned int>(scaledSize.y),
-            GL_RGB));
+            textureFormat);
 
-    if (!texture)
+    texture->CreateTextureObject();
+
+    if (texture->getMTexture() <= 0)
     {
       CLog::Log(LOGERROR, "Couldn't create a texture for video shader %s.", pass.sourcePath.c_str());
       return false;
     }
 
-    texture->CreateTextureObject();
-
     glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NEVER);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
     GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -409,7 +422,7 @@ void CShaderPresetGL::RenderShader(IShader *shader, IShaderTexture *source, ISha
 {
   CRect newViewPort(0.f, 0.f, target->GetWidth(), target->GetHeight());
   m_context.SetViewPort(newViewPort);
-//  m_context.SetScissors(newViewPort);
+  m_context.SetScissors(newViewPort);
 
   shader->Render(source, target);
 }
