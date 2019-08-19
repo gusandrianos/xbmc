@@ -67,7 +67,6 @@ private:
   // Array of shader parameters
   ShaderParameterMap m_shaderParameters;
 
-
   // Look-up textures that the shader uses
   ShaderLutVec m_luts; // todo: back to DX maybe
 

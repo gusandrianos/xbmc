@@ -42,8 +42,19 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   m_viewportSize = viewPortSize;
   m_frameCountMod = frameCountMod;
 
-  std::string defineVertex = "#define VERTEX\n";
-  std::string defineFragment = "#define FRAGMENT\n";
+  std::string defineVertex;
+  std::string defineFragment;
+
+  if (m_shaderParameters.size() == 0)
+  {
+    defineVertex = "#define VERTEX\n";
+    defineFragment = "#define FRAGMENT\n";
+  }
+  else
+  {
+    defineVertex = "#define VERTEX\n#define PARAMETER_UNIFORM\n";
+    defineFragment = "#define FRAGMENT\n#define PARAMETER_UNIFORM\n";
+  }
 
   if (m_shaderSource.rfind("#version", 0) == 0)
   {
@@ -89,6 +100,19 @@ void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
   glUseProgram(m_shaderProgram);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
+//
+//  for (int lutID = 0; lutID < m_luts.size(); ++lutID)
+//  {
+//    auto* lutTexture = dynamic_cast<CShaderTextureGL*>(m_luts[lutID].get()->GetTexture());
+//    if (lutTexture)
+//    {
+//      glEnable(GL_BLEND);
+//      glActiveTexture(GL_TEXTURE0 + lutID + 1);
+//      GLuint lutTextureID = lutTexture->GetPointer()->getMTexture();
+//      glBindTexture(GL_TEXTURE_2D, lutTextureID);
+//    }
+//  }
+
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -117,6 +141,13 @@ void CShaderGL::SetShaderParameters()
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
+
+  for (const auto &parameter : m_shaderParameters)
+  {
+    GLint paramLoc = glGetUniformLocation(m_shaderProgram, parameter.first.c_str());
+    if (paramLoc > 0)
+      glUniform1f(paramLoc, parameter.second);
+  }
 }
 
 void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameCount)
@@ -212,12 +243,12 @@ void CShaderGL::UpdateMVP()
 
 void CShaderGL::GetUniformLocs()
 {
-  CShaderGL::m_FrameDirectionLoc = glGetUniformLocation(m_shaderProgram, "FrameDirection");
-  CShaderGL::m_FrameCountLoc = glGetUniformLocation(m_shaderProgram, "FrameCount");
-  CShaderGL::m_OutputSizeLoc = glGetUniformLocation(m_shaderProgram, "OutputSize");
-  CShaderGL::m_TextureSizeLoc = glGetUniformLocation(m_shaderProgram, "TextureSize");
-  CShaderGL::m_InputSizeLoc = glGetUniformLocation(m_shaderProgram, "InputSize");
-  CShaderGL::m_MVPMatrixLoc = glGetUniformLocation(m_shaderProgram, "MVPMatrix");
+  m_FrameDirectionLoc = glGetUniformLocation(m_shaderProgram, "FrameDirection");
+  m_FrameCountLoc = glGetUniformLocation(m_shaderProgram, "FrameCount");
+  m_OutputSizeLoc = glGetUniformLocation(m_shaderProgram, "OutputSize");
+  m_TextureSizeLoc = glGetUniformLocation(m_shaderProgram, "TextureSize");
+  m_InputSizeLoc = glGetUniformLocation(m_shaderProgram, "InputSize");
+  m_MVPMatrixLoc = glGetUniformLocation(m_shaderProgram, "MVPMatrix");
 }
 
 //TODO:Change name of this method in IShader.h to CreateInputs
@@ -233,7 +264,7 @@ void CShaderGL::UpdateInputBuffer(uint64_t frameCount)
 {
   glUseProgram(m_shaderProgram);
   uniformInputs inputInitData = GetInputData(frameCount);
-  glUniform1i(m_FrameDirectionLoc, inputInitData.frame_direction);
+  glUniform1f(m_FrameDirectionLoc, inputInitData.frame_direction);
   glUniform1i(m_FrameCountLoc, inputInitData.frame_count);
   glUniform2f(m_OutputSizeLoc, inputInitData.output_size.x, inputInitData.output_size.y);
   glUniform2f(m_TextureSizeLoc, inputInitData.texture_size.x, inputInitData.texture_size.y);
