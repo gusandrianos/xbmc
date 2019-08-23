@@ -92,8 +92,9 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
 
   IShader* firstShader = m_pShaders.front().get();
   CShaderTextureGL* firstShaderTexture = m_pShaderTextures.front().get();
-  CShaderTextureGL* lastShaderTexture = m_pShaderTextures.back().get();
   IShader* lastShader = m_pShaders.back().get();
+  int screenWidth = m_context.GetScreenWidth();
+  int screenHeight = m_context.GetScreenHeight();
 
   const unsigned passesNum = static_cast<unsigned int>(m_pShaderTextures.size());
 
@@ -102,18 +103,18 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
   else if (passesNum == 2)
   {
     // Initialize FBO
-    lastShaderTexture->UpdateFBO();
+    firstShaderTexture->CreateFBO(screenWidth, screenHeight);
     // Apply first pass
-    lastShaderTexture->BindFBO();
+    firstShaderTexture->BindFBO();
     RenderShader(firstShader, source, target);
-    lastShaderTexture->UnbindFBO();
+    firstShaderTexture->UnbindFBO();
     // Apply last pass
-    RenderShader(lastShader, lastShaderTexture, target);
+    RenderShader(lastShader, firstShaderTexture, target);
   }
   else
   {
     // Initialize FBO
-    firstShaderTexture->UpdateFBO();
+    firstShaderTexture->CreateFBO(screenWidth, screenHeight);
     // Apply first pass
     firstShaderTexture->BindFBO();
     RenderShader(firstShader, source, target);
@@ -127,7 +128,7 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
       IShader* shader = m_pShaders[shaderIdx].get();
       CShaderTextureGL* prevTexture = m_pShaderTextures[shaderIdx - 1].get();
       CShaderTextureGL* texture = m_pShaderTextures[shaderIdx].get();
-      texture->UpdateFBO();
+      texture->CreateFBO(screenWidth, screenHeight);
       texture->BindFBO();
       RenderShader(shader, prevTexture, target); // The target on each call is only used for setting the viewport
       texture->UnbindFBO();
@@ -301,7 +302,7 @@ bool CShaderPresetGL::CreateShaderTextures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NEVER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
     GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
