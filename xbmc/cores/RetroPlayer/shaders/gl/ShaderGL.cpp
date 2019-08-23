@@ -95,16 +95,16 @@ void CShaderGL::Render(IShaderTexture *source, IShaderTexture *target)
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  for (int i = 0; i < m_luts.size(); ++i)
-  {
-    auto* lutTexture = dynamic_cast<CShaderTextureGL*>(m_luts[i].get()->GetTexture());
-    if (lutTexture)
-    {
-      glActiveTexture(GL_TEXTURE1 + i);
-      GLuint lutTextureID = lutTexture->GetPointer()->getMTexture();
-      glBindTexture(GL_TEXTURE_2D, lutTextureID);
-    }
-  }
+//  for (int i = 0; i < m_luts.size(); ++i)
+//  {
+//    auto* lutTexture = dynamic_cast<CShaderTextureGL*>(m_luts[i].get()->GetTexture());
+//    if (lutTexture)
+//    {
+//      glActiveTexture(GL_TEXTURE1 + i);
+//      GLuint lutTextureID = lutTexture->GetPointer()->getMTexture();
+//      glBindTexture(GL_TEXTURE_2D, lutTextureID);
+//    }
+//  }
 
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
