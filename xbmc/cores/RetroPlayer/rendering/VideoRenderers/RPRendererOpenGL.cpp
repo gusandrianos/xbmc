@@ -291,13 +291,13 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
-  const std::unique_ptr<CGLTexture> sourcetTexture(new CGLTexture(
+  const std::unique_ptr<CGLTexture> sourceTexture(new CGLTexture(
           static_cast<unsigned int>(renderBuffer->GetWidth()),
           static_cast<unsigned int>(renderBuffer->GetHeight()),
           GL_RGB,
           renderBuffer->TextureID()));
 
-  glBindTexture(m_textureTarget, sourcetTexture->getMTexture());
+  glBindTexture(m_textureTarget, sourceTexture->getMTexture());
 
   GLint filter = GL_NEAREST;
   if (GetRenderSettings().VideoSettings().GetScalingMethod() == SCALINGMETHOD::LINEAR)
@@ -318,25 +318,19 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
             m_rotatedDestCoords[3]
     };
 
-    //TODO: Get the width and size dynamically.
     const std::unique_ptr<CGLTexture> renderTargetTexture(new CGLTexture(
-            static_cast<unsigned int>(1920),
-            static_cast<unsigned int>(1080)));
+            static_cast<unsigned int>(m_context.GetScreenWidth()),
+            static_cast<unsigned int>(m_context.GetScreenHeight())));
 
     renderTargetTexture->CreateTextureObject();
 
-    auto source = new SHADER::CShaderTextureGL(*sourcetTexture);
+    auto source = new SHADER::CShaderTextureGL(*sourceTexture);
     auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
     if (!m_shaderPreset->RenderUpdate(destPoints, source, target))
     {
       m_shadersNeedUpdate = false;
       m_bUseShaderPreset = false;
     }
-//    delete source;
-//    delete target;
-//    glBindTexture(GL_TEXTURE_2D, 0);
-//    glBindVertexArray(0);
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
   else
   {
