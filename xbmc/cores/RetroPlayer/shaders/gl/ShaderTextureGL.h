@@ -32,7 +32,7 @@ public:
   float GetHeight() const override { return static_cast<float>(m_texture->GetHeight()); }
 
   CGLTexture *GetPointer() { return m_texture; }
-  bool UpdateFBO();
+  bool CreateFBO(int width, int height);
   void BindFBO();
   void UnbindFBO();
 

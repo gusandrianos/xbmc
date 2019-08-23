@@ -12,7 +12,7 @@
 using namespace KODI;
 using namespace SHADER;
 
-bool CShaderTextureGL::UpdateFBO()
+bool CShaderTextureGL::CreateFBO(int width, int height)
 {
   if (FBO == 0)
     glGenFramebuffers(1, &FBO);
@@ -23,14 +23,12 @@ bool CShaderTextureGL::UpdateFBO()
 
   BindFBO();
   glBindTexture(GL_TEXTURE_2D, renderTargetID);
-//  GLuint w = GetWidth();
-//  GLuint h = GetHeight();
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,  GetWidth(),  GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,  width,  height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTargetID, 0);
 
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
   {
     CLog::Log(LOGERROR, "%s: Framebuffer is not complete!", __func__);
     UnbindFBO();
