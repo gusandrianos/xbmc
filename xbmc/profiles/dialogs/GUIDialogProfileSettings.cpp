@@ -31,7 +31,10 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
-#include "ServiceBroker.h"
+#include "utils/log.h"
+
+#include <cassert>
+#include <utility>
 
 #include <cassert>
 
